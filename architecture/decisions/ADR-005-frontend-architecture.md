@@ -2,6 +2,8 @@
 
 - **Status:** Proposed
 - **Date:** 2026-11-23
+- **Decision owner:** CompileCare Product & Engineering (proposed)
+- **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
 
 ## Context
 CompileCare needs a responsive web experience for different hospital roles and workflows, with maintainable module boundaries and API contracts.
