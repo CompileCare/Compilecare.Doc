@@ -2,6 +2,8 @@
 
 - **Status:** Proposed
 - **Date:** 2026-11-23
+- **Decision owner:** CompileCare Product & Engineering (proposed)
+- **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
 
 ## Context
 CompileCare is a client-based healthcare platform expected to support multiple hospitals, branches, modules, integrations, and deployment models. Distributed deployment and independent scaling may be needed, but early fragmentation increases operational cost, latency, failure modes, and development complexity.
