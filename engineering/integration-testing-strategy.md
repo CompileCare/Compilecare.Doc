@@ -15,7 +15,7 @@ Test deterministic application/domain logic without infrastructure:
 Use WebApplicationFactory<Program> and a dedicated PostgreSQL test database:
 - Exercise routing, model binding, middleware, exception handling and response contracts.
 - Verify database constraints, migrations, tenant filters and concurrency behaviour.
-- Test positive and negative authorization cases once Phase 3 identity is integrated.
+- Test positive and negative OIDC/JWT authentication, tenant membership and role-based authorization cases.
 - Assert content type and schema of Problem Details, not only status codes.
 - Use synthetic tenant/resource data; no real patient data.
 
@@ -45,6 +45,21 @@ Use a controlled in-memory HttpMessageHandler/test server:
 - Tests must be deterministic and independently repeatable. Integration tests sharing the same PostgreSQL test database are serialized through an xUnit collection fixture; do not parallelize destructive database resets.
 - External dependencies should be replaced with controlled test doubles or disposable containers.
 - Assert tenant isolation explicitly; do not rely only on EF query filters.
+
+### 5. Authentication and authorization integration tests
+
+The facility API integration suite uses the real ASP.NET Core JWT Bearer handler and the production issuer-stamping callback. It issues short-lived synthetic HS256 JWTs with a test-only key; only OIDC discovery metadata and the signing key are replaced for deterministic tests. The production validation pipeline is not replaced with a fake authentication handler.
+
+Coverage includes:
+- Valid token without membership is authenticated but denied tenant access.
+- Wrong issuer, wrong audience, expired token, missing subject and invalid subject shape are rejected.
+- Missing or malformed tenant selection is rejected.
+- A tenant ID without a matching active membership and an inactive membership are denied.
+- `HospitalAdmin`, `FacilityManager`, and `FacilityViewer` permissions are checked through real API requests.
+- Forged token role/permission claims cannot grant access beyond the stored membership role.
+- Current API CI evidence after PR #10: 3 unit tests and 29 PostgreSQL-backed integration tests passed.
+
+The test signing key and issuer are synthetic and must never be configured in deployed environments.
 
 ## CI gates
 A PR must restore, build, run unit tests, run API/client integration tests, validate OpenAPI/contracts, and complete applicable code/security scans. Report the exact tests executed and the database/provider used.

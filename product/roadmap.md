@@ -55,27 +55,28 @@ Follow-up release hardening: publish the 0.2.0 package after package inspection 
 
 ## Phase 3 — Database and security
 
-**Status: Active — initial versioned migration slice merged in [CompileCare.Api PR #9](https://github.com/CompileCare/CompileCare.Api/pull/9)**
+**Status: Active — persistence foundation and first OIDC/tenant-RBAC slice are merged**
 
 ### Implemented foundation
-1. PostgreSQL is the active database provider in CompileCare.Api.
-2. EF Core persistence and tenant-aware facility entities/query filters are present.
-3. Tenant-aware indexes, composite tenant foreign keys, audit timestamps and optimistic concurrency foundations exist.
-4. An EF Core 10-generated `InitialFacilityHierarchy` migration, designer metadata, and model snapshot have been added for the current Hospital → Department → Ward → Room → Bed model (merged in PR #9).
-5. The PostgreSQL integration fixture now applies migrations to a clean `_test` database; migration tests verify clean installation, applied/pending state, repeat application, and queryability (merged in PR #9).
-6. CI checks for unscaffolded EF model changes. CI on the current PR head passed: 3 unit tests and 17 PostgreSQL integration tests.
-7. Tenant query filters compare nullable tenant IDs directly; a missing tenant context now yields no tenant-owned rows without throwing (covered by the migration integration test).
+1. PostgreSQL is the active database provider in `CompileCare.Api`; EF Core 10 is the persistence and migration mechanism.
+2. Tenant-aware facility persistence, query filters, scoped uniqueness, composite tenant foreign keys, restrictive deletes, audit timestamps and optimistic concurrency foundations are implemented.
+3. The EF Core 10-generated `InitialFacilityHierarchy` migration and model snapshot cover Hospital → Department → Ward → Room → Bed (merged in [API PR #9](https://github.com/CompileCare/CompileCare.Api/pull/9)).
+4. Integration fixtures apply versioned migrations to an isolated `_test` database. CI checks for unscaffolded EF model changes; clean-install and repeat-application tests pass.
+5. OIDC/JWT Bearer authentication validates signature, issuer, audience, lifetime, expiry and subject. The API uses the issuer from the validated security token and the OIDC `sub` as the external identity key.
+6. Tenant-scoped facility routes require exactly one `X-Tenant-ID` selector and resolve an active database membership matching the exact `(issuer, subject, tenantId)` tuple. The header alone never grants access.
+7. Facility permissions are derived from the stored membership role. Authorization policies accept only claims on a server-created CompileCare membership identity; token-supplied role/permission claims cannot elevate privileges.
+8. Current roles: `HospitalAdmin` (facility read/write/delete), `FacilityManager` (read/write), and `FacilityViewer` (read only).
+9. [API PR #10](https://github.com/CompileCare/CompileCare.Api/pull/10) delivered the first authenticated tenant boundary and facility RBAC. Its CI passed with 3/3 unit tests and 29/29 PostgreSQL integration tests, including real signed test JWTs, invalid issuer/audience/expiry/subject checks, membership denials, and forged-claim rejection.
 
 ### Remaining work — recommended execution order
-1. Validate the migration-script deployment procedure and perform a rehearsal against the supported previous schema before production rollout.
-2. Define identity-provider integration using a standards-based OIDC/OAuth 2.0 approach; provider choice remains an explicit decision.
-3. Implement trusted tenant membership resolution, authentication, and role/permission authorization at API and use-case boundaries. A client-supplied `X-Tenant-ID` is a selector, never proof of membership.
-4. Implement append-only audit events for authentication, authorization, sensitive record access, administrative actions, and material business changes.
-5. Expand tenant isolation/security tests for reads, writes, updates, deletes, relationship traversal, cache keys, background work, and privileged access.
-6. Define backup/restore, retention, encryption, secret-management, and operational recovery controls before production.
-7. Obtain qualified privacy, legal, and security reviews for applicable Indian healthcare/data-protection obligations; do not claim compliance from documentation alone.
+1. Build a trusted tenant registry and secure tenant/membership provisioning workflow; no self-service tenant or membership administration API is included yet.
+2. Add append-only audit events for authentication, authorization, membership/role changes, sensitive record access, administrative actions, and material business changes. Capture actor, tenant, action, resource, outcome, timestamp and correlation/trace reference without logging patient payloads.
+3. Extend isolation and authorization tests to background jobs, message consumers, caches, file/object storage, exports, search indexes, support tooling and privileged operations.
+4. Complete migration-script deployment rehearsal and upgrade tests against the supported previous schema; validate backup/restore before production changes.
+5. Define operational controls for signing-key rotation, secret management, encryption at rest, data retention/deletion, backup/restore, disaster recovery, incident response and access reviews.
+6. Complete threat modelling, suitable penetration testing, and qualified privacy/legal review for applicable Indian healthcare and data-protection obligations. Do not claim regulatory compliance from implementation or documentation alone.
 
-**Phase 3 exit criteria:** versioned migrations support clean install and reviewed upgrades; authenticated users can access only tenants, facilities, roles and resources permitted by trusted server-side identity/membership; audit and security tests pass.
+**Phase 3 exit criteria:** reviewed migration install/upgrade paths; authenticated identity bound to trusted tenant membership; role/permission enforcement at all tenant-scoped entry points; append-only audit coverage for sensitive and privileged actions; tested tenant isolation across API and asynchronous processing; and reviewed production operational controls.
 
 ## Phase 4 — Core healthcare domain
 
