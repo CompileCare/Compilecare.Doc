@@ -2,6 +2,8 @@
 
 - **Status:** Proposed
 - **Date:** 2026-11-23
+- **Decision owner:** CompileCare Product & Engineering (proposed)
+- **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
 
 ## Context
 CompileCare serves multiple client organizations. Tenant isolation is a security boundary across APIs, data, caches, files, jobs, messages, logs, and analytics.
