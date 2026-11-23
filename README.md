@@ -6,6 +6,8 @@ CompileCare is an India-focused hospital technology platform intended to support
 
 ## Start here
 - [Product vision and scope](product/vision-and-scope.md)
+- [MVP scope and non-goals](product/mvp-scope.md)
+- [Glossary](product/glossary.md)
 - [Hospital module catalogue](product/module-catalogue.md)
 - [Initial roadmap](product/roadmap.md)
 - [Requirements lifecycle](product/requirements-lifecycle.md)
