@@ -24,7 +24,7 @@ Errors use RFC 9457 Problem Details and the media type application/problem+json.
 Validation may include an errors object mapping fields to safe messages. Do not create a second unrelated error envelope such as { message: ... } for some endpoints while others return Problem Details.
 
 ## Correlation
-- Accept a valid inbound X-Correlation-ID according to a documented format; otherwise generate one.
+- Accept exactly one inbound X-Correlation-ID containing 1–64 ASCII letters, digits, periods, underscores, or hyphens; otherwise generate one.
 - Return the effective value in the response X-Correlation-ID header.
 - Include the ID in logs and Problem Details as traceId.
 - Do not use correlation IDs as authorization material or place patient identifiers in them.
