@@ -1,21 +1,27 @@
-# ADR-003: Database and Data Ownership
+# ADR-003: PostgreSQL and EF Core for the Initial Transactional Store
 
-- **Status:** Proposed
+- **Status:** Accepted for the current API foundation
 - **Date:** 2026-11-23
-- **Decision owner:** CompileCare Product & Engineering (proposed)
-- **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
+- **Decision owner:** CompileCare Product & Engineering
+- **Review trigger:** Material change in hosting, customer deployment, licensing, performance, data residency, or operational requirements
 
 ## Context
-The platform has relational healthcare workflows, tenant isolation requirements, audit/history needs, reporting, and possible independently deployable services.
+The initial hospital platform needs a relational transactional store with referential integrity, tenant-scoped constraints, migrations, operational tooling, and mature .NET integration. The API repository has implemented PostgreSQL through Npgsql and EF Core 10.
 
 ## Decision
-- Use a relational database as the primary transactional store.
-- SQL Server is a candidate, not yet approved.
-- Each bounded module/service owns its schema and migration lifecycle.
-- The initial modular core may share one database instance, but modules must not directly manipulate another module's tables; use module contracts.
-- Independently deployed services must own their data and avoid runtime shared-table coupling.
-- Database changes are versioned migrations with review, backups, and rollback/recovery planning.
-- Tenant-aware keys, constraints, indexes, and query filters are required where applicable.
+- PostgreSQL is the primary database provider for the current CompileCare API foundation.
+- EF Core 10 is the primary ORM/migration mechanism.
+- Tenant-aware keys, unique indexes, composite relationships, query filters, and persistence checks are required where applicable.
+- Production schema changes must be versioned EF Core migrations. Do not use EnsureCreated for production.
+- Module/schema ownership must remain explicit. A modular monolith may share a database instance initially; independently deployed services own their data and migrations.
+- SQL/Dapper may be used for measured query-specific needs, without bypassing tenant authorization or integrity rules.
 
-## Alternatives
-SQL Server, PostgreSQL, and other relational options require an evaluation based on licensing, hosting, operational skills, client requirements, performance, and ecosystem.
+## Alternatives considered
+- SQL Server: viable, but not selected for the current foundation.
+- PostgreSQL: selected for the implemented initial platform.
+- Database-per-tenant: remains a future deployment/isolation option, not the current default.
+
+## Consequences
+- API and integration tests use PostgreSQL/Npgsql to reflect production behaviour.
+- Migrations, clean install/upgrade testing, backup/restore validation, and production operational runbooks remain required work.
+- Revisit only with documented workload, customer, licensing, deployment, or operational evidence.
