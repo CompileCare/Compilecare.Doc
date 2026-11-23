@@ -11,11 +11,11 @@ Extract a capability into a service when independent scaling, deployment, owners
 | Layer | Proposal | Status |
 |---|---|---|
 | Web UI | React + TypeScript | Proposed |
-| API | ASP.NET Core / .NET | Proposed |
-| Persistence | Relational SQL; SQL Server candidate | ADR required |
-| Data access | EF Core; SQL/Dapper when justified | Proposed |
+| API | ASP.NET Core / .NET 10 | Implemented in CompileCare.Api |
+| Persistence | PostgreSQL + EF Core 10 | Implemented foundation; migrations remain pending |
+| Data access | EF Core 10 | Implemented foundation |
 | API contracts | Versioned REST + OpenAPI | Proposed |
-| Authentication | OIDC/OAuth-compatible provider | ADR required |
+| Authentication | OIDC/OAuth 2.0-compatible identity provider | Phase 3; provider decision pending |
 | Cache | CompileCare.Caching | Existing repo; audit required |
 | Service communication | CompileCare.ApiClient | Existing repo; audit required |
 | Observability | CompileCare.Observability + OpenTelemetry | Existing foundation |

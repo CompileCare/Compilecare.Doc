@@ -1,32 +1,42 @@
 # CompileCare Documentation
 
-CompileCare is an India-focused hospital technology platform intended to support hospitals and healthcare providers through an integrated, modular software suite.
+CompileCare is an India-focused hospital information and management platform for hospitals, clinics, and healthcare provider organizations. This repository is the product, architecture, workflow, and engineering documentation source of truth.
 
-> **Status:** Foundation documentation — draft v1. These documents establish direction and proposed decisions. They are not approved specifications or claims of regulatory compliance.
+> **Status:** Foundation documentation — draft v1. Product scope and several architecture decisions remain proposals until reviewed and approved with hospital stakeholders and technical owners.
 
 ## Start here
 - [Product vision and scope](product/vision-and-scope.md)
 - [MVP scope and non-goals](product/mvp-scope.md)
 - [Glossary](product/glossary.md)
 - [Hospital module catalogue](product/module-catalogue.md)
-- [Initial roadmap](product/roadmap.md)
+- [Delivery roadmap and current implementation status](product/roadmap.md)
 - [Requirements lifecycle](product/requirements-lifecycle.md)
 - [Patient registration workflow](product/workflows/patient-registration.md)
 - [Non-functional requirements](product/non-functional-requirements.md)
 - [Architecture overview](architecture/overview.md)
+- [API conventions and error contracts](architecture/api-conventions.md)
 - [Tenant model](architecture/multi-tenancy.md)
 - [Architecture Decision Records](architecture/decisions/)
 - [Security and privacy principles](security/security-and-privacy.md)
+- [Integration testing strategy](engineering/integration-testing-strategy.md)
 - [Engineering standards](engineering/standards.md)
 - [Definition of Done](engineering/definition-of-done.md)
 - [Existing repository assessment](engineering/repository-assessment.md)
 
-## Status
-Product vision, module catalogue, roadmap, workflows, and non-functional requirements: Draft. Architecture and tenancy: Proposed. Security: baseline guidance requiring legal/security review. Repository assessment: preliminary connector-based review.
+## Delivery status
+The agreed delivery sequence is:
+1. **Phase 1 — Backend foundation:** API foundation and shared observability. Completed and merged.
+2. **Phase 2 — Developer platform:** CompileCare.ApiClient, API conventions/error contracts, and integration testing strategy. The initial ApiClient foundation is merged; remaining work is tracked in the roadmap.
+3. **Phase 3 — Database and security:** PostgreSQL/EF Core tenant-aware persistence is implemented in part; production migrations, identity, authorization, audit logging, and security tests remain.
+4. **Phase 4 — Core healthcare domain:** Hospital hierarchy CRUD is implemented; tenant/organization onboarding, staff, and patient registration remain.
+5. **Phase 5 — UI in parallel:** Begin design system and hospital administration UI once API contracts are stable; do not wait for all backend modules to finish.
 
-Important decisions should be captured as ADRs under `architecture/decisions/`. Documents must distinguish confirmed decisions from proposals and assumptions.
+The roadmap records what is implemented versus planned. A merged repository or passing build does not imply that a complete hospital workflow or production readiness has been delivered.
 
-CompileCare is healthcare/hospital-focused. The proposed target is a distributed system with clear domain boundaries, independently deployable services where justified, and a modular core to avoid premature microservice complexity. See ADR-001.
+## Documentation governance
+Important decisions must be recorded as ADRs. Documents distinguish implemented facts, approved decisions, proposals, assumptions, and open questions. Update affected requirements, workflows, API contracts, and tests when scope or behaviour changes.
+
+CompileCare is exclusively a hospital and healthcare systems product. Unrelated products and repositories are outside this documentation and delivery scope.
 
 ## Contributing
-Use branches following [Engineering Standards](engineering/standards.md), focused commits, reviewable pull requests, tests, and documentation updates.
+Use short-lived branches, focused commits, reviewable pull requests, automated tests, and documentation updates. Follow [Engineering Standards](engineering/standards.md) and [Definition of Done](engineering/definition-of-done.md).
