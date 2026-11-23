@@ -12,9 +12,9 @@
 | `CompileCare.Database` | README says database queries and deployment; inspected initial commit shows README and gitignore | Scope needs clarification |
 | `CompileCare.OtpService` | Root README was not found; inspected initial commit showed gitignore | Need source/tree and service requirements |
 | `CompileCare.Site` | README says CompileCare website; initial commit shows README and gitignore | Skeleton |
-| `Compilecare.Doc` | Empty repository with README; foundation docs are being added | Documentation source of truth |
-| `Complilecare.Web` | README says intended for web app; initial commit shows README and gitignore | Skeleton; spelling inconsistency |
-| `Complilecare.Mobile` | README says intended for mobile app; initial commit shows README and gitignore | Skeleton; spelling inconsistency |
+| `Compilecare.Doc` | Documentation repository; foundation docs are being added | Documentation source of truth; repository capitalization remains a naming inconsistency |
+| `CompileCare.Web` | Renamed from `Complilecare.Web`; README says intended for web app; initial commit shows README and gitignore | Skeleton |
+| `CompileCare.Mobile` | Renamed from `Complilecare.Mobile`; README says intended for mobile app; initial commit shows README and gitignore | Skeleton |
 
 ## Observability evidence
 Inspected project file targets `net9.0`. Packages include OpenTelemetry 1.12.x, health checks, OTLP/Prometheus exporters, ASP.NET Core/HTTP/runtime/process/SQL instrumentation, and Serilog 4.x with console and Elasticsearch sinks.
@@ -32,7 +32,7 @@ Solution contains core, ASP.NET Core, and Worker libraries; sample API/Worker; t
 - Ensure telemetry/logs redact sensitive information and never include patient data.
 
 ## Cross-repository findings
-- Naming inconsistency: `CompileCare`/`Compilecare` and misspelled `Complilecare` Web/Mobile. Consider renaming before consumers/packages accumulate; renames affect URLs and references.
+- Web and Mobile repository spelling errors have been corrected through renaming. The `Compilecare.Doc` capitalization inconsistency remains.
 - Site/Web/Mobile boundaries and ownership need definition.
 - Shared libraries should be packaged/versioned when contracts and consumers are stable; avoid premature proliferation.
 - Database repo's “all database queries and deployment” scope may couple unrelated concerns. Prefer module schema/migration ownership and explicit deployment tooling boundaries.
