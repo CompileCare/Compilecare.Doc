@@ -55,19 +55,19 @@ Follow-up release hardening: publish the 0.2.0 package after package inspection 
 
 ## Phase 3 — Database and security
 
-**Status: Active — initial versioned migration slice submitted for review in [CompileCare.Api PR #9](https://github.com/CompileCare/CompileCare.Api/pull/9)**
+**Status: Active — initial versioned migration slice merged in [CompileCare.Api PR #9](https://github.com/CompileCare/CompileCare.Api/pull/9)**
 
 ### Implemented foundation
 1. PostgreSQL is the active database provider in CompileCare.Api.
 2. EF Core persistence and tenant-aware facility entities/query filters are present.
 3. Tenant-aware indexes, composite tenant foreign keys, audit timestamps and optimistic concurrency foundations exist.
-4. An EF Core 10-generated `InitialFacilityHierarchy` migration, designer metadata, and model snapshot have been added for the current Hospital → Department → Ward → Room → Bed model (PR #9, pending merge).
-5. The PostgreSQL integration fixture now applies migrations to a clean `_test` database; migration tests verify clean installation, applied/pending state, repeat application, and queryability (PR #9, pending merge).
+4. An EF Core 10-generated `InitialFacilityHierarchy` migration, designer metadata, and model snapshot have been added for the current Hospital → Department → Ward → Room → Bed model (merged in PR #9).
+5. The PostgreSQL integration fixture now applies migrations to a clean `_test` database; migration tests verify clean installation, applied/pending state, repeat application, and queryability (merged in PR #9).
 6. CI checks for unscaffolded EF model changes. CI on the current PR head passed: 3 unit tests and 17 PostgreSQL integration tests.
 7. Tenant query filters compare nullable tenant IDs directly; a missing tenant context now yields no tenant-owned rows without throwing (covered by the migration integration test).
 
 ### Remaining work — recommended execution order
-1. Review and merge the initial migration PR after its CI and schema diff are reviewed; validate upgrade from the supported prior schema and production migration-script procedure.
+1. Validate the migration-script deployment procedure and perform a rehearsal against the supported previous schema before production rollout.
 2. Define identity-provider integration using a standards-based OIDC/OAuth 2.0 approach; provider choice remains an explicit decision.
 3. Implement trusted tenant membership resolution, authentication, and role/permission authorization at API and use-case boundaries. A client-supplied `X-Tenant-ID` is a selector, never proof of membership.
 4. Implement append-only audit events for authentication, authorization, sensitive record access, administrative actions, and material business changes.
