@@ -19,7 +19,9 @@ Use WebApplicationFactory<Program> and a dedicated PostgreSQL test database:
 - Assert content type and schema of Problem Details, not only status codes.
 - Use synthetic tenant/resource data; no real patient data.
 
-The existing test fixture resets a database ending in _test and currently uses EnsureDeleted/EnsureCreated. After migrations are added in Phase 3, change the fixture to apply migrations and test clean install plus upgrade from the previous supported schema.
+The API integration fixture resets only a dedicated database ending in `_test`, then uses `Database.Migrate()` to apply the versioned EF Core migrations. The current migration integration tests verify that a clean database receives the facility hierarchy schema, the expected migration is recorded, no migrations remain pending, all hierarchy sets can be queried, and reapplying migrations is idempotent. The fixture does not use `EnsureCreated`.
+
+CI also runs `dotnet ef migrations has-pending-model-changes` to detect a model change that was not captured in a new migration and snapshot. When a prior schema version is released, add explicit upgrade tests from that version and keep representative schema/data fixtures for any data-preserving migrations.
 
 ### 3. API-client tests
 Use a controlled in-memory HttpMessageHandler/test server:
@@ -40,7 +42,7 @@ Use a controlled in-memory HttpMessageHandler/test server:
 - Each test run uses a dedicated isolated database and known synthetic data.
 - Never point a destructive test fixture at development, staging or production databases.
 - Do not use real names, contact details, patient records, tokens, or credentials in fixtures.
-- Tests must be deterministic, independently repeatable, and safe under CI parallelism (or serialize tests that share a database).
+- Tests must be deterministic and independently repeatable. Integration tests sharing the same PostgreSQL test database are serialized through an xUnit collection fixture; do not parallelize destructive database resets.
 - External dependencies should be replaced with controlled test doubles or disposable containers.
 - Assert tenant isolation explicitly; do not rely only on EF query filters.
 

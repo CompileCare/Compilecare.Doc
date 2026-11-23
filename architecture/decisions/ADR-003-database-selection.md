@@ -23,5 +23,6 @@ The initial hospital platform needs a relational transactional store with refere
 
 ## Consequences
 - API and integration tests use PostgreSQL/Npgsql to reflect production behaviour.
-- Migrations, clean install/upgrade testing, backup/restore validation, and production operational runbooks remain required work.
+- The initial facility hierarchy migration and model snapshot are generated and validated in CI; migration-based clean-install tests and model-drift checks are implemented in the current Phase 3 PR.
+- Production upgrade rehearsal, backup/restore validation, and migration runbooks remain required before a production rollout.
 - Revisit only with documented workload, customer, licensing, deployment, or operational evidence.
