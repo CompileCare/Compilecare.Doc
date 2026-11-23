@@ -2,6 +2,8 @@
 
 - **Status:** Proposed
 - **Date:** 2026-11-23
+- **Decision owner:** CompileCare Product & Engineering (proposed)
+- **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
 
 ## Context
 The platform has relational healthcare workflows, tenant isolation requirements, audit/history needs, reporting, and possible independently deployable services.
