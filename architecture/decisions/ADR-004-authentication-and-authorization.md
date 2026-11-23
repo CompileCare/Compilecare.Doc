@@ -2,6 +2,8 @@
 
 - **Status:** Proposed
 - **Date:** 2026-11-23
+- **Decision owner:** CompileCare Product & Engineering (proposed)
+- **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
 
 ## Context
 Healthcare workflows require secure user identity, role and scope-based access, auditability, and potentially client-specific identity providers.
