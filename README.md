@@ -26,10 +26,10 @@ CompileCare is an India-focused hospital information and management platform for
 ## Delivery status
 The agreed delivery sequence is:
 1. **Phase 1 — Backend foundation:** API foundation and shared observability. Completed and merged.
-2. **Phase 2 — Developer platform:** CompileCare.ApiClient, API conventions/error contracts, and integration testing strategy. The initial ApiClient foundation is merged; remaining work is tracked in the roadmap.
-3. **Phase 3 — Database and security:** PostgreSQL/EF Core tenant-aware persistence is implemented in part; production migrations, identity, authorization, audit logging, and security tests remain.
+2. **Phase 2 — Developer platform:** Completed and merged. CompileCare.ApiClient now provides named/typed clients, injectable token/tenant/correlation providers, safe-method resilience, and RFC 9457 error parsing. The API exposes consistent facility Problem Details errors and validated correlation IDs. Integration strategy and conventions are documented.
+3. **Phase 3 — Database and security:** Next active phase. PostgreSQL/EF Core tenant-aware persistence is partly implemented; production migrations, identity, authorization, audit logging, and security tests remain.
 4. **Phase 4 — Core healthcare domain:** Hospital hierarchy CRUD is implemented; tenant/organization onboarding, staff, and patient registration remain.
-5. **Phase 5 — UI in parallel:** Begin design system and hospital administration UI once API contracts are stable; do not wait for all backend modules to finish.
+5. **Phase 5 — UI in parallel:** API conventions are now stable enough to begin the design system and admin shell alongside Phase 3. Build facility/staff/bed screens as their contracts become available; do not wait for all backend modules to finish.
 
 The roadmap records what is implemented versus planned. A merged repository or passing build does not imply that a complete hospital workflow or production readiness has been delivered.
 

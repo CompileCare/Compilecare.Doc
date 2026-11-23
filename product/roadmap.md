@@ -17,17 +17,17 @@ CompileCare is a hospital and healthcare information/management platform. This r
 
 ## Phase 2 — Developer platform
 
-**Status: In progress — next active phase**
+**Status: Completed and merged — initial developer-platform baseline**
 
 ### 2.1 CompileCare.ApiClient
 The initial CompileCare.ApiClient package is merged. It already provides named HttpClient registration, validated base-address/timeout options, injectable access-token, tenant and correlation providers, and outbound header handlers.
 
-Remaining work:
-1. Add strongly typed client registration for generated NSwag clients and hand-written clients.
-2. Add standard, bounded HTTP resilience with explicit timeouts, rate limiting and circuit breaking. Retries must be disabled for unsafe/non-idempotent methods by default; only safe methods may be retried unless an operation explicitly opts into an idempotency contract.
-3. Add a stable client-side error contract for RFC 9457 Problem Details, preserving HTTP status, problem fields, validation errors where present, and correlation ID without logging tokens or patient data.
-4. Expand unit tests for typed registration, provider failures, header propagation, safe retries, unsafe-method non-retries, timeouts, circuit behaviour, and error parsing.
-5. Publish/version the package only after CI, package inspection, and consumer tests succeed.
+Delivered in the Phase 2 PRs:
+1. Strongly typed and named client registration.
+2. Bounded standard HTTP resilience with timeout/concurrency limiting/circuit breaker and up to two retries for safe methods; unsafe methods are excluded from automatic retries.
+3. A client-side RFC 9457 Problem Details contract preserving status, fields, validation errors and correlation ID. Exception messages omit server detail to reduce accidental sensitive-data logging.
+4. Handler, DI, tenant/correlation/token propagation, safe-retry and error-contract tests.
+5. The ApiClient source package version is now 0.2.0. NuGet publication and first consuming-app integration remain release tasks, not claims of completion.
 
 ### 2.2 API conventions and error contracts
 1. Standardize /api/v1 resource routes and HTTP method semantics.
@@ -44,23 +44,25 @@ Remaining work:
 5. Use isolated test databases and synthetic data only; never use patient data.
 6. When production EF migrations are introduced in Phase 3, run integration tests against applied migrations rather than relying only on EnsureCreated.
 
-**Phase 2 exit criteria**
-- Typed and named API client use cases are covered and documented.
-- Safe retry rules are explicit and unsafe requests are never transparently replayed.
-- API error responses and client error parsing share one tested contract.
-- API and API-client CI suites pass.
-- A documented integration strategy is implemented by the relevant test projects.
+**Phase 2 outcome and evidence**
+- Typed/named client registration, safe retry policy and RFC 9457 client error parsing are implemented.
+- Facility API service errors use RFC 9457 Problem Details; correlation IDs follow a documented safe format.
+- ApiClient CI passed on the final Phase 2 PR head with 24/24 tests.
+- API CI passed on the final Phase 2 PR head with 3/3 unit tests and 15/15 PostgreSQL integration tests.
+- API conventions and the integration testing strategy are documented in this repository.
+
+Follow-up release hardening: publish the 0.2.0 package after package inspection and validate it from the first consuming application; expand OpenAPI response annotations/contract validation as modules are introduced.
 
 ## Phase 3 — Database and security
 
-**Status: Partially implemented; starts after Phase 2 contracts are stable**
+**Status: Next active phase; persistence foundation is partially implemented**
 
 ### Implemented foundation
 1. PostgreSQL is the active database provider in CompileCare.Api.
 2. EF Core persistence and tenant-aware facility entities/query filters are present.
 3. Tenant-aware indexes, composite tenant foreign keys, audit timestamps and optimistic concurrency foundations exist.
 
-### Remaining work
+### Remaining work — recommended execution order
 1. Add reviewed, versioned EF Core migrations and validate clean install/upgrade paths.
 2. Define identity-provider integration using a standards-based OIDC/OAuth 2.0 approach; provider choice remains an explicit decision.
 3. Implement authentication, tenant membership validation, and role/permission authorization at API and use-case boundaries.
@@ -94,7 +96,7 @@ Every domain workflow requires hospital-user validation, permissions, audit, ten
 
 ## Phase 5 — UI begins in parallel
 
-**Status: Planned; start when Phase 2 API contracts are stable**
+**Status: Can begin in parallel now that the Phase 2 API conventions baseline is merged**
 
 Do not wait for the complete backend. Build the UI incrementally against versioned contracts and mocked/staging APIs:
 1. Design system and accessible component library.

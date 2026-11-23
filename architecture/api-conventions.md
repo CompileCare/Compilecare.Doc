@@ -46,5 +46,7 @@ Validation may include an errors object mapping fields to safe messages. Do not 
 - OpenAPI is generated from the API contract and validated in CI.
 - Breaking changes require a versioning/deprecation decision.
 
-## Compatibility
-The existing facility API is the first implementation. Phase 2 will align its ad-hoc error bodies with Problem Details and add contract tests. These conventions do not imply that all current endpoints already comply.
+## Current implementation status
+The facility API now maps application-level 400/404/409 outcomes to RFC 9457 Problem Details. Integration tests assert content type/status/title/detail for duplicate and out-of-tenant not-found cases. Correlation IDs are constrained to the format documented above and are returned in the response. The ApiClient package parses Problem Details and exposes the correlation ID without including server detail in the exception message.
+
+The standard is the target for new endpoints. Route-level OpenAPI response annotations, generated-schema validation, and consumer-package verification remain follow-up hardening tasks; do not assume every existing endpoint already documents every possible error response.
