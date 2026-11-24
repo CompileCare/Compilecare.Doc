@@ -1,40 +1,128 @@
 # ADR-008: Patient identity and registration boundary
 
-- **Status:** Proposed — requires hospital/customer validation
+- **Status:** Accepted product direction; implementation and pilot configuration pending
 - **Date:** 2026-11-24
-- **Decision owners:** Product, hospital stakeholders, architecture and security
+- **Decision owners:** CompileCare product and architecture; hospital-specific configuration requires pilot approval
+- **Scope:** Tenant-owned patient identity, hospital registration, identity matching and lifecycle boundaries
 
 ## Context
 
-CompileCare must support patients visiting multiple hospitals/branches within a customer tenant while protecting identity and clinical data. Patient identity must not be coupled to appointments, encounters, billing or a single physical facility. The MVP registration workflow must prevent avoidable duplicates but cannot silently merge uncertain records.
+CompileCare must support a patient visiting multiple hospitals within one customer tenant without duplicating the patient master, while preserving hospital-level access controls. Patient identity must remain separate from appointments, encounters, billing and other clinical/business activity.
 
-The Product Blueprint proposes a tenant-owned patient master with facility affiliations, but patient identifier policy, patient mobility, emergency registration and legal/consent requirements remain open.
+The product direction below is accepted for architecture and implementation. It does not replace hospital-specific operational approval or qualified legal/privacy review. In particular, retention schedules, consent purposes, ABDM exchange and hospital-required demographics must be configured and reviewed for each applicable deployment.
 
-## Proposed decisions
+## Decisions
 
-1. **Tenant boundary:** Patient master records are owned by one tenant. Cross-tenant matching, linking or sharing is disabled by default and requires a separately reviewed legal, consent, identity and technical design.
-2. **Internal identity:** Use an immutable internal GUID for the patient master. It is not a human-facing identifier.
-3. **Facility affiliation:** Represent hospital registration/affiliation separately from the patient master. This allows a tenant's patient to be registered at multiple authorized facilities without duplicating the master.
-4. **Human identifiers:** Do not finalize MRN/UHID generation or uniqueness scope in the initial technical slice. The pilot must choose tenant-wide identifier, facility-local identifier, or a documented combination. Identifier normalization, display, correction and reuse rules must be defined.
-5. **Duplicate handling:** Search before create. Exact identifier matches may be deterministic; demographic matching is advisory and must present candidates for authorized review. No silent merge. Merge/correction requires a privileged, audited, governed workflow and a recovery plan.
-6. **Minimum data:** Store only the demographic fields necessary for the validated registration workflow. DOB is date-only and may be unknown; phone/email are optional and are not unique identity keys. Do not include clinical data in the patient master.
-7. **Access:** Search/create/associate/update are separately authorized. Patient visibility is tenant- and organization-scoped; tenant membership alone is not unrestricted patient access. Candidate lists and search responses return minimal data.
-8. **Lifecycle:** Ordinary API CRUD does not physically delete patient records. Correction, merge, retention and deletion are governed workflows.
+### 1. Identity and identifier scopes
 
-## Consequences
+Use three distinct concepts:
 
-- Patient master and facility affiliation are separate concepts and should have separate contracts.
-- Database uniqueness constraints must encode the approved identifier scope, not an assumption.
-- Search requires tenant and organization scope checks at the service layer, with tenant filters and database constraints as defense-in-depth.
-- Registration endpoints need retry/idempotency strategy and concurrency tests.
-- Before production, validate with hospital users and qualified privacy/legal reviewers, including patient mobility, guardianship, emergency workflows, retention and applicable Indian obligations.
+| Identifier | Scope | Purpose |
+|---|---|---|
+| Internal Patient ID | Tenant-wide | Immutable UUID/GUID and primary database identity |
+| MRN/UHID | Hospital-local (or explicitly configured registration scope) | Human-readable identifier assigned by each hospital |
+| ABHA ID | External, patient-linked | Optional ABDM identity reference, subject to applicable policy and consent |
 
-## Open questions
+A patient visiting Hospital A and Hospital B in the same tenant has one patient master and may have a separate hospital registration and MRN at each hospital. Link a registration to an existing master only after identity is sufficiently established through an authorized workflow.
 
-- What identifier should the first pilot use (tenant UHID, hospital-local MRN, or both)?
-- Which demographic fields are required at registration and which can be deferred?
-- What is the approved candidate matching algorithm and minimum match threshold?
-- Who may resolve duplicates and merge records, and how can merge be reversed?
-- How are guardians, minors, emergency/unknown patients, aliases and name changes handled?
-- What patient access is allowed across hospitals/branches within the same tenant?
-- What retention, correction, deletion and consent rules apply to the pilot?
+Rules:
+- Never use MRN, mobile number, Aadhaar or ABHA as the database primary key.
+- Enforce MRN uniqueness within its hospital or explicitly configured registration scope.
+- Make MRN generation configurable per hospital; define normalization, format, sequencing, correction and reuse behavior before enabling it.
+- Do not automatically link patients across hospitals based only on matching names, phone numbers or other weak demographics.
+- Do not perform cross-tenant patient matching or linking by default.
+- ABHA and Aadhaar are optional references and must not be general registration prerequisites.
+
+### 2. Demographic data and requiredness
+
+Collect minimum registration data. Patient name is required and must support single names and locally appropriate formats. Date of birth is required only when known; otherwise support estimated age or age with unit and preserve that it is estimated. Mobile, email and address are optional initially. Sex is required only where justified by the hospital's registration/clinical workflow, with explicit support for unknown/not-recorded where approved.
+
+Emergency contact and guardian details are conditional. Blood group, photo and other additional attributes are optional and must not be treated as clinically verified without verification.
+
+Keep registration-required fields separate from clinical-workflow-required fields. Hospitals may configure additional registration requirements without changing the patient master schema. Demographic attributes are mutable facts, not immutable identity keys. Patients without mobile phones, email addresses or identity documents must be registrable under the configured minimum-data policy.
+
+### 3. Duplicate detection and matching
+
+Use configurable, auditable, multi-factor candidate matching. Conceptual signal priority (not numeric weights):
+
+| Signal | Relative priority |
+|---|---|
+| Exact existing hospital MRN | Very high |
+| Exact verified ABHA reference | Very high, subject to approved linkage |
+| Exact verified mobile number | High |
+| Name + date of birth | Medium to high |
+| Name + guardian name | Medium |
+| Name + age + sex | Medium |
+| Similar name + matching address | Low to medium |
+| Name alone | Low |
+
+Normalize names and phone numbers; support spelling variations and transliteration appropriate to Indian names. Account for missing/estimated DOB and shared family phone numbers. A shared phone number or address is never sufficient proof of identity.
+
+Strong matches are prioritized for staff verification; possible matches are presented for manual review; weak matches may allow registration with an advisory warning. Conflicting identifiers block assignment of the conflicting identifier and route the case for resolution. Matching thresholds and behavior remain configurable and auditable. No automatic patient linking or merge is permitted based solely on a score.
+
+### 4. Duplicate resolution and merge authority
+
+Separate duplicate reporting, review and merge approval:
+- Receptionist: search and report a potential duplicate.
+- Registration staff: review candidates and submit a merge request.
+- Registration supervisor: verify identity and approve routine merges.
+- Patient identity administrator: resolve complex identity conflicts and exceptional cases.
+- System administrator: configure technical permissions, but does not automatically receive clinical identity-merge authority.
+
+High-risk cases require two-person approval under configurable policy.
+
+A merge must verify that both records refer to the same person; identify the surviving master; preserve both original patient IDs as historical references; reconcile registrations and identifiers; preserve clinical, billing and encounter references; record reason, evidence, requester, approver and timestamp; and support a governed correction/reversal process. Never physically delete the merged record. Maintain an auditable merged-record reference and prevent unsafe cycles or repeated merges.
+
+### 5. Mobility, guardians and emergency registration
+
+A patient has one tenant-owned master with multiple hospital associations. Authorized staff may associate an existing master with another hospital after identity verification; a new hospital-local MRN may be assigned according to that hospital's configuration. Department visits reuse the same master and hospital association.
+
+Guardian/dependant/authorized-representative relationships are separate relationship records, not free-text fields on the patient. Support multiple relationships, effective dates, authority/status and contact preferences. A guardian may be another registered patient, but that is not mandatory. Guardian changes are audited.
+
+Support a temporary emergency registration for an unknown patient with a temporary identifier distinct from a permanent MRN. When identity is established, reconcile the temporary record through an authorized, audited workflow; do not casually delete it. Patients without documents may be registered using the minimum fields allowed by approved hospital policy. Conflicting identities enter manual review.
+
+### 6. Retention, correction, consent and deletion
+
+Use governed lifecycle management, not ordinary CRUD deletion:
+- Retention schedules are configurable by record category and deployment, based on applicable law, hospital policy and qualified legal/compliance review. Do not hardcode one universal retention period.
+- Demographic corrections require authorization and record old/new values, reason, actor and timestamp, with sensitive values protected.
+- Identity conflicts and merges use separate governed workflows.
+- Consent records, where applicable, capture purpose, scope, status, source, timestamp and withdrawal history.
+- Normal patient CRUD never physically deletes a patient.
+- De-identification is allowed only through an approved process where legally permitted.
+- Legal holds prevent disposal while active.
+- Audit evidence has its own access and retention policy.
+
+Distinguish consent to collect/process data, consent to share data, consent for ABDM-related exchange, and consent for treatment or a specific clinical procedure. These are not interchangeable. Consent and retention details require qualified review for each deployment.
+
+### 7. Data model boundaries
+
+Keep these concepts separate:
+- **Patient Master:** tenant-owned, immutable internal UUID, minimal core demographics.
+- **Patient Identifiers:** typed MRN, ABHA reference and other external identifiers, with issuer/scope, verification state and lifecycle metadata.
+- **Patient Relationships:** guardian, dependant and authorized-representative relationships with effective dates and authority.
+- **Hospital Registration:** patient-to-hospital association, local MRN, status and registration metadata.
+- **Identity Management:** duplicate candidates, identity cases, merge requests, approvals and correction/reversal history.
+- **Consent and Audit:** governed consent records and append-only identity/registration audit evidence.
+
+Appointments, encounters, prescriptions, diagnoses, billing and clinical documents remain in their owning modules and reference the internal Patient ID. They must not duplicate the patient identity master.
+
+### 8. Discovery and authorization
+
+Default search is limited to the selected hospital's registrations. Cross-hospital patient discovery is a separate permission and workflow for authorized transfer, referral or registration scenarios. A receptionist at Hospital A must not gain unrestricted access to Hospital B's registrations or clinical information merely because both hospitals share a tenant.
+
+Cross-hospital candidate search returns only the minimum identity information needed to verify a candidate. Access to actual patient information remains subject to hospital/department permissions. Search, create, associate, update, identity review and merge are distinct capabilities. Tenant membership alone does not grant unrestricted patient access.
+
+## Consequences and implementation constraints
+
+- Patient master, identifiers, hospital registrations, relationships and identity governance are separate persistence and API boundaries.
+- Database constraints enforce tenant ownership and the configured hospital-local identifier scope.
+- Search and association require tenant plus organization-scope authorization; cross-hospital discovery is separately authorized.
+- Patient and registration endpoints need idempotency/concurrency handling and PostgreSQL integration tests.
+- No MRN format/sequence, demographic mandatory-field set, matching numeric score, retention period or consent legal basis is globally hardcoded.
+- Implement the smallest safe patient-master and hospital-registration slice first. Add identifiers, relationships and identity-governance workflows as separately reviewed increments.
+- Clinical modules reference the internal Patient ID and remain responsible for their own data lifecycle.
+
+## Deployment validation still required
+
+Before a pilot is enabled, each hospital must approve its MRN format/sequence and uniqueness scope, additional mandatory fields, matching configuration, merge authority and high-risk approval policy, emergency workflow, cross-hospital discovery roles, and retention/consent settings. Qualified privacy/legal review is required for applicable Indian requirements, Aadhaar handling and ABDM exchange. These are deployment decisions, not reasons to weaken the architecture boundaries above.
