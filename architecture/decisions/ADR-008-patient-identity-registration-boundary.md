@@ -43,22 +43,21 @@ Keep registration-required fields separate from clinical-workflow-required field
 
 ### 3. Duplicate detection and matching
 
-Use configurable, auditable, multi-factor candidate matching. Conceptual signal priority (not numeric weights):
+Matching is configurable and auditable, but each signal must have an approved data source, ownership model, verification meaning and access policy. Conceptual future signal priority is not an implementation contract or proof of identity.
 
-| Signal | Relative priority |
+| Signal | Current/future treatment |
 |---|---|
-| Exact existing hospital MRN | Very high |
-| Exact verified ABHA reference | Very high, subject to approved linkage |
-| Exact verified mobile number | High |
-| Name + date of birth | Medium to high |
-| Name + guardian name | Medium |
-| Name + age + sex | Medium |
-| Similar name + matching address | Low to medium |
-| Name alone | Low |
+| Exact existing hospital MRN | Hospital-local identifier lookup and conflict handling; not a global patient primary key |
+| Exact verified ABHA reference | Future, subject to separately approved ABDM linkage and consent/policy |
+| Exact verified patient-owned phone/email | Future corroborating signal only under ADR-012; not sufficient alone and not currently stored or matched |
+| Exact DOB plus normalized name rules | Current hospital-local advisory candidate rule under ADR-011 |
+| Name plus guardian details, estimated age/sex or address | Not implemented; requires separately approved data model, source/ownership semantics and validation |
 
-Normalize names and phone numbers; support spelling variations and transliteration appropriate to Indian names. Account for missing/estimated DOB and shared family phone numbers. A shared phone number or address is never sufficient proof of identity.
+The active matcher is defined by ADR-011: exact DOB is mandatory, with a normalized given-name match or both normalized middle and family names matching. It does not use phone, email, address, sex, estimated age, guardian details or external identity evidence.
 
-Strong matches are prioritized for staff verification; possible matches are presented for manual review; weak matches may allow registration with an advisory warning. Conflicting identifiers block assignment of the conflicting identifier and route the case for resolution. Matching thresholds and behavior remain configurable and auditable. No automatic patient linking or merge is permitted based solely on a score.
+A verified contact proves control of a communication channel at a point in time, not that the controller is the patient. Shared household contacts, recycled phone numbers and representative-owned contacts must not be treated as unique patient identifiers. ADR-012 defines the proposed contact lifecycle and permits only a future corroborating annotation for an already-qualified ADR-011 candidate; a contact-only match must not create a candidate.
+
+No numeric confidence score, transliteration or fuzzy matching is active. Strong/possible/weak categories require a separately validated policy; a no-candidate result is not proof that no duplicate exists. Conflicting identifiers route to a governed resolution workflow. No automatic patient linking or merge is permitted.
 
 ### 4. Duplicate resolution and merge authority
 
@@ -159,6 +158,10 @@ The generated EF migration 20261124143002_AddPatientIdentifierManagement is part
 
 The conservative first-pass matching contract is recorded in [ADR-010](ADR-010-conservative-hospital-local-duplicate-detection.md). The read-only, hospital-local API is merged in CompileCare.Api PR #16 as commit 41b459975b0e64198ad0fb251f1d43ad3e0bfe0f. On the final PR head, Docker Compose verification passed 3 unit tests and 55 PostgreSQL integration tests with zero failures; standard CI and the EF Core model-drift check also passed. The endpoint requires the dedicated patient.duplicate.review permission and hospital-wide scope. It requires exact given name plus exact DOB, returns at most 20 minimal candidates, and never links, blocks or merges records.
 
+### Normalized multi-signal duplicate matching — merged
+
+The normalized matching implementation was delivered in CompileCare.Api PR #17 and squash-merged to main as commit c603dc602565b69f25b24b4738e45f24c4090362. It persists versioned normalized name search keys, requires exact DOB and returns candidates when normalized given name matches or both normalized middle and family names match. The post-merge main build, EF model-drift check, 12 unit tests and 58 PostgreSQL integration tests passed. The endpoint remains hospital-local, advisory and non-linking.
+
 ### Explicitly deferred
 
-Richer duplicate matching/normalization, estimated-age fields, cross-hospital discovery, guardian relationships, emergency reconciliation, patient association and merge workflows, clinical records and retention/consent implementation remain separate increments governed by this ADR. Hospital-specific MRN policy changes and identifier correction/revocation also require a separately reviewed workflow. The accepted product direction remains subject to the deployment validation requirements above.
+Verified phone/email contact capture and verification are designed separately in ADR-012 but are not implemented. The initial future contact-aware matcher may only add corroboration to an existing ADR-011 candidate; it must not create a candidate from contact alone. Cross-hospital discovery, estimated-age fields, guardian relationships, emergency reconciliation, patient association and merge workflows, clinical records, and retention/consent implementation remain separate increments governed by this ADR. Hospital-specific MRN policy changes and identifier correction/revocation also require a separately reviewed workflow. The accepted product direction remains subject to the deployment validation requirements above.

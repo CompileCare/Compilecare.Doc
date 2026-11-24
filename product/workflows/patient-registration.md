@@ -1,6 +1,6 @@
 # Workflow: Patient Registration
 
-**Status:** Patient master, hospital registration and hospital-scoped MRN policy/assignment APIs are merged. The first advisory duplicate-candidate API is merged (API PR #16). The normalized multi-signal matcher is in API PR #17; identity association and merge workflows remain separate work.
+**Status:** Patient master, hospital registration, hospital-scoped MRN policy/assignment and normalized advisory duplicate matching are merged (API PRs #14–#17). Verified phone/email contact capture is designed in ADR-012 but is not implemented. Identity association and merge workflows remain separate work.
 
 ## Actors
 
@@ -16,7 +16,7 @@ Patient; receptionist/front-desk staff; registration staff; registration supervi
 
 1. Patient arrives or registration is initiated.
 2. Staff searches the selected hospital's registrations using the hospital MRN and other permitted details.
-3. Before creating a record, staff may call the hospital-local duplicate-candidate endpoint when an exact date of birth is available. The normalized matcher requires exact DOB and either normalized given name, or both normalized middle and family names. It applies Unicode compatibility normalization, invariant uppercase and whitespace collapsing; punctuation and diacritics remain significant.
+3. Before creating a record, staff may call the hospital-local duplicate-candidate endpoint when an exact date of birth is available. The merged normalized matcher requires exact DOB and either normalized given name, or both normalized middle and family names. It applies Unicode compatibility normalization, invariant uppercase and whitespace collapsing; punctuation and diacritics remain significant. Phone/email are not currently collected or used by this endpoint.
 4. If candidates are returned, staff verifies identity using the hospital's approved procedure. The candidate response is advisory only: it does not link, merge, block registration or expose clinical information.
 5. If date of birth is unavailable, v1 matching is not evaluated and no name-only search is performed. Staff follows the hospital's manual identity-check procedure. A no-candidates response is not proof that no duplicate exists.
 6. If no existing local registration is confirmed for use, staff enters the minimum registration data. Patient name is required; DOB is captured when known or represented as estimated age/age unit. Mobile, email, address, ABHA and Aadhaar are not universal prerequisites. Hospital-specific additional requirements are configurable and separately validated from clinical requirements.
@@ -45,21 +45,24 @@ Patient; receptionist/front-desk staff; registration staff; registration supervi
 - Patient master is tenant-owned; cross-tenant matching/linking is disabled by default.
 - Patient master, identifiers, hospital registration, guardian/representative relationships and identity-management cases are separate concepts.
 - One tenant-wide internal UUID identifies the master. MRN/UHID is hospital-local/configured-scope. ABHA is an optional external patient-linked reference.
+- Phone/email contact methods are designed as separate optional, patient-owned records under ADR-012; they are not fields on the Patient row and are not implemented yet.
 - Appointments, encounters, prescriptions, diagnoses, billing and clinical documents reference the internal Patient ID and remain in their owning modules.
 - Ordinary CRUD does not physically delete patient records. Correction, merge, retention, legal hold, de-identification and deletion are governed workflows.
 - MRN policy prefix/width and the issued identifier value are distinct from the immutable Patient GUID. Initial policy replacement and identifier mutation are not supported.
 
 ## Permissions and scope
 
-Search, create, associate, update, duplicate review, merge request, merge approval and cross-hospital discovery are distinct capabilities. The initial duplicate-candidate endpoint requires the dedicated `patient.duplicate.review` permission and tenant-wide or explicit hospital scope; PatientRegistrar receives this permission in the first increment. Department-only membership cannot use this hospital-wide endpoint. Default search is limited to the selected hospital's registrations. Cross-hospital candidate search requires a separate permission and workflow, and must return minimum identity details. Access to patient or clinical information remains subject to hospital/department permissions. System administration does not automatically confer clinical merge authority. HospitalAdmin manages the hospital MRN policy; PatientRegistrar assigns and reads identifiers within authorized hospital scope.
+Search, create, associate, update, duplicate review, merge request, merge approval and cross-hospital discovery are distinct capabilities. The initial duplicate-candidate endpoint requires the dedicated patient.duplicate.review permission and tenant-wide or explicit hospital scope; PatientRegistrar receives this permission in the first increment. Department-only membership cannot use this hospital-wide endpoint. Default search is limited to the selected hospital's registrations. Cross-hospital candidate search requires a separate permission and workflow, and must return minimum identity details. Access to patient or clinical information remains subject to hospital/department permissions. System administration does not automatically confer clinical merge authority. HospitalAdmin manages the hospital MRN policy; PatientRegistrar assigns and reads identifiers within authorized hospital scope.
 
-## Permissions and scope
+Contact permissions are not granted by the PatientRegistrar role automatically. The proposed patient.contact.manage, patient.contact.read.masked, patient.contact.read.full and patient.contact.verify.initiate permissions are defined in ADR-012 and require explicit role mapping. Every operation must verify the active patient registration and selected hospital scope. Unmasked contact reads are purpose-limited and audited. Challenge completion proves control of a channel, not patient identity or guardian authority.
 
-Search, create, associate, update, duplicate review, merge request, merge approval and cross-hospital discovery are distinct capabilities. Default search is the selected hospital's registrations. Tenant membership alone does not grant unrestricted patient access. Cross-hospital candidate search returns minimum identity details; access to patient or clinical information remains subject to hospital/department scope. System administration does not automatically confer clinical merge authority. HospitalAdmin manages the hospital MRN policy; PatientRegistrar assigns and reads identifiers within authorized hospital scope.
+## Contact data — designed, not implemented
+
+When contact capture is delivered under ADR-012, phone and email remain optional and are stored in separate protected contact records. Values are masked by default; verification requires a one-time challenge and cannot be set manually by staff. The same family phone/email may be attached to multiple patient records. A shared, unverified, expired, revoked, superseded or guardian-owned contact is not a patient identity signal. The first contact-aware matcher may only add a corroborating annotation to an existing exact-DOB/name candidate; it cannot create a candidate from contact alone. Contact verification is distinct from consent or communication preferences.
 
 ## Audit
 
-Record actor, timestamp, tenant, hospital/department scope, operation, outcome, reason/evidence references where relevant, approver for privileged actions and correlation ID. Protect old/new demographic values and identity evidence as sensitive data; do not copy full patient payloads into general logs. MRN value itself is not copied into general audit metadata. Merge and correction records preserve historical patient identifiers and support governed reversal.
+Record actor, timestamp, tenant, hospital/department scope, operation, outcome, reason/evidence references where relevant, approver for privileged actions and correlation ID. Protect old/new demographic values and identity evidence as sensitive data; do not copy full patient payloads into general logs. MRN value itself is not copied into general audit metadata. Contact values, canonical values, lookup digests and OTP/challenge secrets must not appear in audit metadata or telemetry. Unmasked contact reads and verification lifecycle events require dedicated audit evidence. Merge and correction records preserve historical patient identifiers and support governed reversal.
 
 ## Acceptance criteria
 
