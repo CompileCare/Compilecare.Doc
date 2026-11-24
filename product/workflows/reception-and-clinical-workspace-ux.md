@@ -1,6 +1,6 @@
 # Workflow: reception and clinical workspace UX foundation
 
-**Status:** Interaction specification with initial authenticated reception implementation merged; remaining workflows require pilot validation  
+**Status:** Interaction specification with authenticated reception lookup merged; patient registration UI implementation in progress; remaining workflows require pilot validation  
 **Phase:** 5 — User experience  
 **Related workflows:** [Patient registration](patient-registration.md), [Appointments and queue](appointments-and-queue.md), [OPD encounter and clinical documentation](opd-encounter-and-clinical-documentation.md)  
 **Related architecture:** [ADR-005 — Frontend architecture](../../architecture/decisions/ADR-005-frontend-architecture.md)
@@ -128,11 +128,11 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 
 1. **Application shell — implemented:** React + TypeScript in `CompileCare.Web`, OIDC Authorization Code + PKCE, accessible responsive navigation, session controls and shared loading/error patterns. Web PR #1 is merged.
 2. **Tenant and hospital context — implemented:** API PR #26 exposes audited current-user active tenant memberships using validated issuer/subject. The web client lets the user select a tenant and loads only hospitals visible under the persisted organization scope. No client-supplied role or tenant header grants access.
-3. **Reception patient lookup — implemented:** Web PR #2 uses the hospital-scoped patient search API with bounded pagination. Search results are kept in component memory, not browser storage; the API remains authoritative for patient.read permission and hospital scope. Duplicate-candidate review and registration status are the next reception increments.
-3. **Appointment and arrival:** booking, walk-in, check-in and queue-token confirmation.
-4. **Queue operations:** scoped queue view and permitted lifecycle actions.
-5. **Clinical workspace:** clinical queue, encounter draft, sign and append-only amendment flows.
-6. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
+3. **Reception patient lookup — implemented:** Web PR #2 uses the hospital-scoped patient search API with bounded pagination. Search results are kept in component memory, not browser storage; the API remains authoritative for patient.read permission and hospital scope. Patient registration with duplicate-candidate review and MRN assignment is being implemented in a separate focused UI increment.
+4. **Appointment and arrival:** booking, walk-in, check-in and queue-token confirmation.
+5. **Queue operations:** scoped queue view and permitted lifecycle actions.
+6. **Clinical workspace:** clinical queue, encounter draft, sign and append-only amendment flows.
+7. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
 
 Each increment should be a small vertical slice with tests and documentation updates. Do not implement all screens against mocked contracts and then retrofit API behavior.
 
@@ -165,4 +165,8 @@ These questions do not block an initial shell and API-backed patient lookup, but
 
 ## Implementation status — 2026-11-24
 
-The authenticated shell is merged in `CompileCare.Web` PR #1, and the first reception lookup slice is merged in PR #2. The web client uses API PR #26's current-user tenant-context endpoint, explicit tenant selection, API-filtered hospital selection and hospital-scoped patient search with pagination. It does not trust client-side roles or persist patient search results. CI verifies TypeScript build, API-client tests, dependency audit (zero reported vulnerabilities), Docker image build and container HTTP smoke test. Patient registration writes, duplicate-candidate review, appointment booking, walk-in/check-in, queue operations and clinical screens remain deferred to subsequent vertical slices.
+The authenticated shell is merged in `CompileCare.Web` PR #1, and the first reception lookup slice is merged in PR #2. The web client uses API PR #26's current-user tenant-context endpoint, explicit tenant selection, API-filtered hospital selection and hospital-scoped patient search with pagination. It does not trust client-side roles or persist patient search results.
+
+Patient registration UI is being added on branch `phase5/patient-registration`. The planned vertical slice consumes the existing hospital-scoped `POST /api/v1/hospitals/{hospitalId}/patients`, `POST /duplicate-candidates` and `POST /patients/{patientId}/identifiers/mrn` contracts. It requires an explicit duplicate review before submission, supports unknown DOB through the API's not-evaluated/manual-review response, keeps patient data in component memory, and reports MRN assignment separately so a missing hospital policy does not imply that registration failed. It intentionally excludes contact capture, patient merge and cross-hospital matching. This increment is not yet merged; CI and Docker verification remain release gates.
+
+Appointment booking, walk-in/check-in, queue operations and clinical screens remain deferred to subsequent vertical slices.
