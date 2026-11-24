@@ -23,7 +23,7 @@ CompileCare.ApiClient provides named/typed client registration, validated option
 
 ## Phase 3 — Database, identity and security
 
-**Status: Active — persistence, OIDC/tenant RBAC, request audit, tenant registry and lifecycle are implemented and merged; trusted membership and organization-scope provisioning remain**
+**Status: Foundation milestone completed — persistence, OIDC/tenant RBAC, request audit, tenant registry/lifecycle, trusted membership provisioning and organization scopes are implemented and merged. Production operational hardening remains.**
 
 ### Implemented foundation
 
@@ -36,21 +36,20 @@ CompileCare.ApiClient provides named/typed client registration, validated option
 7. Facility permissions are derived from the database membership role; caller-supplied role/permission claims cannot elevate privileges.
 8. Current facility roles are HospitalAdmin, FacilityManager and FacilityViewer (API PR #10).
 9. Append-only tenant-scoped request audit events, EF/PostgreSQL protections and PostgreSQL-backed tests are merged (API PR #11). The current implementation avoids patient payloads and sensitive request data in those events.
-10. Global tenant registry and lifecycle are implemented and merged (API [PR #12](https://github.com/CompileCare/CompileCare.Api/pull/12), merge commit `be62e135e494380eab46980d4637b32a6751425d`). Tenants have unique normalized slugs and Provisioning/Active/Suspended/Closed states; new tenants start in Provisioning, and only persisted platform operators can perform registry actions.
+10. Global tenant registry and lifecycle are implemented and merged (API [PR #12](https://github.com/CompileCare/CompileCare.Api/pull/12)). Tenants have unique normalized slugs and Provisioning/Active/Suspended/Closed states; new tenants start in Provisioning, and only persisted platform operators can perform registry actions.
 11. Platform-operator access is resolved from a persisted, active OIDC issuer/subject record; external role/permission claims do not grant platform access. Platform registry requests use the existing append-only audit middleware. The first platform operator is bootstrapped out-of-band by an authorised database administrator; no public operator self-enrolment endpoint exists.
-12. The tenant-registry migration backfills existing tenant IDs from membership, facility and audit records before adding tenant foreign keys, preserving existing tenant allocations. CI passed the EF model-drift check, Release build, 37 PostgreSQL integration tests and 3 unit tests on the merged implementation.
+12. The tenant-registry migration backfills existing tenant IDs from membership, facility and audit records before adding tenant foreign keys, preserving existing tenant allocations. CI passed the EF model-drift check, Release build, PostgreSQL integration tests and unit tests on the merged implementation.
+13. Trusted initial administrator provisioning and tenant/hospital/department membership scopes are implemented, including scoped membership administration and protections against self-modification and removing the last active tenant-wide HospitalAdmin (API [PR #13](https://github.com/CompileCare/CompileCare.Api/pull/13)).
 
 ### Remaining work — recommended order
 
-1. Continue validating product and architecture decisions for tenant/customer/organization and patient data boundaries against pilot-customer and hospital workflows.
-2. Implement trusted tenant membership provisioning, initial administrator assignment and controlled membership lifecycle. Membership administration is not yet exposed as an API; platform-operator bootstrap currently requires a restricted DBA procedure.
-3. Define and implement organization-scope assignments and role administration without allowing tenant roles to grant platform access.
-4. Extend audit coverage for authentication/authorization outcomes, membership and role changes, sensitive record access, exports, privileged support and material clinical/business actions. Define controlled audit query/export, retention and operational access policies.
-5. Extend tenant isolation and authorization tests to background jobs, messaging, caches, file/object storage, exports, search, support tools and privileged operations.
-6. Rehearse migration install/upgrade, production migration scripts, backup/restore and recovery. Define signing-key rotation, secrets, encryption, retention/deletion, incident response and access reviews.
-7. Complete threat modelling, suitable penetration testing and qualified privacy/legal review for applicable Indian requirements. Do not claim regulatory compliance from implementation or documentation alone.
+1. Validate product and architecture decisions for tenant/customer/organization and patient data boundaries against pilot-customer and hospital workflows.
+2. Extend audit coverage for authentication/authorization outcomes, membership and role changes, sensitive record access, exports, privileged support and material clinical/business actions. Define controlled audit query/export, retention and operational access policies.
+3. Extend tenant isolation and authorization tests to background jobs, messaging, caches, file/object storage, exports, search, support tools and privileged operations.
+4. Rehearse migration install/upgrade and production migration deployment. Complete backup/restore automation and recovery drills; define signing-key rotation, secrets, encryption, retention/deletion, incident response and access reviews.
+5. Complete threat modelling, suitable penetration testing and qualified privacy/legal review for applicable Indian requirements. Do not claim regulatory compliance from implementation or documentation alone.
 
-**Phase 3 exit criteria:** reviewed migration install/upgrade paths; authenticated identity bound to active trusted tenant membership; organization-scope authorization at relevant tenant entry points; append-only audit coverage for the approved sensitive/privileged actions; cross-tenant tests for synchronous and asynchronous paths; and reviewed production operational controls.
+**Phase 3 exit criteria:** reviewed migration install/upgrade paths; authenticated identity bound to active trusted tenant membership; organization-scope authorization at relevant tenant entry points; append-only audit coverage for the approved sensitive/privileged actions; cross-tenant tests for synchronous and asynchronous paths; and reviewed production operational controls. Core security and membership capabilities are implemented; operational and cross-cutting validation remains before calling this phase production-ready.
 
 ## Phase 4 — Core healthcare domain
 
