@@ -82,3 +82,7 @@ The endpoint was merged in CompileCare.Api PR #16 as commit `41b459975b0e64198ad
 This provides a usable, explainable first check but has intentionally low recall: it will not find records with misspelled, transliterated, abbreviated or differently formatted given names, missing DOB, or data-entry variation. A no-candidates result is not proof that no duplicate exists. The front desk must continue its approved manual checks.
 
 Future increments require separate decisions for richer demographic normalization, age-estimate matching, contact/identifier verification, cross-hospital discovery, duplicate case queues, identity review authority, patient association, merge approval, reversal and retention. No fuzzy score or automatic merge is introduced by this ADR.
+
+## Follow-on matcher design
+
+ADR-011 defines the next incremental matcher: versioned Unicode compatibility/case/whitespace normalization and a second candidate path requiring both middle and family names to match while exact DOB remains mandatory. This does not add unverified contact or other demographic signals.
