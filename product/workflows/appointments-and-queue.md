@@ -127,7 +127,7 @@ Queue token is an operational daily identifier, not a patient identifier or MRN.
 - **Patient overlap:** overlapping active appointments for the same tenant patient are rejected; staff must resolve the conflict explicitly.
 - **Provider assignment ended/deactivated:** new booking is rejected; existing appointments remain visible for authorized rescheduling/cancellation and require a reviewed continuity process.
 - **Session change with bookings:** reject destructive edits or require explicit per-appointment resolution; never orphan bookings.
-- **Duplicate check-in:** idempotently return the existing queue entry.
+- **Duplicate check-in:** enforce at most one queue entry per appointment; repeated or concurrent check-in requests return the same existing queue entry and never create another token. A completed, cancelled or no-show appointment cannot be checked in again.
 - **Invalid appointment state:** reject check-in/cancel/reschedule transitions that are not allowed.
 - **Token allocation race:** allocate a unique token transactionally per hospital/department/local date.
 - **Timezone ambiguity:** reject ambiguous/nonexistent local times and require explicit offset resolution.
