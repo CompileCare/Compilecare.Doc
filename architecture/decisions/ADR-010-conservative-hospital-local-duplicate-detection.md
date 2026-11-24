@@ -1,6 +1,6 @@
 # ADR-010: Conservative hospital-local duplicate candidate detection
 
-- **Status:** Accepted for the first advisory implementation increment
+- **Status:** Implemented and merged for the initial advisory increment
 - **Date:** 2026-11-24
 - **Decision owners:** CompileCare product and architecture; each pilot hospital validates its manual identity-verification procedure
 - **Scope:** Read-only duplicate candidate detection before patient registration
@@ -72,6 +72,10 @@ The initial check uses existing patient and hospital-registration fields; it int
 - Results are bounded and disclose only minimum identity data.
 - Tests prove that candidate detection does not associate or merge patient records.
 - Docker Compose PostgreSQL integration verification is required for every API PR that changes this feature.
+
+## Implementation status — 2026-11-24
+
+The endpoint was merged in CompileCare.Api PR #16 as commit `41b459975b0e64198ad0fb251f1d43ad3e0bfe0f`. The final API PR head passed Docker Compose verification with 3 unit tests and 55 PostgreSQL integration tests (zero failures), standard CI, and the EF Core model-drift check. No migration was required.
 
 ## Consequences and deferred work
 
