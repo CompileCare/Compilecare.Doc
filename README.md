@@ -14,7 +14,7 @@ CompileCare is an India-focused hospital information and management platform for
 - [Requirements lifecycle](product/requirements-lifecycle.md)
 - [Patient registration workflow](product/workflows/patient-registration.md)
 - [Staff and provider management workflow](product/workflows/staff-and-provider-management.md)
-- [ADR-012: Staff and provider profile boundaries](architecture/decisions/ADR-012-staff-and-provider-profile-boundaries.md)
+- [ADR-013: Staff and provider profile boundaries](architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md)
 - [ADR-012: Verified patient contact data](architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md)
 - [Non-functional requirements](product/non-functional-requirements.md)
 - [Architecture overview](architecture/overview.md)
