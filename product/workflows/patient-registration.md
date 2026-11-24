@@ -15,14 +15,12 @@ Patient; receptionist/front-desk staff; registration staff; registration supervi
 ## Main flow
 
 1. Patient arrives or registration is initiated.
-2. Staff searches the selected hospital's registrations using the hospital MRN and permitted demographic details.
-3. Before creating a new record, staff may call the hospital-local duplicate-candidate check when an exact date of birth is available. The v1 check requires exact given name (case-insensitive after trimming) plus exact date of birth; middle/family names are shown as additional comparison signals.
-4. If candidates are returned, staff verifies identity using the hospital's approved procedure. The response contains only minimum identity details and never exposes clinical information. A candidate is not a confirmed identity and the API does not link, merge or block registration.
-5. Cross-hospital discovery is not part of the v1 duplicate-check endpoint. It requires a separate permission and separately reviewed workflow.
-6. If no match is confirmed, staff enters the minimum registration data.
-5. If no match is confirmed, staff enters the minimum registration data. Patient name is required; DOB is captured when known or represented as estimated age/age unit. Mobile, email, address, ABHA and Aadhaar are not universal prerequisites. Hospital-specific additional requirements are configurable and separately validated from clinical requirements.
-7. If date of birth is unavailable, v1 matching is not evaluated; staff follows the hospital's manual identity-check procedure. A name-only search is not performed. A no-candidates result is not proof that no duplicate exists.
-8. Staff confirms creation. The system creates a tenant-owned patient master with immutable internal UUID and a separate hospital registration.
+2. Staff searches the selected hospital's registrations using the hospital MRN and other permitted details.
+3. Before creating a record, staff may call the hospital-local duplicate-candidate endpoint when an exact date of birth is available. The v1 check requires exact given name (case-insensitive after trimming) plus exact date of birth. Matching middle/family names are additional comparison signals.
+4. If candidates are returned, staff verifies identity using the hospital's approved procedure. The candidate response is advisory only: it does not link, merge, block registration or expose clinical information.
+5. If date of birth is unavailable, v1 matching is not evaluated and no name-only search is performed. Staff follows the hospital's manual identity-check procedure. A no-candidates response is not proof that no duplicate exists.
+6. If no existing local registration is confirmed for use, staff enters the minimum registration data. Patient name is required; DOB is captured when known or represented as estimated age/age unit. Mobile, email, address, ABHA and Aadhaar are not universal prerequisites. Hospital-specific additional requirements are configurable and separately validated from clinical requirements.
+7. Staff confirms creation. The system creates a tenant-owned patient master with immutable internal UUID and a separate hospital registration.
 8. After registration, an authorized PatientRegistrar requests MRN assignment through the hospital-scoped identifier API. The service allocates the next value from the hospital's configured policy in the same transaction as identifier persistence and request audit. Repeating the request for the same registration returns the existing MRN.
 9. Staff selects the intended department/service and continues to appointment or walk-in check-in. Those records reference the internal Patient ID and remain in their owning modules.
 10. Registration confirmation and next-step details are shown.
@@ -31,9 +29,9 @@ Patient; receptionist/front-desk staff; registration staff; registration supervi
 
 - **No MRN policy:** the system does not invent a default prefix or silently issue an identifier; an authorized HospitalAdmin must configure the policy first.
 - **Possible duplicate:** show a minimal candidate list; route unresolved identity to authorized review. Never silently link or merge.
-- **Strong candidate:** prioritize for staff verification; a match score alone does not authorize association.
+- **Strong candidate:** prioritize for staff verification; the v1 endpoint does not calculate a confidence score and a candidate is not proof of identity.
 - **Conflicting identifier:** block assignment and route to an identity-resolution workflow.
-- **Existing patient at another hospital:** use separately authorized cross-hospital discovery, verify identity, associate the existing master and assign a local MRN if configured.
+- **Existing patient at another hospital:** cross-hospital discovery and association are future increments requiring a separate permission, identity-verification workflow and audit controls; they are not available through the v1 duplicate endpoint.
 - **Patient without phone/email/documents:** allow registration using the configured minimum data.
 - **DOB unknown:** capture unknown or estimated age with unit; do not invent an exact DOB.
 - **Minor/dependant:** create a separate patient master and a guardian/dependant relationship where required; support multiple guardians and effective-dated authority.
@@ -50,6 +48,10 @@ Patient; receptionist/front-desk staff; registration staff; registration supervi
 - Appointments, encounters, prescriptions, diagnoses, billing and clinical documents reference the internal Patient ID and remain in their owning modules.
 - Ordinary CRUD does not physically delete patient records. Correction, merge, retention, legal hold, de-identification and deletion are governed workflows.
 - MRN policy prefix/width and the issued identifier value are distinct from the immutable Patient GUID. Initial policy replacement and identifier mutation are not supported.
+
+## Permissions and scope
+
+Search, create, associate, update, duplicate review, merge request, merge approval and cross-hospital discovery are distinct capabilities. The initial duplicate-candidate endpoint requires the dedicated `patient.duplicate.review` permission and tenant-wide or explicit hospital scope; PatientRegistrar receives this permission in the first increment. Department-only membership cannot use this hospital-wide endpoint. Default search is limited to the selected hospital's registrations. Cross-hospital candidate search requires a separate permission and workflow, and must return minimum identity details. Access to patient or clinical information remains subject to hospital/department permissions. System administration does not automatically confer clinical merge authority. HospitalAdmin manages the hospital MRN policy; PatientRegistrar assigns and reads identifiers within authorized hospital scope.
 
 ## Permissions and scope
 
