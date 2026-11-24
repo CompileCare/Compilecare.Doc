@@ -90,9 +90,11 @@ Each domain workflow requires hospital-user validation, permissions, audit, tena
 
 ## Phase 5 — User experience
 
-**Status: Product discovery and API-contract preparation; implementation follows backend workflow stability**
+**Status: Started — reception and clinical workspace UX foundation specified; implementation is next**
 
-Start with personas, workflow prototypes, design-system/accessibility requirements and versioned API contracts. Then deliver the responsive admin/reception/clinical experience incrementally as each backend workflow is specified. Avoid building screens against assumed patient, tenant or clinical contracts. Mobile remains deferred until validated use cases and identity/API contracts justify it.
+The first UX foundation increment is documented in [Reception and clinical workspace UX](workflows/reception-and-clinical-workspace-ux.md). It maps reception, queue and clinical tasks to the implemented patient, appointment, queue and OPD contracts; defines screen responsibilities, access/data boundaries, accessibility and failure states; and keeps billing, patient self-service and unimplemented clinical capabilities out of the first slice.
+
+The organization has a dedicated `CompileCare.Web` repository, currently a placeholder, separate from the public-facing `CompileCare.Site`. The next implementation increment is the authenticated React + TypeScript application shell in `CompileCare.Web`, followed by API-backed patient lookup and registration status. Build only against existing versioned API contracts; do not create mock business capabilities. Continue Phase 3 audit/tenant-scope and production-operational hardening in parallel as a release-readiness track. Mobile remains deferred until validated use cases and identity/API contracts justify it.
 
 ## Release gates and working rules
 
