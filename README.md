@@ -29,10 +29,10 @@ CompileCare is an India-focused hospital information and management platform for
 ## Delivery status
 
 1. **Phase 1 — Backend foundation:** API foundation and shared observability are implemented and merged.
-2. **Phase 2 — Developer platform:** Initial ApiClient and API conventions are implemented. Package publication/consuming-app validation remains a release task.
-3. **Phase 3 — Database and security:** PostgreSQL/EF Core 10, OIDC/JWT tenant membership, facility RBAC, append-only request audit events, global tenant registry and lifecycle are implemented and merged in CompileCare.Api (PR #12). Trusted initial membership provisioning, organization-scope authorization, broader asynchronous/cross-tenant tests, audit querying/retention policy and production operational controls remain.
+2. **Phase 2 — Developer platform:** ApiClient foundation and resilience/error contracts are implemented and merged. Database operations ownership, migration, backup/restore and environment runbooks are also established in CompileCare.Database (PR #1). Package publication and consuming-application validation, plus platform-specific operational automation, remain release tasks.
+3. **Phase 3 — Database and security:** PostgreSQL/EF Core 10, OIDC/JWT tenant membership, facility RBAC, append-only request audit, global tenant registry/lifecycle, trusted initial membership provisioning and organization-scope authorization are implemented and merged in CompileCare.Api (PRs #12–#13). Broader asynchronous/cross-tenant tests, audit querying/retention policy and production operational controls remain.
 4. **Phase 4 — Core healthcare domain:** Initial hospital hierarchy CRUD and pagination are implemented. Organization onboarding, staff, patient registration, appointments, queue and OPD remain.
-5. **Product-first definition:** The Product Blueprint remains the source of truth. Validate open decisions affecting tenant, patient and clinical data boundaries before the next domain implementation. The next planned implementation milestone is trusted initial membership provisioning and organization-scoped access.
+5. **Product-first definition:** The Product Blueprint remains the source of truth. Validate open decisions affecting tenant, patient and clinical data boundaries before expanding into patient-facing and clinical domains.
 
 A merged repository or passing build does not imply that a complete hospital workflow or production readiness has been delivered.
 
