@@ -239,6 +239,8 @@ MVP acceptance requires: documented tenant provisioning; authenticated organizat
 1. Validate this blueprint and decisions that affect data ownership and clinical workflow.
 2. Approve tenant/organization/patient boundary and shared observability ADRs.
 3. Implement tenant registry, lifecycle and trusted provisioning in CompileCare.Api.
+
+**Implementation status (2026-11-24):** The global tenant registry, lifecycle controls and persisted platform-operator authorization have been implemented and merged in [CompileCare.Api PR #12](https://github.com/CompileCare/CompileCare.Api/pull/12). The migration backfills existing tenant IDs and adds tenant foreign keys. The first platform operator is provisioned out-of-band by an authorised database administrator. Trusted initial tenant membership provisioning and organization-scope assignments remain open; this milestone does not yet constitute complete customer onboarding.
 4. Implement membership/role provisioning and organization-scope authorization.
 5. Implement patient master, registration/search and duplicate review.
 6. Implement appointments, check-in and queue lifecycle.
