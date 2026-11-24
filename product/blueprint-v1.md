@@ -242,7 +242,7 @@ MVP acceptance requires: documented tenant provisioning; authenticated organizat
 
 **Implementation status (2026-11-24):** The global tenant registry and lifecycle controls are merged in CompileCare.Api PR #12. Trusted initial tenant membership provisioning and tenant/hospital/department organization scopes are merged in PR #13. The facility hierarchy, PostgreSQL/EF Core persistence, OIDC/JWT membership authorization and metadata-only audit are also implemented. These provide a platform foundation, not a complete hospital workflow.
 4. Membership/role provisioning and organization-scope authorization are implemented; customer onboarding and production operations require further validation.
-5. Patient master, hospital registration/search and hospital-local MRN policy/assignment are merged in patient master PR #14 and MRN PR #15. The conservative advisory duplicate-candidate API is the current implementation increment; see ADR-010.
+5. Patient master, hospital registration/search, hospital-local MRN policy/assignment and the initial advisory duplicate-candidate API are merged in API PRs #14, #15 and #16. See ADR-010 for the deliberately conservative matching rules.
 6. Implement richer identity matching, authorized cross-hospital discovery, guardian relationships, emergency registration reconciliation and governed identity merge/correction.
 7. Implement appointments, check-in and queue lifecycle.
 8. Implement OPD encounter and follow-up.
