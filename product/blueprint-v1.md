@@ -244,11 +244,11 @@ MVP acceptance requires: documented tenant provisioning; authenticated organizat
 4. Membership/role provisioning and organization-scope authorization are implemented; customer onboarding and production operations require further validation.
 5. Patient master, hospital registration/search, hospital-local MRN policy/assignment and the normalized advisory duplicate-candidate API are merged in API PRs #14–#17. ADR-010 records the first pass; ADR-011 records the merged normalized name matcher. ADR-012 defines the next optional verified-contact design, not yet implemented.
 6. Complete patient-owned contact capture and verification only under the reviewed data-protection design in [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md). Keep verified contacts as corroboration for existing name/DOB candidates initially; any contact-only candidate rule needs a separate ADR and pilot validation. Then deliver separately authorized cross-hospital discovery, guardian relationships, emergency registration reconciliation and governed identity merge/correction.
-7. Implement appointments, check-in and queue lifecycle.
-8. Implement OPD encounter and follow-up.
-9. Add minimal billing only as confirmed by pilot requirements.
-10. Deliver matching web experience against versioned API contracts.
-11. Validate pilot operations, security, privacy, clinical workflows, backups, observability and release readiness.
+8. Implement appointments, check-in and queue lifecycle.
+9. Implement OPD encounter and follow-up.
+10. Add minimal billing only as confirmed by pilot requirements.
+11. Deliver matching web experience against versioned API contracts.
+12. Validate pilot operations, security, privacy, clinical workflows, backups, observability and release readiness.
 
 Each step gets requirements, workflow, acceptance criteria, module design, tests and a focused PR. Repository restructuring/new repositories are considered only after module ownership and deployment needs are known.
 
