@@ -1,6 +1,6 @@
 # Workflow: reception and clinical workspace UX foundation
 
-**Status:** Interaction specification with authenticated reception lookup merged; patient registration UI implementation in progress; remaining workflows require pilot validation  
+**Status:** Reception patient registration, appointment booking, walk-in arrival and queue visibility are merged; queue lifecycle controls are in implementation; remaining workflows require pilot validation  
 **Phase:** 5 — User experience  
 **Related workflows:** [Patient registration](patient-registration.md), [Appointments and queue](appointments-and-queue.md), [OPD encounter and clinical documentation](opd-encounter-and-clinical-documentation.md)  
 **Related architecture:** [ADR-005 — Frontend architecture](../../architecture/decisions/ADR-005-frontend-architecture.md)
@@ -172,3 +172,23 @@ The next implementation slice is being developed on `phase5/appointments-and-arr
 The UI implementation must follow the [CompileCare experience quality bar](../design/experience-quality-bar.md): calm clinical visual hierarchy, responsive desktop/tablet layouts, keyboard-complete selection, visible focus, status text, accessible async feedback and privacy-preserving data handling. This is an implementation standard, not a claim that the current increment has passed visual/accessibility review.
 
 The current increment is not yet merged. Required release gates are API contract tests, UI behavior tests, production TypeScript build, CI Docker build/container smoke test, and manual desktop/tablet/narrow viewport plus keyboard/accessibility review. No unsupported provider data, appointment lists, queue lifecycle actions or clinical workflows will be fabricated in the UI; missing capabilities will remain explicit follow-up work.
+
+
+## Queue operations UI increment — 2026-11-24
+
+The authenticated reception workspace now has a department/date queue view. The next vertical slice adds operator controls to each queue row, using the existing API route POST /api/v1/hospitals/{hospitalId}/queue/{queueEntryId}/{action} and the queue.manage policy. The UI must not attempt a transition unless the server response succeeds; after success, reconcile the affected row from the returned DTO.
+
+| Current state | Available action(s) | Result |
+|---|---|---|
+| Waiting | Call, Cancel, No-show | Called, Cancelled, NoShow |
+| Called | Recall, Start consultation, Cancel, No-show | Waiting, InProgress, Cancelled, NoShow |
+| InProgress | Complete | Completed |
+| Terminal | No ordinary action | Remains closed |
+
+Cancellation and no-show require an explicit 1–250 character reason accepted by the API. No-show is an explicit staff decision, not an automatic timeout. Call/recall/start/complete do not collect a reason. The UI exposes only the returned queue token and operational status; it does not display patient name, MRN or clinical information. Server-side authorization and hospital/department scope remain authoritative for every action. Conflicts and forbidden responses are surfaced without pretending the action succeeded.
+
+The operator controls are responsive and keyboard operable, with status text in addition to color, visible focus, disabled in-flight controls and an accessible error announcement. Manual viewport/accessibility review remains a release gate.
+
+### Visual evidence and screenshot policy
+
+Production UI screenshots must be captured from the actual running authenticated web application, not generated mockups. Use a staging OIDC authority and API with synthetic patient/queue data only. Capture desktop, tablet and narrow-screen views of reception context, patient lookup/registration, appointment booking, walk-in/check-in and queue operations. Never capture real patient data, access tokens, browser storage, or private identity-provider details. Keep the screenshot source environment and commit/build SHA in the accompanying evidence note. Until a staging identity/API configuration and browser capture environment are available, screenshot evidence is marked pending rather than substituted with fabricated images.
