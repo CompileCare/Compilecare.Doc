@@ -10,7 +10,7 @@
 | `CompileCare.Caching` | README describes shared caching library; inspected initial commit shows README and gitignore | Skeleton/early stage |
 | `CompileCare.ApiClient` | README describes API client for microservices communication; inspected initial commit shows README and gitignore | Skeleton/early stage |
 | `CompileCare.Database` | README says database queries and deployment; inspected initial commit shows README and gitignore | Scope needs clarification |
-| `CompileCare.OtpService` | Root README was not found; inspected initial commit showed gitignore | Need source/tree and service requirements |
+| `CompileCare.OtpService` | PR #1 was closed without merging; reviewed its proposed API/service code | Security-sensitive prototype; not safe to integrate or deploy. Requires a complete threat model and refactor before reuse |
 | `CompileCare.Site` | README says CompileCare website; initial commit shows README and gitignore | Skeleton |
 | `Compilecare.Doc` | Documentation repository; foundation docs are being added | Documentation source of truth; repository capitalization remains a naming inconsistency |
 | `CompileCare.Web` | Renamed from `Complilecare.Web`; README says intended for web app; initial commit shows README and gitignore | Skeleton |
@@ -37,6 +37,35 @@ Solution contains core, ASP.NET Core, and Worker libraries; sample API/Worker; t
 - Shared libraries should be packaged/versioned when contracts and consumers are stable; avoid premature proliferation.
 - Database repo's “all database queries and deployment” scope may couple unrelated concerns. Prefer module schema/migration ownership and explicit deployment tooling boundaries.
 - Inventory suggests the hospital platform itself is not yet implemented; documentation must label planned capabilities clearly.
+
+
+## OTP service security assessment (2026-11-24)
+
+Reviewed the closed, unmerged [CompileCare.OtpService PR #1](https://github.com/CompileCare/CompileCare.OtpService/pull/1) and its source. It is not approved for deployment or integration.
+
+### Blocking findings
+- OTP values are stored in the distributed cache in plaintext.
+- Verification has no attempt counter/lockout; a six-digit OTP can be brute-forced while valid.
+- Request cooldown is a non-atomic read-then-write and keyed only by the submitted identifier; concurrent requests and distributed abuse are not controlled.
+- No IP/device/recipient rate-limit policy or abuse monitoring is demonstrated.
+- Endpoints accept primitive parameters, lack a documented identity/authorization contract, and the host configures permissive CORS.
+- Redis is configured without demonstrated fail-closed behavior for missing/invalid production configuration.
+- SMS provider initialization uses a static/global client configuration and the shown request path does not propagate cancellation.
+- Recipient normalization/validation and privacy-safe responses need a formal contract; user existence and channel responses must not enable enumeration.
+- Tests cover basic happy/failure cases but do not prove expiry, attempts, concurrency, delivery failures, rate limits, replay prevention or abuse controls.
+- A provider credential was previously committed in Git history. **The credential must be revoked/rotated by its owner; deleting it from current files does not invalidate history.** No secret value is reproduced here.
+
+### Required remediation before reuse
+1. Confirm purpose and ownership: account verification, login MFA, step-up auth or another use case. Prefer the identity provider's supported MFA where it satisfies the requirement.
+2. Establish a versioned request/response contract, recipient/channel policy and generic anti-enumeration response behavior.
+3. Hash OTPs at rest using a server-side secret/HMAC (with key rotation), compare in constant time, and store expiry plus attempt count/state.
+4. Use atomic Redis operations/Lua or another proven mechanism for issue cooldown, attempt counting, one-time consumption and per-recipient/IP limits across instances.
+5. Enforce short expiry, bounded attempts, resend cooldown, abuse/rate limits, one-time verification and cancellation/timeouts.
+6. Secure delivery adapters and configuration; avoid global provider client mutation; redact recipient identifiers and never log OTPs.
+7. Add comprehensive tests including concurrency and cache outages, plus CI security/dependency checks.
+8. Rotate the exposed historical credential and decide whether repository history rewriting is required by the organization; coordinate it to avoid disrupting collaborators.
+
+This service remains deferred until the product's authentication/contact-verification need and security owner are established.
 
 ## Next audit steps
 Complete tree/source audit of Caching, ApiClient, Database, OTP, Site, Web, Mobile; inspect dependencies, workflows, tests and configuration. Then agree naming/boundaries, CI templates, and platform repository creation.
