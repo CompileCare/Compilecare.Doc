@@ -9,7 +9,7 @@ This audit is based on GitHub connector inspection. A local checkout, full build
 ## Executive summary
 
 - 10 repositories exist in the CompileCare organization.
-- 46 branches were observed, including 10 `main` branches; 36 non-main branches remain.
+- 46 branches were observed in the initial snapshot, including 10 `main` branches; 36 non-main branches remained. The audit branch created for this report is excluded from that snapshot.
 - 25 pull requests were observed across the repositories: 21 merged, 2 closed without merge, and 2 open.
 - The two open PRs are CompileCare.Mobile #1 and CompileCare.OtpService #1.
 - The API is the most complete application repository: .NET 10, PostgreSQL/EF Core 10, tenant context, OIDC/JWT membership-based authorization, facility hierarchy CRUD, pagination, migrations, and metadata-only append-only audit.
