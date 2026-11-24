@@ -7,9 +7,9 @@
 | Repository | Observed purpose/state | Initial assessment |
 |---|---|---|
 | `CompileCare.Observability` | .NET 9 solution with core, ASP.NET Core and Worker components, samples, health checks, OpenTelemetry, Serilog, Docker stack, CI/NuGet publishing | Most mature shared foundation; hardening/review before adoption |
-| `CompileCare.Caching` | README describes shared caching library; inspected initial commit shows README and gitignore | Skeleton/early stage |
-| `CompileCare.ApiClient` | README describes API client for microservices communication; inspected initial commit shows README and gitignore | Skeleton/early stage |
-| `CompileCare.Database` | README says database queries and deployment; inspected initial commit shows README and gitignore | Scope needs clarification |
+| `CompileCare.Caching` | .NET 10 HybridCache + optional Redis package on main; config validation, tenant/global key builder, sample, CI; PR #2 merged with 11 tests and pack | Foundation complete; consumer integration, invalidation strategy and production Redis configuration remain |
+| `CompileCare.ApiClient` | .NET 10 typed/named clients, auth/tenant/correlation providers, resilience, Problem Details; correlation validation fix merged in PR #3 | Foundation complete; package/consumer validation and API contract generation remain |
+| `CompileCare.Database` | Operational ownership, migration/release, backup/restore and environment runbooks merged in PR #1 | Documentation foundation; hosting-specific automation and restore drills remain |
 | `CompileCare.OtpService` | PR #1 was closed without merging; reviewed its proposed API/service code | Security-sensitive prototype; not safe to integrate or deploy. Requires a complete threat model and refactor before reuse |
 | `CompileCare.Site` | README says CompileCare website; initial commit shows README and gitignore | Skeleton |
 | `Compilecare.Doc` | Documentation repository; foundation docs are being added | Documentation source of truth; repository capitalization remains a naming inconsistency |
@@ -67,5 +67,9 @@ Reviewed the closed, unmerged [CompileCare.OtpService PR #1](https://github.com/
 
 This service remains deferred until the product's authentication/contact-verification need and security owner are established.
 
-## Next audit steps
-Complete tree/source audit of Caching, ApiClient, Database, OTP, Site, Web, Mobile; inspect dependencies, workflows, tests and configuration. Then agree naming/boundaries, CI templates, and platform repository creation.
+## Next implementation steps
+- Finish Phase 2 consumer validation and package publication/release workflow.
+- Validate proposed patient identity/registration ADR-008 with pilot stakeholders before implementing patient schema and APIs.
+- Continue API cross-tenant, audit, asynchronous and production-hardening tests.
+- Defer OTP until its purpose/security owner is agreed and all blockers—including credential rotation—are addressed.
+- Start Web after patient/registration API contracts are stable; Mobile follows validated use cases and auth contracts.
