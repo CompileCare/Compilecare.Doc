@@ -202,7 +202,7 @@ The first UI slice includes:
 - A department/date-filtered clinical queue that shows only operational queue tokens and in-progress state.
 - Open/resume behavior: look up the existing encounter first, create only when none exists, and recover a concurrent create conflict by retrieving the newly created encounter.
 - Explicit draft save for the five approved note sections with API-aligned character limits.
-- Review-and-sign action that saves the current draft before requesting the server-side signature; chief complaint and assessment are required by the API.
+- Require explicit confirmation that the displayed patient identity has been checked before showing or editing note content. The review-and-sign action saves the current draft before requesting the server-side signature; chief complaint and assessment are required by the API.
 - Read-only signed/closed note presentation, append-only amendments with required reason/content, unsigned cancellation with required reason, and signed encounter closure.
 - Server-returned state reconciliation only; permission, validation and concurrency errors remain visible.
 - Queue rows remain token-only; the encounter editor retrieves and displays only the patient name and date of birth returned by the hospital-scoped patient read contract. No MRN, contact data or note text is placed in queue rows, URLs or general telemetry. The encounter workspace may show the minimal patient identity returned by the authorized hospital-scoped patient read API.
