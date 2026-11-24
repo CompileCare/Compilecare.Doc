@@ -43,22 +43,21 @@ Keep registration-required fields separate from clinical-workflow-required field
 
 ### 3. Duplicate detection and matching
 
-Use configurable, auditable, multi-factor candidate matching. Conceptual signal priority (not numeric weights):
+Matching is configurable and auditable, but each signal must have an approved data source, ownership model, verification meaning and access policy. Conceptual future signal priority is not an implementation contract or proof of identity.
 
-| Signal | Relative priority |
+| Signal | Current/future treatment |
 |---|---|
-| Exact existing hospital MRN | Very high |
-| Exact verified ABHA reference | Very high, subject to approved linkage |
-| Exact verified mobile number | High |
-| Name + date of birth | Medium to high |
-| Name + guardian name | Medium |
-| Name + age + sex | Medium |
-| Similar name + matching address | Low to medium |
-| Name alone | Low |
+| Exact existing hospital MRN | Hospital-local identifier lookup and conflict handling; not a global patient primary key |
+| Exact verified ABHA reference | Future, subject to separately approved ABDM linkage and consent/policy |
+| Exact verified patient-owned phone/email | Future corroborating signal only under ADR-012; not sufficient alone and not currently stored or matched |
+| Exact DOB plus normalized name rules | Current hospital-local advisory candidate rule under ADR-011 |
+| Name plus guardian details, estimated age/sex or address | Not implemented; requires separately approved data model, source/ownership semantics and validation |
 
-Normalize names and phone numbers; support spelling variations and transliteration appropriate to Indian names. Account for missing/estimated DOB and shared family phone numbers. A shared phone number or address is never sufficient proof of identity.
+The active matcher is defined by ADR-011: exact DOB is mandatory, with a normalized given-name match or both normalized middle and family names matching. It does not use phone, email, address, sex, estimated age, guardian details or external identity evidence.
 
-Strong matches are prioritized for staff verification; possible matches are presented for manual review; weak matches may allow registration with an advisory warning. Conflicting identifiers block assignment of the conflicting identifier and route the case for resolution. Matching thresholds and behavior remain configurable and auditable. No automatic patient linking or merge is permitted based solely on a score.
+A verified contact proves control of a communication channel at a point in time, not that the controller is the patient. Shared household contacts, recycled phone numbers and representative-owned contacts must not be treated as unique patient identifiers. ADR-012 defines the proposed contact lifecycle and permits only a future corroborating annotation for an already-qualified ADR-011 candidate; a contact-only match must not create a candidate.
+
+No numeric confidence score, transliteration or fuzzy matching is active. Strong/possible/weak categories require a separately validated policy; a no-candidate result is not proof that no duplicate exists. Conflicting identifiers route to a governed resolution workflow. No automatic patient linking or merge is permitted.
 
 ### 4. Duplicate resolution and merge authority
 
