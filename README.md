@@ -13,6 +13,9 @@ CompileCare is an India-focused hospital information and management platform for
 - [Delivery roadmap and current implementation status](product/roadmap.md)
 - [Requirements lifecycle](product/requirements-lifecycle.md)
 - [Patient registration workflow](product/workflows/patient-registration.md)
+- [Staff and provider management workflow](product/workflows/staff-and-provider-management.md)
+- [ADR-012: Staff and provider profile boundaries](architecture/decisions/ADR-012-staff-and-provider-profile-boundaries.md)
+- [ADR-012: Verified patient contact data](architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md)
 - [Non-functional requirements](product/non-functional-requirements.md)
 - [Architecture overview](architecture/overview.md)
 - [API conventions and error contracts](architecture/api-conventions.md)
@@ -31,7 +34,7 @@ CompileCare is an India-focused hospital information and management platform for
 1. **Phase 1 — Backend foundation:** API foundation and shared observability are implemented and merged.
 2. **Phase 2 — Developer platform:** ApiClient foundation and resilience/error contracts are implemented and merged. Database operations ownership, migration, backup/restore and environment runbooks are also established in CompileCare.Database (PR #1). Package publication and consuming-application validation, plus platform-specific operational automation, remain release tasks.
 3. **Phase 3 — Database and security:** PostgreSQL/EF Core 10, OIDC/JWT tenant membership, facility RBAC, append-only request audit, global tenant registry/lifecycle, trusted initial membership provisioning and organization-scope authorization are implemented and merged in CompileCare.Api (PRs #12–#13). Broader asynchronous/cross-tenant tests, audit querying/retention policy and production operational controls remain.
-4. **Phase 4 — Core healthcare domain:** Initial hospital hierarchy CRUD and pagination are implemented. Organization onboarding, staff, patient registration, appointments, queue and OPD remain.
+4. **Phase 4 — Core healthcare domain:** Hospital hierarchy, patient master/registration, hospital-local MRN, advisory duplicate detection and normalized multi-signal matching are implemented. Verified patient-contact capture is designed but not implemented (documentation PR #19). Staff/provider management is the next design increment (documentation PR #20); appointments, queue and OPD follow.
 5. **Product-first definition:** The Product Blueprint remains the source of truth. Validate open decisions affecting tenant, patient and clinical data boundaries before expanding into patient-facing and clinical domains.
 
 A merged repository or passing build does not imply that a complete hospital workflow or production readiness has been delivered.

@@ -51,7 +51,7 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 ## Phase 4 — Core healthcare domain
 
-**Status: Partially implemented**
+**Status: Partially implemented — patient identity matching foundation merged; contact enrichment is designed separately; staff/provider management is the next design increment.**
 
 ### Implemented
 
@@ -63,12 +63,13 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 ### Remaining delivery order
 
 1. Complete the validated hospital group/branch onboarding model; tenant registry, lifecycle, trusted initial membership provisioning and organization scopes are implemented, while customer-specific onboarding and operational controls remain.
-2. Staff/provider profiles, organizational assignments, schedules and scoped permissions.
-3. **Patient identity — normalized candidate matching completed; contact design is the next increment.** Patient master, hospital registration, hospital-local MRN assignment and advisory duplicate-candidate matching are merged through API PRs #14–#17. The normalized matcher is on API main at c603dc602565b69f25b24b4738e45f24c4090362; post-merge build, EF model-drift check, 12 unit tests and 58 PostgreSQL integration tests passed. ADR-012 now defines the proposed patient-owned phone/email contact lifecycle, protected storage, verification, permissions and matching limits. This documentation increment does not add API schema or runtime contact handling. After design review, implement contact storage/protection first, then challenge verification, and only later add corroboration to already-qualified name/DOB candidates. Cross-hospital discovery, guardian relationships, emergency reconciliation, identifier lifecycle and governed patient association/merge remain separate increments.
-4. Patient appointments, walk-in, check-in and queue journey.
-5. OPD encounter and clinical documentation foundation.
-6. Minimal billing only if required by the validated pilot journey.
-7. Pharmacy, diagnostics, inpatient, inventory and advanced revenue workflows in the approved roadmap sequence.
+2. **Patient identity — normalized candidate matching completed; contact design is next.** Patient master, hospital registration, hospital-local MRN and advisory duplicate matching are merged through API PRs #14–#17. The normalized matcher is on API main at c603dc602565b69f25b24b4738e45f24c4090362; post-merge build, EF model-drift check, 12 unit tests and 58 PostgreSQL integration tests passed. Patient-owned phone/email contact lifecycle, protected storage, verification, permissions and matching limits are proposed in ADR-012, merged through documentation PR #19. No contact API/schema/runtime implementation is included. Following design review, implement protected contact storage first, then challenge verification, and only later consider contact corroboration for existing name/DOB candidates. Cross-hospital discovery, guardian relationships, emergency reconciliation and governed identity workflows remain separate.
+3. Staff and provider management: tenant-owned profiles, hospital/department assignments and scoped permissions as defined in ADR-012 (staff/provider profile boundaries) and documentation PR #20.
+4. Patient-owned contact storage and verification following ADR-012 (verified patient contact design, documentation PR #19), after security/privacy/provider/key-management decisions are approved. Initially allow only corroboration of existing exact-DOB/name candidates.
+5. Patient appointments, walk-in, check-in and queue journey.
+6. OPD encounter and clinical documentation foundation.
+7. Minimal billing only if required by the validated pilot journey.
+8. Pharmacy, diagnostics, inpatient, inventory and advanced revenue workflows in the approved roadmap sequence.
 
 Each domain workflow requires hospital-user validation, permissions, audit, tenant scope, acceptance criteria, migration and automated tests.
 
