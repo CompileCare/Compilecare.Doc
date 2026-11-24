@@ -1,6 +1,6 @@
 # ADR-011: Normalized multi-signal patient duplicate matching
 
-- **Status:** Accepted for implementation; API PR #17 is under review
+- **Status:** Implemented and merged in CompileCare.Api PR #17; contact enrichment is governed separately by ADR-012
 - **Date:** 2026-11-24
 - **Decision owners:** CompileCare product and architecture; pilot hospitals validate registration and identity-review procedures
 - **Scope:** Improve advisory duplicate candidates inside the selected hospital using currently supported patient demographics
@@ -47,7 +47,7 @@ Return explicit match signals for DOB, normalized given name, normalized middle 
 
 ### 4. Do not invent unavailable demographic signals
 
-Phone, email, address, sex, estimated age, verified identifiers and guardian details are not part of the current patient master. Do not use any of them for matching until their data model, optionality, validation, verification status, retention, encryption/access controls and hospital configuration have been separately reviewed. A shared or unverified phone number must never be treated as identity proof.
+Phone, email, address, sex, estimated age, verified identifiers and guardian details are not part of the current patient master. Phone/email contact design is defined separately in ADR-012; it is not yet implemented. The ADR-011 candidate inclusion rule must not be widened by contact data. A shared, guardian-owned or unverified phone/email must never be treated as patient identity proof.
 
 ### 5. No automatic identity action
 
@@ -66,9 +66,15 @@ Candidate detection remains advisory. It must not block registration, allocate a
 
 This expands recall for formatting differences and records whose given name differs while both middle and family names match. It still does not detect misspellings, transliteration differences, phonetic equivalents, nickname variants, missing DOB or records with different dates of birth. A no-candidate result is not proof that no duplicate exists. Manual hospital verification remains mandatory.
 
-Future demographic enrichment, cross-hospital discovery, verified-contact matching, duplicate case queues, patient association, merge approval and reversal require their own reviewed increments and tests.
+Future contact capture and verification follow ADR-012. The first contact-aware increment may only annotate an already-qualified ADR-011 candidate with a verified, patient-owned, non-shared contact corroboration signal; it must not create candidates by contact alone. Cross-hospital discovery, duplicate case queues, patient association, merge approval and reversal require their own reviewed increments and tests.
 
 
 ## Implementation status — 2026-11-24
+
+The implementation was squash-merged into CompileCare.Api main through PR #17 as commit c603dc602565b69f25b24b4738e45f24c4090362. It adds persisted normalized name keys, a migration/backfill, tenant/DOB/name indexes and the normalized given-name OR middle-plus-family candidate rule.
+
+The final PR head passed the EF Core model-drift check, standard CI and Docker Compose PostgreSQL verification: 12 unit tests and 58 integration tests passed with zero failures. Post-merge main CI also passed on the merge commit: build succeeded with zero compiler warnings/errors, the EF Core pending-model-change check passed, 12 unit tests passed and 58 PostgreSQL integration tests passed.
+
+The API remains advisory and hospital-local. It requires exact DOB and the documented normalized-name rule, returns at most 20 minimal candidates, and does not link, block or merge records. See ADR-012 before introducing phone/email contact data or contact-based corroboration.
 
 The implementation is proposed in [CompileCare.Api PR #17](https://github.com/CompileCare/CompileCare.Api/pull/17). It adds persisted normalized name keys, a migration/backfill, tenant/DOB/name indexes and the normalized given-name OR middle-plus-family candidate rule. The final PR head passed the EF Core model-drift check, standard CI and Docker Compose verification: 12 unit tests and 58 PostgreSQL integration tests passed in each verification path, with zero failures. The PR remains open and unmerged pending review.
