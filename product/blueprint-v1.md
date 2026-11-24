@@ -121,8 +121,8 @@ Modules are logical domain boundaries, not automatic instructions to create repo
 | Organization & facilities | Group/hospital/branch/department/unit/facility resources | Extend existing slice |
 | Identity & access | OIDC principal binding, membership, roles, permissions, scope | Foundation |
 | Patient management | Identity, demographics, identifiers, registration, duplicate review | MVP |
-| Scheduling | Provider/service availability, appointments, cancellation/reschedule | MVP |
-| Front desk & queue | Arrival, check-in, tokens, queue and worklists | MVP |
+| Scheduling | Date-specific provider availability, appointment booking/cancellation/rescheduling | MVP — next delivery increment |
+| Front desk & queue | Walk-ins, arrival, check-in, FIFO tokens and queue worklists | MVP — next delivery increment |
 | Clinical/OPD | Encounters, notes, observations, diagnoses, care plan and orders | MVP foundation |
 | Revenue cycle | Tariffs, charges, invoices, receipts, payments and refunds | Minimal pilot scope |
 | Diagnostics | Laboratory and radiology workflows/results | Later |
@@ -257,8 +257,8 @@ MVP acceptance requires: documented tenant provisioning; authenticated organizat
 4. Membership/role provisioning and organization-scope authorization are implemented; customer onboarding and production operations require further validation.
 5. Patient master, hospital registration/search, hospital-local MRN policy/assignment and the normalized advisory duplicate-candidate API are merged in API PRs #14–#17. ADR-010 records the first pass; ADR-011 records the merged normalized name matcher. ADR-012 defines the next optional verified-contact design, not yet implemented.
 6. **Staff/provider foundation implemented:** tenant-owned profiles, effective-dated hospital/department assignments and scoped staff permissions are merged in CompileCare.Api PR #18, following [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). Profile-to-membership linking remains deferred. A profile or provider designation must not itself grant access or establish credentialing/clinical authority.
-7. Complete patient-owned contact capture and verification only under the reviewed data-protection design in [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md). Keep verified contacts as corroboration for existing name/DOB candidates initially; any contact-only candidate rule needs a separate ADR and pilot validation. Cross-hospital discovery, guardian relationships, emergency registration reconciliation and governed identity merge/correction remain separate.
-8. Implement appointments, check-in and queue lifecycle.
+7. Implement appointments, walk-ins, check-in and queue lifecycle following [ADR-014](../architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md) and [the appointment/queue workflow](workflows/appointments-and-queue.md). Keep availability, appointment, queue and encounter ownership separate.
+8. Complete patient-owned contact capture and verification only under the reviewed data-protection design in [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md). Keep verified contacts as corroboration for existing name/DOB candidates initially; any contact-only candidate rule needs a separate ADR and pilot validation. Cross-hospital discovery, guardian relationships, emergency registration reconciliation and governed identity merge/correction remain separate and gated on approved privacy/security decisions.
 9. Implement OPD encounter and follow-up.
 10. Add minimal billing only as confirmed by pilot requirements.
 11. Deliver matching web experience against versioned API contracts.
