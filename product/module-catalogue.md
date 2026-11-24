@@ -8,6 +8,9 @@ Tenant/customer management; hospital/branch/department/unit hierarchy; identity/
 ## Patient services
 Registration, demographics, contact details, UHID/MRN, search, duplicate detection/merge governance, appointments, rescheduling/cancellation, queue/token management, waiting-room display, patient portal/mobile (later).
 
+## Appointments and front desk
+Date-specific provider availability sessions; appointment booking, cancellation and rescheduling; patient arrival and check-in; walk-in registration; department FIFO queue and token lifecycle. Scheduling reserves a provider time; queue records operational arrival/work; neither is a clinical encounter. Patient self-booking, recurring rosters, waitlists, service catalogue/tariffs and clinical prioritization are later capabilities.
+
 ## Clinical care
 OPD encounters, vitals, notes, diagnosis, allergies/history, care plans, referrals, prescription/medication orders, templates.
 
@@ -34,4 +37,4 @@ Operational dashboards; OPD/IPD census; occupancy; wait time; revenue/collection
 ABDM/ABHA subject to approved requirements; FHIR/HL7; DICOM; payment providers/UPI; SMS/email/WhatsApp; insurance/TPA; accounting/external systems.
 
 ## Proposed delivery order
-Foundation → Patient + Appointments → OPD/Clinical → Billing → Pharmacy → Lab → IPD → integrations and advanced operations.
+Foundation → Patient + Staff/Provider → Appointments + Walk-ins + Check-in/Queue → OPD/Clinical → Billing (if pilot requires) → Pharmacy → Lab → IPD → integrations and advanced operations.
