@@ -51,7 +51,7 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 ## Phase 4 — Core healthcare domain
 
-**Status: Partially implemented — patient identity matching foundation merged; staff/provider management is the next implementation increment; contact enrichment is designed separately.**
+**Status: Partially implemented — patient identity matching and the initial staff/provider management foundation are implemented and merged; patient contact enrichment is designed separately.**
 
 ### Implemented
 
@@ -64,12 +64,25 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 1. Complete the validated hospital group/branch onboarding model; tenant registry, lifecycle, trusted initial membership provisioning and organization scopes are implemented, while customer-specific onboarding and operational controls remain.
 2. **Patient identity — normalized candidate matching completed; contact design is next.** Patient master, hospital registration, hospital-local MRN and advisory duplicate matching are merged through API PRs #14–#17. The normalized matcher is on API main at c603dc602565b69f25b24b4738e45f24c4090362; post-merge build, EF model-drift check, 12 unit tests and 58 PostgreSQL integration tests passed. Patient-owned phone/email contact lifecycle, protected storage, verification, permissions and matching limits are proposed in ADR-012, merged through documentation PR #19. No contact API/schema/runtime implementation is included. Following design review, implement protected contact storage first, then challenge verification, and only later consider contact corroboration for existing name/DOB candidates. Cross-hospital discovery, guardian relationships, emergency reconciliation and governed identity workflows remain separate.
-3. **Staff and provider management (next):** deliver tenant-owned profiles, effective-dated hospital/department assignments and integration with the existing membership model. Follow [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). Profiles do not independently grant access; OIDC identity, tenant membership, scoped role grants and authorization remain authoritative.
+3. **Staff and provider management — initial foundation merged:** tenant-owned profiles, effective-dated hospital/department assignments, bounded staff search and scoped staff permissions are implemented in CompileCare.Api PR #18. Follow [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). Profile-to-membership linking, credential verification and clinical privileging are deliberately not included; profiles and designations do not independently grant access or clinical authority.
 4. Patient-owned contact storage and verification following [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md), after security/privacy/provider/key-management decisions are approved. Initially allow only corroboration of existing exact-DOB/name candidates.
 5. Patient appointments, walk-in, check-in and queue journey.
 6. OPD encounter and clinical documentation foundation.
 7. Minimal billing only if required by the validated pilot journey.
 8. Pharmacy, diagnostics, inpatient, inventory and advanced revenue workflows in the approved roadmap sequence.
+
+### Deferred workforce, credentialing and HR roadmap — retained for later
+
+These capabilities are intentionally outside the initial staff-profile increment and the first outpatient MVP. They remain planned product areas and must not be dropped from future planning:
+
+1. **Workforce identity:** approved staff-profile-to-membership linking and the employee self-service foundation. A profile is not an account; linking requires a verified identity and an attributable approval trail.
+2. **Credentialing and clinical privileging:** qualification and credential evidence, issuing-body verification, licence validity/expiry, renewal and facility-specific privileges. Provider designation alone never authorizes clinical practice; clinical permissions must depend on verified credentials and active privileges.
+3. **Workforce operations:** rosters, shifts, attendance, leave and related approval workflows, designed as explicit workforce capabilities rather than extra staff-profile fields.
+4. **HR and finance:** compensation, payroll, payslips and payroll integration. Prefer integration with established payroll providers before building a full payroll engine unless pilot requirements justify otherwise.
+5. **Secure employee records:** sensitive identifiers and employment documents in a dedicated, encrypted and access-restricted employee-record/document capability, with purpose limitation, audit and retention controls. Do not expose these fields in ordinary staff APIs or telemetry.
+6. **Cross-tenant workforce:** governed multi-hospital/cross-tenant staff sharing and assignments only after ownership, consent, legal basis, authorization, audit and tenant-isolation rules are explicitly approved.
+
+**Provisional pilot defaults to revisit with the hospital:** collect only operationally necessary profile fields (staff code, name, designation and only the contact details required for the workflow); permit concurrent assignments only where explicitly allowed by policy and validate conflicting effective dates; keep profile create/update/deactivate permissions with HospitalAdmin initially and make account linking a separately restricted action; prefer a tenant-configurable designation catalogue; require verified identity plus an auditable approval process before membership linking; and confirm applicable Indian legal requirements and the pilot hospital's retention policy before collecting employment records or sensitive identifiers. These are planning defaults, not legal advice or final product approvals.
 
 Each domain workflow requires hospital-user validation, permissions, audit, tenant scope, acceptance criteria, migration and automated tests.
 
