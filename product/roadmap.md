@@ -25,7 +25,7 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 ## Phase 3 — Database, identity and security
 
-**Status: Foundation milestone completed — persistence, OIDC/tenant RBAC, request audit, tenant registry/lifecycle, trusted membership provisioning and organization scopes are implemented and merged. Production operational hardening remains.**
+**Status: Foundation milestone completed — persistence, OIDC/tenant RBAC, request audit, tenant registry/lifecycle, trusted membership provisioning and organization scopes are implemented and merged. Audit hardening is actively progressing in parallel with the user experience track; production operational hardening remains.**
 
 ### Implemented foundation
 
@@ -42,7 +42,7 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 ### Remaining work — recommended order
 
-1. Extend audit coverage for authentication/authorization outcomes, membership and role changes, sensitive record access, exports, privileged support and material clinical/business actions. Define controlled audit query/export, retention and operational access policies.
+1. **Audit hardening in progress:** API PR #24 is merged with PostgreSQL-backed coverage for anonymous access denial and malformed tenant-context rejection. API PR #25 adds coverage for privileged initial-administrator provisioning. Continue with membership role/scope updates, sensitive record access, exports, privileged support and material clinical/business actions. Define controlled audit query/export, retention and operational access policies.
 2. Extend tenant isolation and authorization tests to background jobs, messaging, caches, file/object storage, exports, search, support tools and privileged operations.
 3. Rehearse migration install/upgrade and production migration deployment. Complete backup/restore automation and recovery drills; define signing-key rotation, secrets, encryption, retention/deletion, incident response and access reviews.
 4. Complete threat modelling, suitable penetration testing and qualified privacy/legal review for applicable Indian requirements. Do not claim regulatory compliance from implementation or documentation alone.
@@ -90,11 +90,11 @@ Each domain workflow requires hospital-user validation, permissions, audit, tena
 
 ## Phase 5 — User experience
 
-**Status: Started — reception and clinical workspace UX foundation specified; authenticated shell and patient lookup are next**
+**Status: Started — authenticated workspace shell implemented and merged; API-backed reception workflows are next**
 
 The first UX foundation increment is documented in [Reception and clinical workspace UX](workflows/reception-and-clinical-workspace-ux.md). It maps reception, queue and clinical tasks to the implemented patient, appointment, queue and OPD contracts; defines screen responsibilities, access/data boundaries, accessibility and failure states; and keeps billing, patient self-service and unimplemented clinical capabilities out of the first slice.
 
-The organization has a dedicated `CompileCare.Web` repository, currently a placeholder, separate from the public-facing `CompileCare.Site`. The next implementation increment is the authenticated React + TypeScript application shell in `CompileCare.Web`, followed by API-backed patient lookup and registration status. Build only against existing versioned API contracts; do not create mock business capabilities. Continue Phase 3 audit/tenant-scope and production-operational hardening in parallel as a release-readiness track. Mobile remains deferred until validated use cases and identity/API contracts justify it.
+The organization has a dedicated `CompileCare.Web` repository, separate from the public-facing `CompileCare.Site`. The authenticated React + TypeScript workspace shell is implemented and merged (Web PR #1, merge commit `af37ecba2d8224474964f9052b394cb9dca6fd6b`). It establishes the OIDC Authorization Code + PKCE boundary, responsive workspace navigation and Docker-backed build/smoke verification. Reception, queue and clinical cards are entry-point placeholders only; no patient or clinical data is mocked or exposed. Next, agree and implement the current-user tenant/hospital context contract, then deliver API-backed patient lookup and registration status. Build only against versioned API contracts; do not create mock business capabilities. Continue Phase 3 audit/tenant-scope and production-operational hardening in parallel as a release-readiness track. Mobile remains deferred until validated use cases and identity/API contracts justify it.
 
 ## Release gates and working rules
 
