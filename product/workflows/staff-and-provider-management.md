@@ -23,12 +23,10 @@ Maintain the workforce profiles and facility assignments needed to operate a hos
 
 ## Main workflow
 
-1. **Create profile:** an authorized administrator records the minimum approved operational details. The API derives tenant context from the authenticated request and validates any selected facility references.
-2. **Assign organization:** the administrator assigns the person to a hospital and, where applicable, a department. The assignment records effective dates and status. Department-to-hospital and tenant relationships are validated server-side.
-3. **Link application access (optional):** when the person needs CompileCare access, an authorized administrator links the profile to an existing tenant membership after verifying the identity relationship. Creating a profile does not create a login or grant a role.
-4. **Record provider designation (optional):** an authorized user records an operational provider designation or specialty from an approved vocabulary. The UI and API clearly distinguish this metadata from verified professional credentials or clinical privileges.
-5. **Maintain changes:** authorized administrators update permitted profile fields, add or end-date assignments, or deactivate/reactivate profiles. Changes retain history and generate attributable audit events.
-6. **Review:** users can list/search only within their authorized tenant and organization scope. Collection endpoints use bounded pagination and do not expose sensitive HR data.
+1. **Create profile and first assignment:** an authorized administrator records the minimum approved operational details and the initial hospital/department assignment in one transaction. The API derives tenant context from the authenticated request and validates facility references and organization scope.
+2. **Record provider designation (optional):** an authorized user records an operational provider designation or specialty from an approved vocabulary. The UI and API clearly distinguish this metadata from verified professional credentials or clinical privileges.
+3. **Maintain changes:** authorized administrators update permitted profile fields, add or end-date assignments, or deactivate/reactivate profiles. Changes retain history and generate attributable audit events.
+4. **Review:** users can list/search only within their authorized tenant and organization scope. Collection endpoints use bounded pagination and do not expose sensitive HR data.
 
 ## Alternate and failure paths
 
@@ -52,7 +50,7 @@ Maintain the workforce profiles and facility assignments needed to operate a hos
 - A tenant-scoped administrator can create and retrieve a minimal staff profile.
 - Authorized users can list/search profiles with bounded pagination; out-of-scope users cannot enumerate them.
 - Hospital and department assignments enforce tenant and hierarchy integrity and retain effective-date history.
-- Profile-to-membership linking is explicit, same-tenant, authorized and auditable; a profile alone never grants access.
+- The first increment does not link profiles to login memberships. A future linking workflow must be explicit, same-tenant, authorized, evidence-backed and auditable; a profile alone must never grant access.
 - Provider designation is explicitly non-credentialing metadata.
 - Deactivation preserves profile and assignment history.
 - PostgreSQL integration tests cover tenant isolation, organization-scope authorization, invalid references, pagination, lifecycle and audit behavior.
@@ -61,4 +59,4 @@ Maintain the workforce profiles and facility assignments needed to operate a hos
 
 ## Deferred
 
-Payroll, attendance, rostering, leave, compensation, employee self-service, credential verification, licensing/privileging, sensitive identifiers, document vaults and cross-tenant staff sharing require separate product and security decisions.
+Profile-to-membership linking, payroll, attendance, rostering, leave, compensation, employee self-service, credential verification, licensing/privileging, sensitive identifiers, document vaults and cross-tenant staff sharing require separate product and security decisions.
