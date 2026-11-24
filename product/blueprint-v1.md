@@ -81,7 +81,7 @@ A tenant represents one customer relationship and is the top-level data-isolatio
 - Duplicate detection may suggest a match. Merge is privileged, reviewable, reversible where possible and audited; never automatic/silent.
 - Same-tenant membership alone does not grant every staff member access to all clinical data.
 
-This recommended boundary requires validation against patient mobility, group operations, consent, guardianship, emergency registration and retention before final schema approval. See [ADR-006](../architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md).
+This recommended boundary requires validation against patient mobility, group operations, consent, guardianship, emergency registration and retention before final schema approval. See [ADR-006](../architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md) and proposed [ADR-008: Patient identity and registration boundary](../architecture/decisions/ADR-008-patient-identity-registration-boundary.md).
 
 ## 5. Patient and hospital workflows
 
