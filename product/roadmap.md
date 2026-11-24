@@ -55,15 +55,16 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 ### Implemented
 
-1. Initial Hospital → Department → Ward → Room → Bed hierarchy.
-2. CRUD endpoints and bounded pagination for the facility hierarchy.
-3. Tenant-scoped uniqueness, relationships and persistence constraints.
+1. Hospital → Department → Ward → Room → Bed hierarchy with CRUD, bounded pagination, tenant-scoped relationships and persistence constraints.
+2. Tenant-owned patient master and hospital registration, with hospital-scoped search, authorization and PostgreSQL-backed tests (API PR #14).
+3. Hospital-configured MRN policy and concurrency-safe, idempotent MRN assignment/lookup (API PR #15). Patient GUID remains the internal identity; MRN is hospital-local.
+4. Required patient registration and MRN workflows are documented in ADR-008/009 and the patient-registration workflow.
 
 ### Remaining delivery order
 
-1. Complete tenant and organization onboarding/provisioning, including trusted initial membership provisioning and the validated hospital group/branch model. Tenant registry and lifecycle are complete; group/hospital/branch onboarding remains.
+1. Complete the validated hospital group/branch onboarding model; tenant registry, lifecycle, trusted initial membership provisioning and organization scopes are implemented, while customer-specific onboarding and operational controls remain.
 2. Staff/provider profiles, organizational assignments, schedules and scoped permissions.
-3. **Patient Identity and Registration — current milestone.** Implement tenant-owned patient master, hospital-local registration/MRN boundary, scoped search and association, configurable minimum demographics, advisory duplicate candidates and cross-hospital discovery authorization. Follow with guardian relationships, emergency reconciliation, identifier lifecycle and governed identity/merge workflows in separately tested increments.
+3. **Patient identity — current increment.** Advisory, hospital-local duplicate candidate detection is being implemented on a dedicated API branch (see ADR-010). Then deliver richer matching inputs and normalization, cross-hospital discovery, guardian relationships, emergency reconciliation, identifier lifecycle and governed patient association/merge workflows as separately reviewed increments.
 4. Patient appointments, walk-in, check-in and queue journey.
 5. OPD encounter and clinical documentation foundation.
 6. Minimal billing only if required by the validated pilot journey.
