@@ -126,3 +126,18 @@ Cross-hospital candidate search returns only the minimum identity information ne
 ## Deployment validation still required
 
 Before a pilot is enabled, each hospital must approve its MRN format/sequence and uniqueness scope, additional mandatory fields, matching configuration, merge authority and high-risk approval policy, emergency workflow, cross-hospital discovery roles, and retention/consent settings. Qualified privacy/legal review is required for applicable Indian requirements, Aadhaar handling and ABDM exchange. These are deployment decisions, not reasons to weaken the architecture boundaries above.
+
+
+## Implementation status — 2026-11-24
+
+The first API implementation slice is being delivered in `CompileCare.Api` on `feature/patient-master-registration-foundation` (tracking PR #14). The initial code boundary is intentionally narrower than the full ADR:
+
+- `Patient` is a tenant-owned master with an internal GUID, given name, optional middle/family name and optional date of birth.
+- `HospitalPatientRegistration` associates the master with a hospital using tenant-composite foreign keys. The database enforces one registration per patient per hospital.
+- Registration and lookup/search routes are nested under the selected hospital. Search queries only that hospital's registration rows and is paginated.
+- A dedicated `PatientRegistrar` membership role receives only `patient.read` and `patient.register`. Existing facility roles do not implicitly receive patient permissions, and the patient role does not receive facility administration permissions. The hospital-nested patient API requires tenant-wide or explicit hospital scope; a department-only membership cannot read the entire hospital's patient registrations.
+- Patient writes participate in the existing audited request transaction. Audit metadata does not persist request bodies or patient demographics.
+
+The first slice deliberately does **not** implement MRN generation/storage, external identifiers (including ABHA), estimated-age fields, duplicate matching/linking, cross-hospital discovery, guardian relationships, merge workflows, clinical records or retention/consent workflows. Those remain separate increments governed by this ADR. MRN is omitted from the initial registration entity until the hospital-specific identifier scope and generation policy are approved; identifiers will remain a separate model rather than being used as the patient primary key.
+
+The API migration `20261124143001_AddPatientMasterRegistration` has been generated and committed. The guarded migration workflow completed restore, build, migration-snapshot alignment and tests successfully (3 unit tests and 45 PostgreSQL integration tests). The final implementation commit also passed standard CI and Docker Compose verification: each ran 3 unit tests and 47 PostgreSQL integration tests with zero failures. Coverage includes explicit department-scope and hospital-scope isolation. The accepted product direction above remains subject to the deployment validation requirements in this ADR.
