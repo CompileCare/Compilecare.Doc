@@ -1,55 +1,66 @@
 # Architecture Overview
 
-**Status:** Proposed; decisions must be recorded and approved.
+**Status:** Initial delivery architecture accepted; detailed module boundaries and deployment choices remain subject to product requirements and ADR review.
 
-## Target architecture
-CompileCare is intended to be a **distributed system**: domain capabilities may run as independently deployable services and communicate through explicit APIs and asynchronous events. However, the first hospital-core implementation should use a **modular monolith** (one primary deployable) with strict internal boundaries. This is an implementation strategy—not a rejection of distributed architecture.
+The [Product Blueprint v1](../product/blueprint-v1.md) is the product-first reference for capabilities, workflows, users, MVP and delivery order. Architecture follows those product boundaries, not the current repository inventory.
 
-Extract a capability into a service when independent scaling, deployment, ownership, security boundary, integration isolation, or resilience needs justify the operational cost. See [ADR-001](decisions/ADR-001-distributed-architecture.md).
+## Target and implementation architecture
 
-## Proposed technology baseline
-| Layer | Proposal | Status |
+CompileCare has a distributed-system target, but the first hospital core is implemented as a **modular monolith** with explicit internal boundaries and one primary application deployment. Extract a capability into an independently deployed service only when scaling, deployment, ownership, security isolation, integration or resilience needs justify the operational cost. See [ADR-001](decisions/ADR-001-distributed-architecture.md).
+
+## Current technology baseline
+
+| Layer | Direction | Status |
 |---|---|---|
-| Web UI | React + TypeScript | Proposed |
+| Web UI | React + TypeScript | Proposed; confirm through product/UI discovery |
 | API | ASP.NET Core / .NET 10 | Implemented in CompileCare.Api |
-| Persistence | PostgreSQL + EF Core 10 | Implemented foundation; migrations remain pending |
-| Data access | EF Core 10 | Implemented foundation |
-| API contracts | Versioned REST + OpenAPI | Proposed |
-| Authentication | OIDC/OAuth 2.0-compatible identity provider | Phase 3; provider decision pending |
-| Cache | CompileCare.Caching | Existing repo; audit required |
-| Service communication | CompileCare.ApiClient | Existing repo; audit required |
-| Observability | CompileCare.Observability + OpenTelemetry | Existing foundation |
-| Async messaging | Broker abstraction; broker choice TBD | Proposed |
-| Background jobs | Queue/job abstraction; evaluate by use case | Proposed |
-| Packaging | Docker | Proposed |
-| CI | GitHub Actions | Existing in one repo; standardize |
+| Persistence | PostgreSQL + EF Core 10 | Implemented; initial facility hierarchy migrations are merged |
+| API contracts | Versioned REST + OpenAPI | Existing conventions; evolve by module |
+| Authentication | OIDC/JWT with database-backed tenant membership | First validation/authorization slice implemented; identity provider lifecycle and provisioning remain |
+| API client | CompileCare.ApiClient | Reusable foundation implemented; publication/consumer validation remains |
+| Observability | CompileCare.Observability + CompileCare.Observability.AspNetCore | Existing shared packages consumed by CompileCare.Api; retain and reuse |
+| Cache | No mandatory cache dependency for the MVP | Introduce only for measured need and tenant-safe semantics |
+| Async messaging | Select per validated workflow | Broker choice not yet made |
+| Background jobs | Select per validated workflow | No framework mandated today |
+| Packaging/deployment | Docker/containerized environments | Existing foundation; hardening and rehearsal remain |
+| CI | GitHub Actions | Existing workflows; standardize quality/security gates |
+
+PostgreSQL and EF Core 10 are the current implemented transactional baseline. Revisit only with documented workload, customer, licensing, hosting or operational evidence; do not treat SQL Server as an active default for this foundation.
+
+## Shared observability
+
+The existing CompileCare.Observability and CompileCare.Observability.AspNetCore packages are the canonical shared telemetry/bootstrap foundation for CompileCare .NET hosts. Reuse them for logging, tracing, metrics and health-check wiring rather than creating duplicate pipelines. Package compatibility and security hardening remain review items. See [ADR-007](decisions/ADR-007-shared-observability-reuse.md).
 
 ## Logical layers and bounded contexts
-Presentation/API; Application (use cases/orchestration); Domain (rules/entities/value objects); Infrastructure (database/providers/messaging/storage). Initial modules include Patients, Appointments, Clinical, Billing, Pharmacy, Laboratory, and IPD. Building blocks include tenant context, audit, errors, identity, time, and IDs.
+
+Presentation/API; Application (use cases/orchestration); Domain (rules/entities/value objects); Infrastructure (database/providers/messaging/storage). Initial capabilities include platform/tenant, organization/facilities, identity/access, patients, scheduling, front desk/queue, clinical/OPD and revenue cycle. Diagnostics, pharmacy, inpatient, inventory and integrations are later capability areas. The blueprint defines module responsibilities and their proposed delivery order.
 
 ## Service and module boundaries
-- Each module/service owns its business rules and data/schema.
-- Modules inside the core interact through explicit interfaces/contracts and internal events, not another module's internals.
+
+- Each module owns its business rules and write operations.
+- Modules inside the core interact through explicit interfaces/contracts and internal events, not another module's internals or direct table writes.
 - Independently deployed services communicate via APIs or versioned events.
 - Avoid runtime shared-database coupling between independently deployed services.
-- Shared libraries should remain small and stable; do not share domain entities across service boundaries.
+- Shared libraries remain focused and stable; do not share domain entities across service boundaries.
+- A module does not automatically require a separate repository, database or deployable.
 
 ## Distributed-system principles
+
 - Synchronous calls only when the user workflow requires an immediate response; avoid deep call chains.
-- Use asynchronous messaging for suitable workflows, with idempotent consumers and versioned contracts.
-- Apply timeouts, bounded retries/backoff, circuit breakers where appropriate, and graceful degradation.
-- Correlation/trace context and safe tenant context propagation across requests and messages.
-- Design for partial failure; never assume a multi-service workflow is one ACID transaction. Use compensating actions/sagas when warranted.
-- Secrets, authentication, authorization, and tenant isolation are enforced at each service boundary.
+- Use asynchronous messaging only for workflows where decoupling and resilience justify its operational needs.
+- Apply timeouts, bounded retries/backoff, circuit breakers where appropriate and graceful degradation.
+- Propagate correlation/trace context and validated tenant context across requests and messages.
+- Design for partial failure; do not assume a multi-service workflow is one ACID transaction. Use compensating actions/sagas where warranted.
+- Enforce secrets, authentication, authorization and tenant isolation at every service boundary.
 
 ## API principles
-Version intentionally; publish OpenAPI; consistent validation/errors; authorize at endpoint and use-case boundaries; validate tenant scope on every data access; idempotency for retry-sensitive operations; pagination/filtering; no internal exception leakage.
+
+Version intentionally; publish OpenAPI; use consistent validation/errors; authorize at endpoint and use-case boundaries; validate tenant/facility scope on every data access; use idempotency for retry-sensitive operations; paginate/filter collections; never leak internal exception details.
 
 ## Data principles
-Relational integrity; explicit tenant ownership/indexing; audit important events; migrations; no production schema drift; consistent time handling; define correction/retention rules rather than casually hard-deleting clinical/financial records. Service-owned data; shared DB instance may be used initially, but ownership boundaries must be enforced.
 
-## Deployment
-Local, CI/test, staging, production. Reproducible Docker-based deployments. SaaS vs dedicated deployment remains open. A client may eventually use shared SaaS, dedicated services/data, or hybrid deployment subject to approved requirements.
+Enforce relational integrity and explicit tenant ownership/indexing. Audit important events. Use versioned migrations and prevent production schema drift. Use consistent time handling. Define correction, retention and deletion rules rather than casually hard-deleting clinical/financial records. A shared database deployment may serve the initial modular monolith, but module data ownership and transaction boundaries remain explicit.
 
-## Quality attributes
-Security, privacy, tenant isolation, availability, recovery, performance, maintainability, observability, interoperability, accessibility.
+## Deployment and quality attributes
+
+Support local, CI/test, staging and production environments with reproducible containerized deployments. Shared SaaS is an initial candidate; dedicated/hybrid topology remains open pending customer requirements. Security, privacy, tenant isolation, availability, recovery, performance, maintainability, observability, interoperability and accessibility are design requirements.

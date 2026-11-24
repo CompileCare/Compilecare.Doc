@@ -1,123 +1,85 @@
 # CompileCare Delivery Roadmap
 
-**Status:** Working delivery plan aligned with the agreed engineering sequence on 2026-11-23. This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
+**Status:** Working product-first delivery plan, updated 2026-11-24. This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
 
-CompileCare is a hospital and healthcare information/management platform. This roadmap contains only hospital-system capabilities.
+CompileCare is a hospital and healthcare information/management platform. This roadmap contains only hospital-system capabilities. The [Product Blueprint v1](blueprint-v1.md) is the source for product scope and patient workflows.
 
 ## Phase 1 — Backend foundation
 
 **Status: Completed and merged**
 
-1. API foundation: ASP.NET Core/.NET 10 host, middleware, tenant-context plumbing, health checks, versioned API structure, and initial endpoint foundation.
-2. Shared observability: structured logging, tracing, metrics, correlation IDs, and health instrumentation through CompileCare.Observability.
+1. API foundation: ASP.NET Core/.NET 10 host, middleware, tenant-context plumbing, health checks, versioned API structure and initial endpoint foundation.
+2. Shared observability: structured logging, tracing, metrics, correlation IDs and health instrumentation through CompileCare.Observability.
 
-**Evidence:** CompileCare.Api and CompileCare.Observability repositories have merged implementations. The API currently targets .NET 10; use the repository's actual target rather than older .NET 9 references in earlier planning notes.
-
-**Exit:** API foundation builds and its baseline CI checks pass; observability is consumable as a shared package. Completed.
+**Evidence:** CompileCare.Api and CompileCare.Observability repositories have merged implementations. The API currently targets .NET 10 and consumes the shared Observability packages.
 
 ## Phase 2 — Developer platform
 
 **Status: Completed and merged — initial developer-platform baseline**
 
-### 2.1 CompileCare.ApiClient
-The initial CompileCare.ApiClient package is merged. It already provides named HttpClient registration, validated base-address/timeout options, injectable access-token, tenant and correlation providers, and outbound header handlers.
+CompileCare.ApiClient provides named/typed client registration, validated options, injectable access-token/tenant/correlation providers, outbound handlers, bounded safe-method resilience and RFC 9457 Problem Details parsing. API conventions include versioned routes, bounded pagination, consistent errors and correlation IDs.
 
-Delivered in the Phase 2 PRs:
-1. Strongly typed and named client registration.
-2. Bounded standard HTTP resilience with timeout/concurrency limiting/circuit breaker and up to two retries for safe methods; unsafe methods are excluded from automatic retries.
-3. A client-side RFC 9457 Problem Details contract preserving status, fields, validation errors and correlation ID. Exception messages omit server detail to reduce accidental sensitive-data logging.
-4. Handler, DI, tenant/correlation/token propagation, safe-retry and error-contract tests.
-5. The ApiClient source package version is now 0.2.0. NuGet publication and first consuming-app integration remain release tasks, not claims of completion.
+**Follow-up release hardening:** publish/inspect the 0.2.0 package and validate it from a consuming application; expand OpenAPI response annotations and contract validation as modules are introduced.
 
-### 2.2 API conventions and error contracts
-1. Standardize /api/v1 resource routes and HTTP method semantics.
-2. Use consistent success responses, 201 Created with Location, 204 No Content, and bounded pagination metadata.
-3. Standardize errors as application/problem+json (RFC 9457) with consistent type, title, status, detail, instance, and a non-sensitive traceId/correlation reference.
-4. Keep tenant/resource existence responses from leaking cross-tenant data.
-5. Document concurrency, validation, conflict, not-found, cancellation, and pagination conventions in OpenAPI and this repository.
+## Phase 3 — Database, identity and security
 
-### 2.3 Integration testing strategy
-1. Keep unit tests for client handlers, options, mapping and pure business rules.
-2. Use WebApplicationFactory and PostgreSQL-backed integration tests for API/database behaviour.
-3. Test the API client against a controlled in-memory HTTP server for request headers, authentication provider, Problem Details parsing, timeouts, and resilience behaviour.
-4. Add contract checks between OpenAPI/API responses and client expectations.
-5. Use isolated test databases and synthetic data only; never use patient data.
-6. When production EF migrations are introduced in Phase 3, run integration tests against applied migrations rather than relying only on EnsureCreated.
-
-**Phase 2 outcome and evidence**
-- Typed/named client registration, safe retry policy and RFC 9457 client error parsing are implemented.
-- Facility API service errors use RFC 9457 Problem Details; correlation IDs follow a documented safe format.
-- ApiClient CI passed on the final Phase 2 PR head with 24/24 tests.
-- API CI passed on the final Phase 2 PR head with 3/3 unit tests and 15/15 PostgreSQL integration tests.
-- API conventions and the integration testing strategy are documented in this repository.
-
-Follow-up release hardening: publish the 0.2.0 package after package inspection and validate it from the first consuming application; expand OpenAPI response annotations/contract validation as modules are introduced.
-
-## Phase 3 — Database and security
-
-**Status: Active — persistence foundation and first OIDC/tenant-RBAC slice are merged**
+**Status: Active — persistence foundation, first OIDC/tenant-RBAC slice and request audit event infrastructure are merged**
 
 ### Implemented foundation
-1. PostgreSQL is the active database provider in `CompileCare.Api`; EF Core 10 is the persistence and migration mechanism.
-2. Tenant-aware facility persistence, query filters, scoped uniqueness, composite tenant foreign keys, restrictive deletes, audit timestamps and optimistic concurrency foundations are implemented.
-3. The EF Core 10-generated `InitialFacilityHierarchy` migration and model snapshot cover Hospital → Department → Ward → Room → Bed (merged in [API PR #9](https://github.com/CompileCare/CompileCare.Api/pull/9)).
-4. Integration fixtures apply versioned migrations to an isolated `_test` database. CI checks for unscaffolded EF model changes; clean-install and repeat-application tests pass.
-5. OIDC/JWT Bearer authentication validates signature, issuer, audience, lifetime, expiry and subject. The API uses the issuer from the validated security token and the OIDC `sub` as the external identity key.
-6. Tenant-scoped facility routes require exactly one `X-Tenant-ID` selector and resolve an active database membership matching the exact `(issuer, subject, tenantId)` tuple. The header alone never grants access.
-7. Facility permissions are derived from the stored membership role. Authorization policies accept only claims on a server-created CompileCare membership identity; token-supplied role/permission claims cannot elevate privileges.
-8. Current roles: `HospitalAdmin` (facility read/write/delete), `FacilityManager` (read/write), and `FacilityViewer` (read only).
-9. [API PR #10](https://github.com/CompileCare/CompileCare.Api/pull/10) delivered the first authenticated tenant boundary and facility RBAC. Its CI passed with 3/3 unit tests and 29/29 PostgreSQL integration tests, including real signed test JWTs, invalid issuer/audience/expiry/subject checks, membership denials, and forged-claim rejection.
 
-### Remaining work — recommended execution order
-1. Build a trusted tenant registry and secure tenant/membership provisioning workflow; no self-service tenant or membership administration API is included yet.
-2. Add append-only audit events for authentication, authorization, membership/role changes, sensitive record access, administrative actions, and material business changes. Capture actor, tenant, action, resource, outcome, timestamp and correlation/trace reference without logging patient payloads.
-3. Extend isolation and authorization tests to background jobs, message consumers, caches, file/object storage, exports, search indexes, support tooling and privileged operations.
-4. Complete migration-script deployment rehearsal and upgrade tests against the supported previous schema; validate backup/restore before production changes.
-5. Define operational controls for signing-key rotation, secret management, encryption at rest, data retention/deletion, backup/restore, disaster recovery, incident response and access reviews.
-6. Complete threat modelling, suitable penetration testing, and qualified privacy/legal review for applicable Indian healthcare and data-protection obligations. Do not claim regulatory compliance from implementation or documentation alone.
+1. PostgreSQL is the active provider in CompileCare.Api; EF Core 10 is the persistence and migration mechanism.
+2. Tenant-aware facility persistence, query filters, scoped uniqueness, composite tenant foreign keys, restrictive deletes, audit timestamps and concurrency foundations are implemented.
+3. The InitialFacilityHierarchy migration and model snapshot cover Hospital → Department → Ward → Room → Bed (API PR #9).
+4. Integration fixtures apply versioned migrations to an isolated _test database; CI checks model drift.
+5. OIDC/JWT Bearer authentication validates signature, issuer, audience, lifetime, expiry and subject. The validated issuer and OIDC sub are used as the external identity key.
+6. Tenant-scoped facility routes require X-Tenant-ID as a selector and resolve an active membership matching the validated (issuer, subject, tenantId) tuple. The header alone grants no access.
+7. Facility permissions are derived from the database membership role; caller-supplied role/permission claims cannot elevate privileges.
+8. Current facility roles are HospitalAdmin, FacilityManager and FacilityViewer (API PR #10).
+9. Append-only tenant-scoped request audit events, EF/PostgreSQL protections and PostgreSQL-backed tests are merged (API PR #11). The current implementation avoids patient payloads and sensitive request data in those events.
 
-**Phase 3 exit criteria:** reviewed migration install/upgrade paths; authenticated identity bound to trusted tenant membership; role/permission enforcement at all tenant-scoped entry points; append-only audit coverage for sensitive and privileged actions; tested tenant isolation across API and asynchronous processing; and reviewed production operational controls.
+### Remaining work — recommended order
+
+1. Finalize product and architecture decisions for tenant/customer/organization and patient data boundaries.
+2. Implement tenant registry/lifecycle and restricted, trusted tenant plus initial membership provisioning; no self-service tenant or membership administration API exists yet.
+3. Define and implement organization-scope assignments and role administration without allowing tenant roles to grant platform access.
+4. Extend audit coverage for authentication/authorization outcomes, membership and role changes, sensitive record access, exports, privileged support and material clinical/business actions. Define controlled audit query/export, retention and operational access policies.
+5. Extend tenant isolation and authorization tests to background jobs, messaging, caches, file/object storage, exports, search, support tools and privileged operations.
+6. Rehearse migration install/upgrade, production migration scripts, backup/restore and recovery. Define signing-key rotation, secrets, encryption, retention/deletion, incident response and access reviews.
+7. Complete threat modelling, suitable penetration testing and qualified privacy/legal review for applicable Indian requirements. Do not claim regulatory compliance from implementation or documentation alone.
+
+**Phase 3 exit criteria:** reviewed migration install/upgrade paths; authenticated identity bound to active trusted tenant membership; organization-scope authorization at relevant tenant entry points; append-only audit coverage for the approved sensitive/privileged actions; cross-tenant tests for synchronous and asynchronous paths; and reviewed production operational controls.
 
 ## Phase 4 — Core healthcare domain
 
 **Status: Partially implemented**
 
 ### Implemented
-1. Hospital hierarchy: Hospital → Department → Ward → Room → Bed.
-2. CRUD endpoints and bounded pagination for the hierarchy.
+1. Initial Hospital → Department → Ward → Room → Bed hierarchy.
+2. CRUD endpoints and bounded pagination for the facility hierarchy.
 3. Tenant-scoped uniqueness, relationships and persistence constraints.
 
 ### Remaining delivery order
-1. Tenant and organization onboarding/provisioning, including hospital group/branch scope.
-2. Complete facility/unit model and operational metadata needed by real hospitals.
-3. Bed lifecycle and availability/occupancy rules (not just an IsActive flag).
-4. Healthcare staff, provider profiles, departments/roles, assignments and schedules.
-5. Patient registration, patient identifiers/MRN policy, search and duplicate-review workflow.
-6. Patient appointment, check-in and queue journey.
-7. OPD encounter and clinical documentation foundation.
-8. Billing, pharmacy, laboratory and inpatient workflows in the approved MVP sequence.
+1. Tenant and organization onboarding/provisioning, including the validated hospital group/branch model.
+2. Staff/provider profiles, organizational assignments, schedules and scoped permissions.
+3. Patient registration, patient identifier/MRN policy, search and duplicate-review workflow.
+4. Patient appointments, walk-in, check-in and queue journey.
+5. OPD encounter and clinical documentation foundation.
+6. Minimal billing only if required by the validated pilot journey.
+7. Pharmacy, diagnostics, inpatient, inventory and advanced revenue workflows in the approved roadmap sequence.
 
-Every domain workflow requires hospital-user validation, permissions, audit, tenant scope, acceptance criteria, migration and automated tests.
+Each domain workflow requires hospital-user validation, permissions, audit, tenant scope, acceptance criteria, migration and automated tests.
 
-## Phase 5 — UI begins in parallel
+## Phase 5 — User experience
 
-**Status: Can begin in parallel now that the Phase 2 API conventions baseline is merged**
+**Status: Product discovery and API-contract preparation; implementation follows blueprint validation**
 
-Do not wait for the complete backend. Build the UI incrementally against versioned contracts and mocked/staging APIs:
-1. Design system and accessible component library.
-2. Login and tenant/hospital selection.
-3. Hospital admin dashboard shell, navigation and sidebar.
-4. Organization and facility management UI.
-5. Staff and role management.
-6. Ward/room/bed management dashboard and availability views.
-7. Patient registration UI when its API contract and workflow are ready.
-
-The UI must enforce user experience rules, but authorization remains server-side. Unavailable backend capabilities must be clearly represented as pending, not simulated as persisted functionality.
+Start with personas, workflow prototypes, design-system/accessibility requirements and versioned API contracts. Then deliver the responsive admin/reception/clinical experience incrementally as each backend workflow is specified. Avoid building screens against assumed patient, tenant or clinical contracts. Mobile remains deferred until validated use cases and identity/API contracts justify it.
 
 ## Release gates and working rules
-- Work in the phase order above. Do not skip ahead because a later feature appears easier.
-- Keep work in short-lived feature branches and focused pull requests; do not commit directly to main.
+
+- Product workflow and ownership precede module/repository implementation.
+- Work in short-lived branches and focused PRs; do not commit directly to main.
 - Review root causes and existing architecture before changing implementation.
-- Every PR includes the related documentation updates, tests, security/privacy implications, migration/recovery notes, and CI evidence.
+- Every PR includes related docs, tests, security/privacy implications, migration/recovery notes and CI evidence.
 - A phase is complete only when its exit criteria are met and reviewed.
-- Keep the modular core simple; introduce separately deployed services only when a documented scaling, ownership, security, integration, or resilience need justifies them.
+- Keep the modular core simple; introduce separately deployed services only when documented needs justify them.
