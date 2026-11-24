@@ -142,7 +142,7 @@ The foundational API slice was merged into `CompileCare.Api` through PR #14. The
 
 The patient master migration `20261124143001_AddPatientMasterRegistration` is part of the merged API history. The final foundation implementation passed Docker Compose verification with 3 unit tests and 47 PostgreSQL integration tests.
 
-### Hospital MRN and patient identifiers — under review
+### Hospital MRN and patient identifiers — merged
 
 The next increment is being delivered separately in `CompileCare.Api` PR #15 and follows ADR-009:
 
@@ -153,8 +153,12 @@ The next increment is being delivered separately in `CompileCare.Api` PR #15 and
 - HospitalAdmin can read/manage policy configuration. PatientRegistrar can read and assign identifiers. Every operation still requires tenant-wide or explicit hospital scope; department-only membership cannot use these hospital-wide endpoints.
 - Hospital-scoped routes expose policy creation/read, MRN assignment, a patient's identifiers and lookup by MRN. ABHA and other external identifiers are not issued or verified by this increment.
 
-The generated EF migration is `20261124143002_AddPatientIdentifierManagement`. Its guarded migration-generation workflow passed restore, build, model-snapshot alignment and PostgreSQL-backed tests (3 unit tests and 49 integration tests). The API PR #15 also passed the required Docker Compose verification on its final branch head: 3 unit tests and 49 PostgreSQL integration tests, with zero failures. Standard PR CI passed on the same head. The implementation remains open for review and has not been merged.
+The generated EF migration 20261124143002_AddPatientIdentifierManagement is part of the merged API history. Its guarded migration-generation workflow passed restore, build, model-snapshot alignment and PostgreSQL-backed tests (3 unit tests and 49 integration tests). API PR #15 was squash-merged to main as commit 7eb431a0d10e54c88b498fa54b956decc8b78608. Its final branch head passed Docker Compose verification (3 unit tests and 49 PostgreSQL integration tests, zero failures) and standard PR CI. Post-merge CI on the resulting main commit also passed.
+
+### Duplicate candidate detection — initial implementation in progress
+
+The conservative first-pass matching contract is recorded in ADR-010. It is read-only, hospital-local and advisory. It requires exact given name plus exact date of birth, displays middle/family-name comparison signals, and never links or merges records. The API implementation is being delivered separately from the patient master and MRN changes.
 
 ### Explicitly deferred
 
-Estimated-age fields, duplicate matching/linking, cross-hospital discovery, guardian relationships, emergency reconciliation, patient merge workflows, clinical records and retention/consent implementation remain separate increments governed by this ADR. Hospital-specific MRN policy changes and identifier correction/revocation also require a separately reviewed workflow. The accepted product direction remains subject to the deployment validation requirements above.
+Richer duplicate matching/normalization, estimated-age fields, cross-hospital discovery, guardian relationships, emergency reconciliation, patient association and merge workflows, clinical records and retention/consent implementation remain separate increments governed by this ADR. Hospital-specific MRN policy changes and identifier correction/revocation also require a separately reviewed workflow. The accepted product direction remains subject to the deployment validation requirements above.

@@ -240,14 +240,15 @@ MVP acceptance requires: documented tenant provisioning; authenticated organizat
 2. Approve tenant/organization/patient boundary and shared observability ADRs.
 3. Implement tenant registry, lifecycle and trusted provisioning in CompileCare.Api.
 
-**Implementation status (2026-11-24):** The global tenant registry, lifecycle controls and persisted platform-operator authorization have been implemented and merged in [CompileCare.Api PR #12](https://github.com/CompileCare/CompileCare.Api/pull/12). The migration backfills existing tenant IDs and adds tenant foreign keys. The first platform operator is provisioned out-of-band by an authorised database administrator. Trusted initial tenant membership provisioning and organization-scope assignments remain open; this milestone does not yet constitute complete customer onboarding.
-4. Implement membership/role provisioning and organization-scope authorization.
-5. Implement patient master, registration/search and duplicate review.
-6. Implement appointments, check-in and queue lifecycle.
-7. Implement OPD encounter and follow-up.
-8. Add minimal billing only as confirmed by pilot requirements.
-9. Deliver matching web experience against versioned API contracts.
-10. Validate pilot operations, security, privacy, clinical workflows, backups, observability and release readiness.
+**Implementation status (2026-11-24):** The global tenant registry and lifecycle controls are merged in CompileCare.Api PR #12. Trusted initial tenant membership provisioning and tenant/hospital/department organization scopes are merged in PR #13. The facility hierarchy, PostgreSQL/EF Core persistence, OIDC/JWT membership authorization and metadata-only audit are also implemented. These provide a platform foundation, not a complete hospital workflow.
+4. Membership/role provisioning and organization-scope authorization are implemented; customer onboarding and production operations require further validation.
+5. Patient master, hospital registration/search and hospital-local MRN policy/assignment are merged in patient master PR #14 and MRN PR #15. The conservative advisory duplicate-candidate API is the current implementation increment; see ADR-010.
+6. Implement richer identity matching, authorized cross-hospital discovery, guardian relationships, emergency registration reconciliation and governed identity merge/correction.
+7. Implement appointments, check-in and queue lifecycle.
+8. Implement OPD encounter and follow-up.
+9. Add minimal billing only as confirmed by pilot requirements.
+10. Deliver matching web experience against versioned API contracts.
+11. Validate pilot operations, security, privacy, clinical workflows, backups, observability and release readiness.
 
 Each step gets requirements, workflow, acceptance criteria, module design, tests and a focused PR. Repository restructuring/new repositories are considered only after module ownership and deployment needs are known.
 
