@@ -153,7 +153,7 @@ The next increment is being delivered separately in `CompileCare.Api` PR #15 and
 - HospitalAdmin can read/manage policy configuration. PatientRegistrar can read and assign identifiers. Every operation still requires tenant-wide or explicit hospital scope; department-only membership cannot use these hospital-wide endpoints.
 - Hospital-scoped routes expose policy creation/read, MRN assignment, a patient's identifiers and lookup by MRN. ABHA and other external identifiers are not issued or verified by this increment.
 
-The generated EF migration is `20261124143002_AddPatientIdentifierManagement`. Its guarded migration-generation workflow passed restore, build, model-snapshot alignment and PostgreSQL-backed tests (3 unit tests and 49 integration tests). The required Docker Compose PR verification is running on PR #15 and must pass before that implementation is merged.
+The generated EF migration is `20261124143002_AddPatientIdentifierManagement`. Its guarded migration-generation workflow passed restore, build, model-snapshot alignment and PostgreSQL-backed tests (3 unit tests and 49 integration tests). The API PR #15 also passed the required Docker Compose verification on its final branch head: 3 unit tests and 49 PostgreSQL integration tests, with zero failures. Standard PR CI passed on the same head. The implementation remains open for review and has not been merged.
 
 ### Explicitly deferred
 
