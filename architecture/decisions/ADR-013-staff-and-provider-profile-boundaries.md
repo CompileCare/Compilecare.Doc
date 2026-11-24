@@ -13,7 +13,7 @@ A staff member may work at more than one hospital or department, may hold multip
 ## Decision
 
 1. **Separate person/workforce profile from authentication.** A staff profile is a tenant-owned business record. It is not an OIDC principal, login credential, tenant membership or role grant.
-2. **Keep authorization authoritative in the existing access model.** Only validated OIDC identity plus an active tenant membership, scoped role grants and server-side authorization can permit access. Linking a profile to a membership is an explicit, auditable association; the profile itself grants no permissions.
+2. **Keep authorization authoritative in the existing access model.** Only validated OIDC identity plus an active tenant membership, scoped role grants and server-side authorization can permit access. If a future workflow links a profile to a membership, it must be an explicit, same-tenant, auditable association; the profile itself must never grant permissions.
 3. **Model assignments explicitly.** Hospital and department assignments belong to a tenant and reference the existing facility hierarchy. Assignments carry effective-from/effective-to dates and an explicit status. Validate that department assignments belong to the selected hospital and tenant. Do not infer access scope solely from an employment assignment.
 4. **Treat provider designation as a workforce classification, not credential verification.** A provider profile may record operational specialty/designation metadata, but must not imply that a professional licence, registration, qualification or scope of practice has been verified.
 5. **Preserve history.** Deactivate or end-date profiles and assignments instead of physically deleting records that have operational history. Prevent overlapping or contradictory active assignments where the business rule requires it; make changes auditable.
@@ -25,7 +25,6 @@ A staff member may work at more than one hospital or department, may hold multip
 - Create and maintain a tenant-owned staff profile with minimal operational fields.
 - List/search profiles within the caller's authorized tenant and organization scope, with bounded pagination.
 - Record and manage hospital/department assignments with effective dates.
-- Link an existing staff profile to an existing tenant membership where the identity relationship is verified and authorized.
 - Support provider designation metadata without representing credential verification.
 - Deactivate/reactivate profiles and end-date assignments with audit history.
 
@@ -35,6 +34,7 @@ A staff member may work at more than one hospital or department, may hold multip
 - Payroll, attendance, rostering, leave, compensation or performance management.
 - Credential verification, licensing checks, privileging, clinical scope-of-practice decisions or credential document vaults.
 - Government identity numbers, bank details, biometrics and background-check data.
+- Profile-to-membership linking until the identity-verification evidence and audit workflow is approved.
 - Cross-tenant staff sharing or automatic profile matching.
 
 ## Security and data boundaries
