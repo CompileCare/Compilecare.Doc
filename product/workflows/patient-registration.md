@@ -10,7 +10,7 @@ Patient; receptionist/front-desk staff; registration staff; registration supervi
 
 - User is authenticated and authorized for the active tenant and selected hospital/branch.
 - A hospital MRN policy is configured by an authorized HospitalAdmin before staff assign MRNs.
-- Cross-hospital discovery is available only to users with its separate permission.
+- Cross-hospital discovery is not included in the initial duplicate-check API; it requires a separately approved permission and workflow.
 
 ## Main flow
 
