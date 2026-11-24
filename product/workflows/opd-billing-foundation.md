@@ -1,6 +1,10 @@
 # OPD billing foundation
 
-**Status:** Initial implementation scope approved for development; pilot policy validation remains required before production use.
+**Status:** Initial backend implementation merged in CompileCare.Api PR #23; pilot policy validation and frontend billing workspace remain required before production use.
+
+## Implementation status — 2026-11-24
+
+The first backend baseline is merged in CompileCare.Api PR #23 (merge commit `9fd10c12145d2022f6ac8d49d4c35bd1b9db4e38`). The merged API provides service catalogue management, hospital tariffs, queue-visit-linked invoices with immutable line snapshots, append-only partial/full payments, receipt retrieval and daily collection reporting. CI, EF model-drift validation, PostgreSQL integration tests and Docker Integration Verification passed. No billing user interface is included yet. The deferred policy decisions below remain out of scope and must be validated with the pilot hospital before production activation.
 
 ## Purpose
 
