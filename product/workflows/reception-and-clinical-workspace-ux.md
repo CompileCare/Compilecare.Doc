@@ -196,7 +196,7 @@ Production UI screenshots must be captured from the actual running authenticated
 
 ## OPD clinical workspace UI increment — 2026-11-24
 
-The clinical UI consumes the existing OPD encounter API; it does not create a second clinical data model. The paired API increment adds a queue-entry encounter lookup for safe resume after refresh and grants ClinicalUser `patient.read` for identity verification, plus scoped `facility.read`, `queue.read` and the existing encounter permissions. Queue mutations remain unavailable to ClinicalUser.
+The clinical UI consumes the existing OPD encounter API; it does not create a second clinical data model. The paired API increment adds a queue-entry encounter lookup for safe resume after refresh and grants ClinicalUser `patient.identity.read` for linked-patient identity verification without general patient-search access, plus scoped `facility.read`, `queue.read` and the existing encounter permissions. Queue mutations remain unavailable to ClinicalUser.
 
 The first UI slice includes:
 - A department/date-filtered clinical queue that shows only operational queue tokens and in-progress state.
