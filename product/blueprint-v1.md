@@ -129,12 +129,25 @@ Modules are logical domain boundaries, not automatic instructions to create repo
 | Pharmacy | Medication catalogue, prescription validation, dispensing and stock | Later |
 | Inpatient | Admission, transfer, bed occupancy, nursing and discharge | Later |
 | Inventory/supply chain | Stores, batches, expiry, procurement and movement | Later |
-| Workforce | Staff/provider profiles, schedules, rosters and credentials | As needed |
+| Workforce | Staff/provider profiles and assignments; later identity linking, credentialing, rosters, attendance, leave and HR | Initial profile foundation merged; broader capabilities deferred |
 | Notifications | Templates, delivery, preferences, consent and retries | Supporting |
 | Documents | Metadata, secure storage, access and retention | Supporting |
 | Reporting/analytics | Permissioned operational/financial reporting and exports | Later/basic MVP views |
 | Integrations | Identity, payments, messaging, FHIR/HL7, ABDM, DICOM | Validate per pilot |
 | Audit/compliance | Security/business audit and controlled audit access | Cross-cutting |
+
+### Workforce, credentialing and HR — retained future scope
+
+The initial staff/provider profile and assignment foundation is implemented. The following capabilities remain planned, but are not part of the first staff increment or initial OPD MVP:
+
+1. Workforce identity: verified staff-profile-to-membership linking and employee self-service.
+2. Credentialing: qualification and licence evidence, verification, expiry/renewal and facility-specific clinical privileges. Provider designation is descriptive and never grants clinical authority.
+3. Workforce operations: rostering, shifts, attendance and leave with explicit policies and approval workflows.
+4. HR/finance: compensation, payroll, payslips and payroll-provider integrations; prefer integration before building a full payroll engine.
+5. Secure employee records: sensitive identifiers and employment documents behind dedicated encryption, least-privilege access, audit and retention controls.
+6. Cross-tenant workforce: multi-hospital sharing only after legal basis, consent, ownership, authorization and tenant-isolation decisions are approved.
+
+**Provisional pilot defaults (revisit before the relevant milestone):** keep the profile to staff code, name, designation and only operationally necessary contact details; allow concurrent assignments only where policy permits and prevent conflicting effective-date combinations; keep create/update/deactivate with HospitalAdmin initially and treat membership linking as a separately restricted operation; prefer a tenant-configurable designation catalogue; require verified identity and an auditable approval before linking a profile to a login; and confirm applicable Indian requirements plus the pilot hospital's retention policy before collecting employment records or sensitive identifiers. These are product-planning assumptions, not legal advice or final approvals.
 
 Each module owns its rules and write operations. Modules use explicit application contracts or versioned events, not another module's internals or direct table writes. One PostgreSQL deployment may serve the initial modular monolith, but data ownership, schema ownership and transaction boundaries remain explicit. Do not share domain entities through a common library.
 
@@ -243,13 +256,15 @@ MVP acceptance requires: documented tenant provisioning; authenticated organizat
 **Implementation status (2026-11-24):** The global tenant registry and lifecycle controls are merged in CompileCare.Api PR #12. Trusted initial tenant membership provisioning and tenant/hospital/department organization scopes are merged in PR #13. The facility hierarchy, PostgreSQL/EF Core persistence, OIDC/JWT membership authorization and metadata-only audit are also implemented. These provide a platform foundation, not a complete hospital workflow.
 4. Membership/role provisioning and organization-scope authorization are implemented; customer onboarding and production operations require further validation.
 5. Patient master, hospital registration/search, hospital-local MRN policy/assignment and the normalized advisory duplicate-candidate API are merged in API PRs #14–#17. ADR-010 records the first pass; ADR-011 records the merged normalized name matcher. ADR-012 defines the next optional verified-contact design, not yet implemented.
-6. Implement staff and provider profile management, effective-dated hospital/department assignments and integration with existing tenant membership and scoped authorization. Follow [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). A profile or provider designation must not itself grant access or establish credentialing/clinical authority.
+6. **Staff/provider foundation implemented:** tenant-owned profiles, effective-dated hospital/department assignments and scoped staff permissions are merged in CompileCare.Api PR #18, following [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). Profile-to-membership linking remains deferred. A profile or provider designation must not itself grant access or establish credentialing/clinical authority.
 7. Complete patient-owned contact capture and verification only under the reviewed data-protection design in [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md). Keep verified contacts as corroboration for existing name/DOB candidates initially; any contact-only candidate rule needs a separate ADR and pilot validation. Cross-hospital discovery, guardian relationships, emergency registration reconciliation and governed identity merge/correction remain separate.
 8. Implement appointments, check-in and queue lifecycle.
 9. Implement OPD encounter and follow-up.
 10. Add minimal billing only as confirmed by pilot requirements.
 11. Deliver matching web experience against versioned API contracts.
 12. Validate pilot operations, security, privacy, clinical workflows, backups, observability and release readiness.
+
+13. Deliver the deferred workforce roadmap in dependency order: verified identity linking and employee self-service; credential verification/clinical privileging before granting clinical authority; rostering/attendance/leave; compensation/payroll integrations; secure employee records; and governed cross-tenant workforce sharing last.
 
 Each step gets requirements, workflow, acceptance criteria, module design, tests and a focused PR. Repository restructuring/new repositories are considered only after module ownership and deployment needs are known.
 
