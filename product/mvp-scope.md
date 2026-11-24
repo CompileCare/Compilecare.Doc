@@ -12,8 +12,8 @@ Deliver a secure, tenant-aware foundation and one end-to-end outpatient journey 
 4. Audit logging for security-sensitive and key business actions.
 5. Patient registration with demographic data and configurable identifier/MRN rules.
 6. Patient search and duplicate-patient detection support.
-7. Appointment booking, cancellation/rescheduling, and basic provider/service availability.
-8. Patient check-in and queue/token lifecycle.
+7. Date-specific provider availability and appointment booking, cancellation and rescheduling.
+8. Patient check-in, walk-in registration and department FIFO queue/token lifecycle. Appointment-linked check-in and walk-ins converge on the same queue workflow; a walk-in does not create a fictitious appointment.
 9. Basic OPD encounter workflow with clinician notes and a minimal set of structured clinical fields, subject to workflow validation.
 10. Basic service catalogue and billing/receipt workflow only if required to complete the pilot journey; otherwise defer to the next milestone.
 11. Admin screens for tenant/hospital setup and essential user management.
@@ -36,7 +36,7 @@ Deliver a secure, tenant-aware foundation and one end-to-end outpatient journey 
 ## MVP success criteria — proposed, measurable targets to be agreed
 - Tenant provisioning and sign-in can be completed through documented flows.
 - Automated tests demonstrate tenant isolation for relevant data-access and API scenarios.
-- A patient can be registered, found, booked, checked in, queued, and have an OPD encounter recorded in a demonstrable workflow.
+- A patient with a valid hospital registration can be booked into a provider slot or registered as a walk-in, checked in, queued and handed off to a separately recorded OPD encounter.
 - Key actions are permission-checked and audit-recorded.
 - Critical journey tests run in CI.
 - A documented deployment and recovery process exists for the pilot environment.
