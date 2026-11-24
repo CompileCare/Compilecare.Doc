@@ -12,7 +12,7 @@ Registration, demographics, contact details, UHID/MRN, search, duplicate detecti
 Date-specific provider availability sessions; appointment booking, cancellation and rescheduling; patient arrival and check-in; walk-in registration; department FIFO queue and token lifecycle. Scheduling reserves a provider time; queue records operational arrival/work; neither is a clinical encounter. Patient self-booking, recurring rosters, waitlists, service catalogue/tariffs and clinical prioritization are later capabilities.
 
 ## Clinical care
-OPD encounters, vitals, notes, diagnosis, allergies/history, care plans, referrals, prescription/medication orders, templates.
+OPD encounters linked to front-desk queue entries; immutable signed clinical notes with append-only amendments; approved vital observations; diagnosis, allergy/history, care plans, referrals, prescription/medication orders and templates as separately governed later capabilities. The first encounter increment must not infer diagnoses or recommend treatment.
 
 ## Inpatient
 Admission/discharge/transfer; ward/room/bed; occupancy; nursing assessments, care plans, observations, shift handover; medication administration record; discharge summary and follow-up.
