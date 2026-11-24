@@ -91,8 +91,8 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 
 ### 7. Clinical queue and encounter
 
-- Show only in-progress queue entries visible to the authenticated ClinicalUser in the selected hospital/department.
-- Starting an encounter must use the queue-linked encounter API; do not create an encounter directly from an appointment.
+- Show in-progress queue entries and completed visits visible to the authenticated ClinicalUser in the selected hospital/department; completed visits are available only to resume an existing encounter, never to create a new one.
+- Starting an encounter must use the queue-linked encounter API; do not create an encounter directly from an appointment. Retrieve an existing encounter first; create only for an in-progress queue entry and recover a concurrent create conflict by reading the existing encounter.
 - Display a clear distinction between queue status and encounter status.
 - Show the approved note sections: chief complaint, history, examination, assessment and plan.
 - Draft edits remain available only while the encounter is InProgress.
