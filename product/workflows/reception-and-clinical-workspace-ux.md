@@ -160,3 +160,8 @@ Each increment should be a small vertical slice with tests and documentation upd
 - What design system and visual brand tokens should be adopted?
 
 These questions do not block an initial shell and API-backed patient lookup, but they must be resolved before exposing role-sensitive or clinical workflows to pilot users.
+
+
+## Implementation status — 2026-11-24
+
+The first Phase 5 shell is now merged in `CompileCare.Web` (PR #1). It provides the responsive workspace frame and OIDC Authorization Code + PKCE integration boundary. Reception, queue and clinical navigation remain placeholders. The shell intentionally does not invent a tenant or hospital selection, patient data, or client-side authorization. The next vertical slice must first integrate a server-owned current-user tenant/hospital context contract, then implement patient lookup and registration status against the existing API. The shell's CI verifies the TypeScript build, UI baseline test, Docker image build and container HTTP smoke test.
