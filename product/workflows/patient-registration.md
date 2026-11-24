@@ -1,6 +1,6 @@
 # Workflow: Patient Registration
 
-**Status:** Patient master, hospital registration and hospital-scoped MRN policy/assignment APIs are merged. The first advisory duplicate-candidate API increment is under implementation; richer matching and identity-resolution workflows remain separate work.
+**Status:** Patient master, hospital registration and hospital-scoped MRN policy/assignment APIs are merged. The first advisory duplicate-candidate API increment is merged (API PR #16); richer matching and identity-resolution workflows remain separate work.
 
 ## Actors
 
