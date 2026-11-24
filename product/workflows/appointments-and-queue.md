@@ -20,7 +20,7 @@ Coordinate outpatient visits from availability publication through booking or wa
 
 - Tenant is active and the selected hospital and department exist.
 - Acting user has a validated OIDC identity, active tenant membership and the specific permission for the requested action.
-- Patient has a tenant-owned Patient ID and a valid registration at the selected hospital.
+- Patient has a tenant-owned Patient ID and a valid registration at the selected hospital. If the patient is new to the tenant, an authorized user must first create the patient master and then the hospital registration. If the patient already exists in the tenant but is not registered at the selected hospital, an authorized user must verify identity through the patient-registration workflow and create that hospital association before booking. Demographic similarity alone must never create or establish an association.
 - The hospital has an IANA timezone configured.
 - A provider has an active staff profile, provider designation and effective assignment to the selected hospital/department for the scheduled time. This is not credential verification or a clinical privilege grant.
 
@@ -36,19 +36,23 @@ Recurring schedules, roster/leave integration and external calendar synchronizat
 
 ## B. Book an appointment
 
-1. Reception searches/selects the patient within the selected hospital using the existing patient-registration workflow.
-2. Reception selects department, provider, date and an available slot.
-3. API verifies the patient has an active hospital registration for that hospital and that the provider remains assigned to the department at the appointment time.
-4. API checks that the slot is available and that the patient has no overlapping active appointment in the tenant.
-5. API reserves the slot and creates a Booked appointment in one transaction. Concurrent attempts for the same slot cannot both succeed.
-6. Confirmation returns appointment ID, scheduled time in hospital timezone, department and provider. The appointment reason is optional operational text; clinical notes are not captured here.
+1. Reception searches/selects the patient through the selected hospital's patient-registration workflow.
+2. If no patient master exists in the tenant, authorized registration staff create the patient master and the corresponding registration at the selected hospital before returning to booking.
+3. If a patient master exists in the tenant but has no registration at the selected hospital, authorized registration staff verify the patient's identity and explicitly create the hospital registration before booking. A demographic match or duplicate-candidate result is only a review aid; it must never automatically associate the patient with a hospital or another patient record.
+4. Appointment booking is enabled only after the selected hospital registration is successfully created and active. The booking API independently validates that registration; it never creates appointment-only patient records or bypasses registration.
+5. Reception selects department, provider, date and an available slot.
+6. API verifies the patient has an active hospital registration for that hospital and that the provider remains assigned to the department at the appointment time.
+7. API checks that the slot is available and that the patient has no overlapping active appointment in the tenant.
+8. API reserves the slot and creates a Booked appointment in one transaction. Concurrent attempts for the same slot cannot both succeed.
+9. Confirmation returns appointment ID, scheduled time in hospital timezone, department and provider. The appointment reason is optional operational text; clinical notes are not captured here.
 
-A no-slot response does not automatically create a waitlist entry. Staff may select another available slot or use the walk-in workflow if permitted by the hospital.
+The pilot uses staff-assisted registration and booking only. Self-service registration and online booking for new patients are separate future workflows. A no-slot response does not automatically create a waitlist entry. Staff may select another available slot or use the walk-in workflow if permitted by the hospital.
 
 ## C. Cancel or reschedule
 
-- Authorized staff may cancel a Booked appointment with an approved reason code; the slot is released transactionally.
-- Rescheduling creates a new appointment and cancels the original in one transaction. Both records retain explicit links and audit history.
+- Only users granted the appointment.manage capability within the appointment's tenant/hospital/department scope may cancel or reschedule a Booked appointment; every action records the actor and an approved reason code. The initial pilot is staff-assisted; patient self-service is deferred. The exact staff-role mapping and any role-specific cancellation restrictions must be approved by the hospital before production.
+- A successful cancellation releases the provider slot in the same transaction, making it bookable again immediately unless the availability session itself has been withdrawn or otherwise made unavailable. A failed/rolled-back cancellation must not release the slot.
+- Rescheduling creates a new appointment and cancels the original in one transaction. Both records retain explicit links and audit history; the new slot must be successfully reserved before the old booking is finalized as rescheduled.
 - A checked-in appointment cannot be silently cancelled or rescheduled; front desk must resolve its queue entry through the appropriate workflow.
 - Completed, cancelled or no-show appointments cannot be rebooked by editing the old record.
 - Patient self-service cancellation/rescheduling is not part of this increment.
@@ -57,7 +61,7 @@ A no-slot response does not automatically create a waitlist entry. Staff may sel
 
 1. Patient arrives at the hospital.
 2. Reception verifies the patient and appointment using the selected hospital registration.
-3. API checks appointment status, hospital/department scope and configured early/late check-in window.
+3. API checks appointment status, hospital/department scope and the hospital-configured early/late check-in window. The provisional pilot window is 60 minutes before through 30 minutes after the scheduled start; the values are configurable and must be confirmed by the hospital.
 4. API records check-in actor/time and creates one queue entry transactionally.
 5. Repeated requests return the same queue entry; duplicate tokens are not created.
 6. Patient receives the queue token and waiting instructions.
@@ -83,7 +87,7 @@ Initial queue order is FIFO by check-in timestamp within the hospital/department
 - Recall an entry by returning Called to Waiting.
 - Start consultation by moving Called to InProgress.
 - Complete an entry after the operational hand-off is finished.
-- Cancel a waiting/called entry or mark it NoShow with an approved reason.
+- Cancel a waiting/called entry or mark it NoShow with an approved reason. For appointment no-shows, an authorized front-desk user explicitly marks the appointment NoShow after the hospital-configured grace period has elapsed and confirms the patient has not arrived; the initial pilot does not automatically infer or mark no-shows.
 
 Allowed transitions:
 
@@ -102,7 +106,7 @@ When an appointment-linked queue entry is completed, the appointment may be mark
 
 ## Appointment and queue lifecycles
 
-**Appointment:** Booked → Cancelled | Completed | NoShow. Rescheduling cancels the old appointment and creates a new linked appointment. Check-in is a separate timestamp and queue-entry reference.
+**Appointment:** Booked → Cancelled | Completed | NoShow. Only appointment.manage users with matching facility scope may cancel/reschedule; role mapping and reason policy require hospital approval. A successful cancellation releases its slot transactionally. No-show is an explicit, audited staff action after the configured grace period in the initial pilot, not an automatic demographic, clock-only or background inference. Rescheduling cancels the old appointment and creates a new linked appointment. Check-in is a separate timestamp and queue-entry reference.
 
 **Queue entry:** Waiting → Called → InProgress → Completed, with Called → Waiting for recall, and Waiting/Called → Cancelled | NoShow.
 
@@ -132,7 +136,8 @@ Queue token is an operational daily identifier, not a patient identifier or MRN.
 
 ## Acceptance criteria
 
-- Appointment can only be booked for an existing patient registration at the selected hospital.
+- Appointment can only be booked after a valid patient registration exists at the selected hospital. New-to-tenant patients require patient-master creation plus hospital registration first; existing tenant patients without that hospital association require authorized identity verification and explicit registration first. Demographic matching never auto-associates patients, and booking never creates appointment-only patient records or bypasses registration.
+- Initial pilot registration and booking are staff-assisted; self-service registration and online booking for new patients are deferred.
 - Availability session and appointment are tenant-owned and scoped to hospital/department.
 - Provider has an effective assignment to the selected hospital/department at appointment time.
 - Provider designation is operational metadata and does not imply credential verification or clinical authority.
@@ -140,6 +145,11 @@ Queue token is an operational daily identifier, not a patient identifier or MRN.
 - Concurrent requests cannot double-book a provider slot.
 - Overlapping active appointments for the same tenant patient are rejected.
 - Appointment rescheduling preserves old/new links and is atomic.
+- Cancellation/rescheduling is restricted to appointment.manage users with tenant/hospital/department scope; approved role mapping and reason rules are validated with the pilot hospital.
+- A successful cancellation releases the provider slot transactionally; failed cancellation does not release it.
+- Check-in enforces hospital-configured opening/closing windows, with the provisional 60-minute-early/30-minute-late defaults validated by the hospital.
+- Appointment no-show is explicitly marked by authorized staff after a configured grace period in the pilot; automatic no-show detection is deferred.
+- An appointment can have at most one queue entry; repeated/concurrent check-in returns that same entry and cannot create another token.
 - Cancelled, completed and no-show appointments cannot be checked in.
 - Check-in creates exactly one queue entry; retries return the existing entry.
 - Walk-in creates a queue entry without creating an appointment.
@@ -151,7 +161,7 @@ Queue token is an operational daily identifier, not a patient identifier or MRN.
 - Tenant/hospital/department authorization is tested for reads and mutations.
 - PostgreSQL integration tests cover booking concurrency, patient overlap, reschedule, check-in idempotency, token allocation and queue transitions.
 - Docker-based build and tests pass before implementation PR is considered ready.
-- Pilot hospital stakeholders validate visit types, durations, check-in windows, role mapping and queue operating rules before production use.
+- Pilot hospital stakeholders validate visit types, durations, check-in opening/closing windows, no-show grace period and staff identification procedure, cancellation/rescheduling permissions and reason rules, role mapping, and queue operating rules before production use.
 
 ## Deferred
 
