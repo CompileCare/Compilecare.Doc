@@ -137,14 +137,14 @@ The foundational API slice was merged into `CompileCare.Api` through PR #14. The
 - `Patient` is a tenant-owned master with an internal GUID, given name, optional middle/family name and optional date of birth.
 - `HospitalPatientRegistration` associates the master with a hospital using tenant-composite foreign keys. The database enforces one registration per patient per hospital.
 - Registration and lookup/search routes are nested under the selected hospital. Search queries only that hospital's registration rows and is paginated.
-- A dedicated `PatientRegistrar` membership role receives only `patient.read` and `patient.register`. Existing facility roles do not implicitly receive patient permissions, and the patient role does not receive facility administration permissions. The hospital-nested patient API requires tenant-wide or explicit hospital scope; a department-only membership cannot read the entire hospital's patient registrations.
+- A dedicated `PatientRegistrar` membership role receives `patient.read`, `patient.register`, `patient.duplicate.review`, `patient.identifier.read` and `patient.identifier.assign`. Existing facility roles do not implicitly receive patient permissions, and the patient role does not receive facility administration or MRN-policy management permissions. The hospital-nested patient API requires tenant-wide or explicit hospital scope; a department-only membership cannot read the entire hospital's patient registrations.
 - Patient writes participate in the existing audited request transaction. Audit metadata does not persist request bodies or patient demographics.
 
 The patient master migration `20261124143001_AddPatientMasterRegistration` is part of the merged API history. The final foundation implementation passed Docker Compose verification with 3 unit tests and 47 PostgreSQL integration tests.
 
 ### Hospital MRN and patient identifiers — merged
 
-The next increment is being delivered separately in `CompileCare.Api` PR #15 and follows ADR-009:
+Hospital MRN policy and assignment were delivered separately in `CompileCare.Api` PR #15 and follow ADR-009:
 
 - `PatientIdentifier` is a separate tenant-owned entity tied through a tenant + hospital + patient composite foreign key to an existing `HospitalPatientRegistration`. The immutable Patient GUID remains the primary identity.
 - Each hospital may create one MRN policy with an approved prefix and numeric padding width. No global prefix or implicit policy is assumed; replacement/reset is not available in this initial increment.
@@ -155,9 +155,9 @@ The next increment is being delivered separately in `CompileCare.Api` PR #15 and
 
 The generated EF migration 20261124143002_AddPatientIdentifierManagement is part of the merged API history. Its guarded migration-generation workflow passed restore, build, model-snapshot alignment and PostgreSQL-backed tests (3 unit tests and 49 integration tests). API PR #15 was squash-merged to main as commit 7eb431a0d10e54c88b498fa54b956decc8b78608. Its final branch head passed Docker Compose verification (3 unit tests and 49 PostgreSQL integration tests, zero failures) and standard PR CI. Post-merge CI on the resulting main commit also passed.
 
-### Duplicate candidate detection — initial implementation in progress
+### Duplicate candidate detection — initial increment merged
 
-The conservative first-pass matching contract is recorded in ADR-010. It is read-only, hospital-local and advisory. It requires exact given name plus exact date of birth, displays middle/family-name comparison signals, and never links or merges records. The API implementation is being delivered separately from the patient master and MRN changes.
+The conservative first-pass matching contract is recorded in [ADR-010](ADR-010-conservative-hospital-local-duplicate-detection.md). The read-only, hospital-local API is merged in CompileCare.Api PR #16 as commit 41b459975b0e64198ad0fb251f1d43ad3e0bfe0f. On the final PR head, Docker Compose verification passed 3 unit tests and 55 PostgreSQL integration tests with zero failures; standard CI and the EF Core model-drift check also passed. The endpoint requires the dedicated patient.duplicate.review permission and hospital-wide scope. It requires exact given name plus exact DOB, returns at most 20 minimal candidates, and never links, blocks or merges records.
 
 ### Explicitly deferred
 

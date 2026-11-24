@@ -1,6 +1,6 @@
 # Workflow: Patient Registration
 
-**Status:** Patient master, hospital registration and hospital-scoped MRN policy/assignment APIs are merged. The first advisory duplicate-candidate API increment is under implementation; richer matching and identity-resolution workflows remain separate work.
+**Status:** Patient master, hospital registration and hospital-scoped MRN policy/assignment APIs are merged. The first advisory duplicate-candidate API is merged (API PR #16). The normalized multi-signal matcher is in API PR #17; identity association and merge workflows remain separate work.
 
 ## Actors
 
@@ -16,7 +16,7 @@ Patient; receptionist/front-desk staff; registration staff; registration supervi
 
 1. Patient arrives or registration is initiated.
 2. Staff searches the selected hospital's registrations using the hospital MRN and other permitted details.
-3. Before creating a record, staff may call the hospital-local duplicate-candidate endpoint when an exact date of birth is available. The v1 check requires exact given name (case-insensitive after trimming) plus exact date of birth. Matching middle/family names are additional comparison signals.
+3. Before creating a record, staff may call the hospital-local duplicate-candidate endpoint when an exact date of birth is available. The normalized matcher requires exact DOB and either normalized given name, or both normalized middle and family names. It applies Unicode compatibility normalization, invariant uppercase and whitespace collapsing; punctuation and diacritics remain significant.
 4. If candidates are returned, staff verifies identity using the hospital's approved procedure. The candidate response is advisory only: it does not link, merge, block registration or expose clinical information.
 5. If date of birth is unavailable, v1 matching is not evaluated and no name-only search is performed. Staff follows the hospital's manual identity-check procedure. A no-candidates response is not proof that no duplicate exists.
 6. If no existing local registration is confirmed for use, staff enters the minimum registration data. Patient name is required; DOB is captured when known or represented as estimated age/age unit. Mobile, email, address, ABHA and Aadhaar are not universal prerequisites. Hospital-specific additional requirements are configurable and separately validated from clinical requirements.
@@ -73,9 +73,9 @@ Record actor, timestamp, tenant, hospital/department scope, operation, outcome, 
 - MRN assignment requires an existing hospital registration and hospital-wide authorization.
 - ABHA/Aadhaar/mobile/email are not universal registration prerequisites.
 - Hospital-specific registration-required fields are configurable and distinct from clinical requirements.
-- The v1 duplicate check is hospital-local and requires exact given name plus exact date of birth; middle/family-name matches are additional signals only.
+- Duplicate checks are hospital-local and require exact DOB plus normalized given name or both normalized middle and family names. Family name alone is insufficient.
 - Unknown date of birth returns an explicit not-evaluated result; no name-only search is performed.
-- Candidate output is bounded, contains minimum identity details only, and never includes clinical data or MRN values.
+- Candidate output is bounded, contains minimum identity details only, and never includes clinical data, normalized keys or MRN values.
 - Duplicate candidates are advisory; no automatic linking, registration blocking or merge occurs.
 - A no-candidate result is not proof that no duplicate exists; hospital manual verification remains necessary.
 - Conflicting identifier assignment is blocked and routed for resolution.

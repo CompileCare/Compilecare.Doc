@@ -1,6 +1,6 @@
 # ADR-010: Conservative hospital-local duplicate candidate detection
 
-- **Status:** Accepted for the first advisory implementation increment
+- **Status:** Implemented and merged for the initial advisory increment
 - **Date:** 2026-11-24
 - **Decision owners:** CompileCare product and architecture; each pilot hospital validates its manual identity-verification procedure
 - **Scope:** Read-only duplicate candidate detection before patient registration
@@ -73,8 +73,16 @@ The initial check uses existing patient and hospital-registration fields; it int
 - Tests prove that candidate detection does not associate or merge patient records.
 - Docker Compose PostgreSQL integration verification is required for every API PR that changes this feature.
 
+## Implementation status — 2026-11-24
+
+The endpoint was merged in CompileCare.Api PR #16 as commit `41b459975b0e64198ad0fb251f1d43ad3e0bfe0f`. The final API PR head passed Docker Compose verification with 3 unit tests and 55 PostgreSQL integration tests (zero failures), standard CI, and the EF Core model-drift check. No migration was required.
+
 ## Consequences and deferred work
 
 This provides a usable, explainable first check but has intentionally low recall: it will not find records with misspelled, transliterated, abbreviated or differently formatted given names, missing DOB, or data-entry variation. A no-candidates result is not proof that no duplicate exists. The front desk must continue its approved manual checks.
 
 Future increments require separate decisions for richer demographic normalization, age-estimate matching, contact/identifier verification, cross-hospital discovery, duplicate case queues, identity review authority, patient association, merge approval, reversal and retention. No fuzzy score or automatic merge is introduced by this ADR.
+
+## Follow-on matcher design
+
+ADR-011 defines the next incremental matcher: versioned Unicode compatibility/case/whitespace normalization and a second candidate path requiring both middle and family names to match while exact DOB remains mandatory. This does not add unverified contact or other demographic signals.
