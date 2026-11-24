@@ -130,7 +130,9 @@ Before a pilot is enabled, each hospital must approve its MRN format/sequence an
 
 ## Implementation status — 2026-11-24
 
-The first API implementation slice is being delivered in `CompileCare.Api` on `feature/patient-master-registration-foundation` (tracking PR #14). The initial code boundary is intentionally narrower than the full ADR:
+### Patient master and hospital registration — merged
+
+The foundational API slice was merged into `CompileCare.Api` through PR #14. The separate patient-master boundary is intentionally narrower than this full ADR:
 
 - `Patient` is a tenant-owned master with an internal GUID, given name, optional middle/family name and optional date of birth.
 - `HospitalPatientRegistration` associates the master with a hospital using tenant-composite foreign keys. The database enforces one registration per patient per hospital.
@@ -138,6 +140,21 @@ The first API implementation slice is being delivered in `CompileCare.Api` on `f
 - A dedicated `PatientRegistrar` membership role receives only `patient.read` and `patient.register`. Existing facility roles do not implicitly receive patient permissions, and the patient role does not receive facility administration permissions. The hospital-nested patient API requires tenant-wide or explicit hospital scope; a department-only membership cannot read the entire hospital's patient registrations.
 - Patient writes participate in the existing audited request transaction. Audit metadata does not persist request bodies or patient demographics.
 
-The first slice deliberately does **not** implement MRN generation/storage, external identifiers (including ABHA), estimated-age fields, duplicate matching/linking, cross-hospital discovery, guardian relationships, merge workflows, clinical records or retention/consent workflows. Those remain separate increments governed by this ADR. MRN is omitted from the initial registration entity until the hospital-specific identifier scope and generation policy are approved; identifiers will remain a separate model rather than being used as the patient primary key.
+The patient master migration `20261124143001_AddPatientMasterRegistration` is part of the merged API history. The final foundation implementation passed Docker Compose verification with 3 unit tests and 47 PostgreSQL integration tests.
 
-The API migration `20261124143001_AddPatientMasterRegistration` has been generated and committed. The guarded migration workflow completed restore, build, migration-snapshot alignment and tests successfully (3 unit tests and 45 PostgreSQL integration tests). The final implementation commit also passed standard CI and Docker Compose verification: each ran 3 unit tests and 47 PostgreSQL integration tests with zero failures. Coverage includes explicit department-scope and hospital-scope isolation. The accepted product direction above remains subject to the deployment validation requirements in this ADR.
+### Hospital MRN and patient identifiers — under review
+
+The next increment is being delivered separately in `CompileCare.Api` PR #15 and follows ADR-009:
+
+- `PatientIdentifier` is a separate tenant-owned entity tied through a tenant + hospital + patient composite foreign key to an existing `HospitalPatientRegistration`. The immutable Patient GUID remains the primary identity.
+- Each hospital may create one MRN policy with an approved prefix and numeric padding width. No global prefix or implicit policy is assumed; replacement/reset is not available in this initial increment.
+- Allocation locks the hospital policy row in PostgreSQL. Sequence advancement, identifier insertion and the metadata-only request audit are committed in the same request transaction.
+- Repeated assignment for the same registration returns the existing identifier; database uniqueness constraints protect both the normalized hospital MRN and the one-MRN-per-registration rule.
+- HospitalAdmin can read/manage policy configuration. PatientRegistrar can read and assign identifiers. Every operation still requires tenant-wide or explicit hospital scope; department-only membership cannot use these hospital-wide endpoints.
+- Hospital-scoped routes expose policy creation/read, MRN assignment, a patient's identifiers and lookup by MRN. ABHA and other external identifiers are not issued or verified by this increment.
+
+The generated EF migration is `20261124143002_AddPatientIdentifierManagement`. Its guarded migration-generation workflow passed restore, build, model-snapshot alignment and PostgreSQL-backed tests (3 unit tests and 49 integration tests). The API PR #15 also passed the required Docker Compose verification on its final branch head: 3 unit tests and 49 PostgreSQL integration tests, with zero failures. Standard PR CI passed on the same head. The implementation remains open for review and has not been merged.
+
+### Explicitly deferred
+
+Estimated-age fields, duplicate matching/linking, cross-hospital discovery, guardian relationships, emergency reconciliation, patient merge workflows, clinical records and retention/consent implementation remain separate increments governed by this ADR. Hospital-specific MRN policy changes and identifier correction/revocation also require a separately reviewed workflow. The accepted product direction remains subject to the deployment validation requirements above.
