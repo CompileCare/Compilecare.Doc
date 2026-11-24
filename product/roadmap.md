@@ -64,7 +64,7 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 1. Complete the validated hospital group/branch onboarding model; tenant registry, lifecycle, trusted initial membership provisioning and organization scopes are implemented, while customer-specific onboarding and operational controls remain.
 2. Staff/provider profiles, organizational assignments, schedules and scoped permissions.
-3. **Patient identity — current increment delivered.** Patient master, hospital registration and hospital-local MRN assignment are merged. The initial advisory duplicate-candidate API is also merged (API PR #16; see ADR-010). Next deliver richer matching inputs and normalization, separately authorized cross-hospital discovery, guardian relationships, emergency reconciliation, identifier lifecycle and governed patient association/merge workflows as separately reviewed increments.
+3. **Patient identity — current increment.** Patient master, hospital registration, hospital-local MRN assignment and the initial advisory duplicate-candidate API are merged. The normalized multi-signal matching enhancement is being implemented in API PR #17 (see ADR-011). Next deliver richer demographic/contact inputs only after their data-protection model is approved, then separately authorized cross-hospital discovery, guardian relationships, emergency reconciliation, identifier lifecycle and governed patient association/merge workflows.
 4. Patient appointments, walk-in, check-in and queue journey.
 5. OPD encounter and clinical documentation foundation.
 6. Minimal billing only if required by the validated pilot journey.
