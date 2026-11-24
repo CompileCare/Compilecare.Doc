@@ -15,11 +15,13 @@ CompileCare is a hospital and healthcare information/management platform. This r
 
 ## Phase 2 — Developer platform
 
-**Status: Completed and merged — initial developer-platform baseline**
+**Status: Completed and merged — shared client, database operations and caching baseline**
 
-CompileCare.ApiClient provides named/typed client registration, validated options, injectable access-token/tenant/correlation providers, outbound handlers, bounded safe-method resilience and RFC 9457 Problem Details parsing. API conventions include versioned routes, bounded pagination, consistent errors and correlation IDs.
+CompileCare.ApiClient provides named/typed client registration, validated options, injectable access-token/tenant/correlation providers, outbound handlers, bounded safe-method resilience and RFC 9457 Problem Details parsing. The correlation header handler now validates provider values and replaces untrusted/unsafe caller values (ApiClient PR #3).
 
-**Follow-up release hardening:** publish/inspect the 0.2.0 package and validate it from a consuming application; expand OpenAPI response annotations and contract validation as modules are introduced.
+CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/release, backup/restore and operations runbooks (Database PR #1). CompileCare.Caching now has a .NET 10 HybridCache package with optional Redis, validated configuration, explicit tenant/global cache-key namespaces and a tested sample (Caching PR #2; restore/build/test/pack passed, 11 tests).
+
+**Follow-up release hardening:** publish/inspect packages and validate them from consuming applications; expand OpenAPI response annotations and contract validation as modules are introduced. Database backup automation and production recovery drills remain.
 
 ## Phase 3 — Database, identity and security
 
