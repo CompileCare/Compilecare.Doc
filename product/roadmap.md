@@ -51,7 +51,7 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 ## Phase 4 — Core healthcare domain
 
-**Status: Partially implemented — patient identity matching foundation merged; contact enrichment is designed separately; staff/provider management is the next design increment.**
+**Status: Partially implemented — patient identity matching foundation merged; staff/provider management is the next implementation increment; contact enrichment is designed separately.**
 
 ### Implemented
 
@@ -64,8 +64,8 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 
 1. Complete the validated hospital group/branch onboarding model; tenant registry, lifecycle, trusted initial membership provisioning and organization scopes are implemented, while customer-specific onboarding and operational controls remain.
 2. **Patient identity — normalized candidate matching completed; contact design is next.** Patient master, hospital registration, hospital-local MRN and advisory duplicate matching are merged through API PRs #14–#17. The normalized matcher is on API main at c603dc602565b69f25b24b4738e45f24c4090362; post-merge build, EF model-drift check, 12 unit tests and 58 PostgreSQL integration tests passed. Patient-owned phone/email contact lifecycle, protected storage, verification, permissions and matching limits are proposed in ADR-012, merged through documentation PR #19. No contact API/schema/runtime implementation is included. Following design review, implement protected contact storage first, then challenge verification, and only later consider contact corroboration for existing name/DOB candidates. Cross-hospital discovery, guardian relationships, emergency reconciliation and governed identity workflows remain separate.
-3. Staff and provider management: tenant-owned profiles, hospital/department assignments and scoped permissions as defined in ADR-012 (staff/provider profile boundaries) and documentation PR #20.
-4. Patient-owned contact storage and verification following ADR-012 (verified patient contact design, documentation PR #19), after security/privacy/provider/key-management decisions are approved. Initially allow only corroboration of existing exact-DOB/name candidates.
+3. **Staff and provider management (next):** deliver tenant-owned profiles, effective-dated hospital/department assignments and integration with the existing membership model. Follow [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). Profiles do not independently grant access; OIDC identity, tenant membership, scoped role grants and authorization remain authoritative.
+4. Patient-owned contact storage and verification following [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md), after security/privacy/provider/key-management decisions are approved. Initially allow only corroboration of existing exact-DOB/name candidates.
 5. Patient appointments, walk-in, check-in and queue journey.
 6. OPD encounter and clinical documentation foundation.
 7. Minimal billing only if required by the validated pilot journey.
