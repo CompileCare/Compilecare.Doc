@@ -1,6 +1,6 @@
 # Workflow: reception and clinical workspace UX foundation
 
-**Status:** Reception patient registration, appointment booking, walk-in arrival and queue visibility are merged; queue lifecycle controls are in implementation; remaining workflows require pilot validation  
+**Status:** Reception, appointment/arrival and queue lifecycle controls are merged; OPD clinical workspace UI is in implementation; remaining workflows require pilot validation  
 **Phase:** 5 — User experience  
 **Related workflows:** [Patient registration](patient-registration.md), [Appointments and queue](appointments-and-queue.md), [OPD encounter and clinical documentation](opd-encounter-and-clinical-documentation.md)  
 **Related architecture:** [ADR-005 — Frontend architecture](../../architecture/decisions/ADR-005-frontend-architecture.md)
@@ -130,8 +130,8 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 2. **Tenant and hospital context — implemented:** API PR #26 exposes audited current-user active tenant memberships using validated issuer/subject. The web client lets the user select a tenant and loads only hospitals visible under the persisted organization scope. No client-supplied role or tenant header grants access.
 3. **Reception patient lookup — implemented:** Web PR #2 uses the hospital-scoped patient search API with bounded pagination. Search results are kept in component memory, not browser storage; the API remains authoritative for patient.read permission and hospital scope. Patient registration with duplicate-candidate review and MRN assignment is being implemented in a separate focused UI increment.
 4. **Appointment and arrival:** booking, walk-in, check-in and queue-token confirmation.
-5. **Queue operations:** scoped queue view and permitted lifecycle actions.
-6. **Clinical workspace:** clinical queue, encounter draft, sign and append-only amendment flows.
+5. **Queue operations — implemented:** scoped queue view and permitted lifecycle actions, merged in CompileCare.Web PR #5 with paired documentation in Compilecare.Doc PR #32.
+6. **Clinical workspace — active implementation:** scoped clinical queue discovery, queue-linked encounter create/resume, draft note editing, signing, append-only amendments, cancellation and closure against the existing OPD API. The clinical UI must not expose patient details in queue rows or represent unsupported vitals, diagnoses, prescriptions or diagnostic orders.
 7. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
 
 Each increment should be a small vertical slice with tests and documentation updates. Do not implement all screens against mocked contracts and then retrofit API behavior.
@@ -192,3 +192,21 @@ The operator controls are responsive and keyboard operable, with status text in 
 ### Visual evidence and screenshot policy
 
 Production UI screenshots must be captured from the actual running authenticated web application, not generated mockups. Use a staging OIDC authority and API with synthetic patient/queue data only. Capture desktop, tablet and narrow-screen views of reception context, patient lookup/registration, appointment booking, walk-in/check-in and queue operations. Never capture real patient data, access tokens, browser storage, or private identity-provider details. Keep the screenshot source environment and commit/build SHA in the accompanying evidence note. Until a staging identity/API configuration and browser capture environment are available, screenshot evidence is marked pending rather than substituted with fabricated images.
+
+
+## OPD clinical workspace UI increment — 2026-11-24
+
+The clinical UI consumes the existing OPD encounter API; it does not create a second clinical data model. The paired API increment adds a queue-entry encounter lookup for safe resume after refresh and grants ClinicalUser only scoped `facility.read`, `queue.read` and the existing encounter permissions. Queue mutations remain unavailable to ClinicalUser.
+
+The first UI slice includes:
+- A department/date-filtered clinical queue that shows only operational queue tokens and in-progress state.
+- Open/resume behavior: look up the existing encounter first, create only when none exists, and recover a concurrent create conflict by retrieving the newly created encounter.
+- Explicit draft save for the five approved note sections with API-aligned character limits.
+- Review-and-sign action that saves the current draft before requesting the server-side signature; chief complaint and assessment are required by the API.
+- Read-only signed/closed note presentation, append-only amendments with required reason/content, unsigned cancellation with required reason, and signed encounter closure.
+- Server-returned state reconciliation only; permission, validation and concurrency errors remain visible.
+- No patient name, MRN, contact data or note text in queue rows, URLs or general telemetry.
+
+The UI deliberately does not implement coded vitals, diagnoses, medication reconciliation, prescriptions, laboratory/radiology orders, referrals, triage or clinical decision support. Those remain gated on pilot clinician validation and separate API/product decisions. Encounter signing is not queue completion; queue and clinical lifecycle remain independent.
+
+Release gates include Web API contract tests, Vitest suite, production TypeScript build, CI Docker image build and HTTP smoke test, plus manual keyboard and desktop/tablet/narrow viewport review. Authenticated staging screenshots remain pending until the staging OIDC/API and secure browser capture environment are available.
