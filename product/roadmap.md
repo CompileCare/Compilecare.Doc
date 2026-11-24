@@ -68,7 +68,7 @@ CompileCare.Database establishes PostgreSQL/EF migration ownership, deployment/r
 4. **Appointments, walk-ins, check-in and queue — implemented and merged:** CompileCare.Api PR #20 delivers appointment rescheduling with persisted lineage, idempotent check-in, walk-in registration, department/day queue tokens and queue lifecycle transitions. CI, EF model snapshot validation and PostgreSQL Docker integration verification passed before squash merge (commit `c968d9441affaa21070063081b2bc785c848e547`). Follow [ADR-014](../architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md) and the [appointments and queue workflow](workflows/appointments-and-queue.md).
 5. Patient-owned contact storage and verification following [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md), only after security/privacy/provider/key-management and retention decisions are approved. Initially allow only corroboration of existing exact-DOB/name candidates.
 6. **OPD encounter and clinical documentation — implemented and merged:** CompileCare.Api PR #21 adds queue-linked encounters, scoped ClinicalUser permissions, draft notes, signed-note immutability, append-only amendments and a bounded lifecycle. CI, EF model-drift validation, PostgreSQL integration tests and Docker Integration Verification passed before squash merge (commit `723a107c0de40e95cf28f1c12a772f1ab2a75c73`). Follow [ADR-015](../architecture/decisions/ADR-015-opd-encounter-and-clinical-documentation-boundaries.md) and the [OPD encounter workflow](workflows/opd-encounter-and-clinical-documentation.md). Production activation remains gated on clinician, privacy, role and retention validation.
-7. **Minimal billing — decision-gated:** implement only if the pilot hospital confirms the required service catalogue, charge capture, invoice, payment and receipt workflow. Do not start a billing engine from assumptions.
+7. **Minimal OPD billing — initial baseline approved for implementation:** service catalogue and hospital tariffs, queue-visit-linked invoice with immutable line snapshots, partial/full payment recording, receipts and daily collection reporting. The baseline excludes tax, discounts/waivers, refunds/credit notes, insurance/TPA, gateway and accounting integrations, deposits/advances and advanced reconciliation until pilot decisions are confirmed. Follow [OPD billing foundation](workflows/opd-billing-foundation.md).
 8. Pharmacy, diagnostics, inpatient, inventory and advanced revenue workflows in the approved roadmap sequence.
 
 ### Deferred workforce, credentialing and HR roadmap — retained for later
@@ -90,7 +90,7 @@ Each domain workflow requires hospital-user validation, permissions, audit, tena
 
 ## Phase 5 — User experience
 
-**Status: Started — reception and clinical workspace UX foundation specified; implementation is next**
+**Status: Started — reception and clinical workspace UX foundation specified; authenticated shell and patient lookup are next**
 
 The first UX foundation increment is documented in [Reception and clinical workspace UX](workflows/reception-and-clinical-workspace-ux.md). It maps reception, queue and clinical tasks to the implemented patient, appointment, queue and OPD contracts; defines screen responsibilities, access/data boundaries, accessibility and failure states; and keeps billing, patient self-service and unimplemented clinical capabilities out of the first slice.
 
