@@ -196,7 +196,7 @@ Production UI screenshots must be captured from the actual running authenticated
 
 ## OPD clinical workspace UI increment — 2026-11-24
 
-The clinical UI consumes the existing OPD encounter API; it does not create a second clinical data model. The paired API increment adds a queue-entry encounter lookup for safe resume after refresh and grants ClinicalUser only scoped `facility.read`, `queue.read` and the existing encounter permissions. Queue mutations remain unavailable to ClinicalUser.
+The clinical UI consumes the existing OPD encounter API; it does not create a second clinical data model. The paired API increment adds a queue-entry encounter lookup for safe resume after refresh and grants ClinicalUser `patient.read` for identity verification, plus scoped `facility.read`, `queue.read` and the existing encounter permissions. Queue mutations remain unavailable to ClinicalUser.
 
 The first UI slice includes:
 - A department/date-filtered clinical queue that shows only operational queue tokens and in-progress state.
@@ -205,7 +205,7 @@ The first UI slice includes:
 - Review-and-sign action that saves the current draft before requesting the server-side signature; chief complaint and assessment are required by the API.
 - Read-only signed/closed note presentation, append-only amendments with required reason/content, unsigned cancellation with required reason, and signed encounter closure.
 - Server-returned state reconciliation only; permission, validation and concurrency errors remain visible.
-- No patient name, MRN, contact data or note text in queue rows, URLs or general telemetry.
+- Queue rows remain token-only; the encounter editor retrieves and displays only the patient name and date of birth returned by the hospital-scoped patient read contract. No MRN, contact data or note text is placed in queue rows, URLs or general telemetry. The encounter workspace may show the minimal patient identity returned by the authorized hospital-scoped patient read API.
 
 The UI deliberately does not implement coded vitals, diagnoses, medication reconciliation, prescriptions, laboratory/radiology orders, referrals, triage or clinical decision support. Those remain gated on pilot clinician validation and separate API/product decisions. Encounter signing is not queue completion; queue and clinical lifecycle remain independent.
 
