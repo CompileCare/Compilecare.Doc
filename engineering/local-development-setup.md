@@ -248,7 +248,9 @@ The API host failed its startup options validation for the HTTP authority (see D
 
 **Fix**
 
-Correct the effective API OIDC authority/Development opt-in, rebuild/recreate the API and inspect API logs and health status. A message about optional `libgssapi_krb5.so.2` should be investigated separately if integrated authentication is required; it was not the fatal startup exception shown in this run.
+Correct the effective API OIDC authority/Development opt-in, rebuild/recreate the API and inspect API logs and health status.
+
+**Npgsql 10 GSSAPI message (non-fatal):** the API pins Npgsql EF Core provider 10.0.0. Npgsql 10 defaults `GSS Encryption Mode` to `Prefer`; on Linux without Kerberos/GSSAPI libraries it may log that `libgssapi_krb5.so.2` cannot be loaded, then safely fall back to a non-GSS connection. This is not the API startup failure described above. The local Compose connection string now sets `GSS Encryption Mode=Disable` because this developer stack uses PostgreSQL username/password authentication and does not configure Kerberos. This setting only disables GSS session encryption attempts in the local stack; it does not change the separate `SSL Mode` setting or production connection configuration. Keep this local-only and revisit it if the local environment is later configured for GSS/Kerberos.
 
 ### G. Workspace displayed but API authorization failed
 
