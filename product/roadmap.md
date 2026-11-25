@@ -112,6 +112,7 @@ The following focused hardening changes are in review; they are **not complete o
 - **Membership administration audit coverage — CompileCare.Api PR #54:** adds PostgreSQL integration assertions for role/scope changes, deactivation/reactivation and rejected self-demotion. No runtime or schema change.
 - **Logical backup/restore tooling — CompileCare.Database PR #2:** adds provider-neutral PostgreSQL custom-format logical backup and guarded restore scripts, checksum/manifest sidecars and a PostgreSQL 16 Docker verification workflow. This is not provider-native physical backup/PITR, backup scheduling, retention or proof of production RPO/RTO.
 - **Tenant cache value isolation — CompileCare.Caching PR #5:** adds tests proving values and invalidation remain isolated across tenant namespaces and the global namespace. No API cache adoption or patient-data caching is included.
+- **Authenticated mobile responsiveness — CompileCare.Web PR #27:** runs the synthetic OPD reception → walk-in/queue → clinical → billing journey at 375px and asserts no horizontal document overflow at each stage. This complements the existing keyboard-flow E2E tests; it remains pending browser/Docker execution.
 - **Local Npgsql warning — CompileCare.Local PR #5, paired with Compilecare.Doc PR #50:** documents the Npgsql 10 GSSAPI fallback message and scopes `GSS Encryption Mode=Disable` to the local Docker connection string only. Production connection settings and the separate SSL/TLS mode are unchanged.
 
 ### Hosted-runner allocation blocker
