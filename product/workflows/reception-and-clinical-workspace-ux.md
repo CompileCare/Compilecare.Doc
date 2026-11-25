@@ -231,3 +231,15 @@ The first UI slice includes:
 The UI deliberately does not implement coded vitals, diagnoses, medication reconciliation, prescriptions, laboratory/radiology orders, referrals, triage or clinical decision support. Those remain gated on pilot clinician validation and separate API/product decisions. Encounter signing is not queue completion; queue and clinical lifecycle remain independent.
 
 Release gates include Web API contract tests, Vitest suite, production TypeScript build, CI Docker image build and HTTP smoke test, plus manual keyboard and desktop/tablet/narrow viewport review. Authenticated staging screenshots remain pending until the staging OIDC/API and secure browser capture environment are available.
+
+## Workspace shell navigation and keyboard access — 2026-11-25
+
+The Phase 5 visual foundation in [CompileCare.Web PR #29](https://github.com/CompileCare/CompileCare.Web/pull/29) refines the authenticated shell without changing its API or authorization model.
+
+- The sidebar reflects the current workspace section using the location hash and exposes the active item with `aria-current="location"`.
+- A dedicated Patient registration entry is rendered only when the selected membership has both `patient.register` and `patient.duplicate.review`; the API continues to authorize registration and duplicate review independently.
+- A keyboard-visible “Skip to main content” link moves focus to the main workspace region, reducing repeated tab stops through the shell.
+- On narrow screens, the module navigation becomes a horizontally scrollable single row so links remain available without creating a tall multi-row navigation block.
+- The selected tenant, hospital, and API-derived permissions remain the source for module availability; this is presentation/navigation state only and does not grant access.
+
+Verification remains pending until the Web unit/build/browser checks and Docker smoke checks execute successfully and the actual application is reviewed at desktop, tablet and 375px widths with keyboard-only navigation. The current PR CI attempt had no allocated GitHub runner and performed zero steps; that status is not evidence of a passing or failing implementation.
