@@ -114,6 +114,8 @@ The following focused hardening changes are in review; they are **not complete o
 - **Tenant cache value isolation — CompileCare.Caching PR #5:** adds tests proving values and invalidation remain isolated across tenant namespaces and the global namespace. No API cache adoption or patient-data caching is included.
 - **Authenticated mobile responsiveness — CompileCare.Web PR #27:** runs the synthetic OPD reception → walk-in/queue → clinical → billing journey at 375px and asserts no horizontal document overflow at each stage. This complements the existing keyboard-flow E2E tests; it remains pending browser/Docker execution.
 - **Local Npgsql warning — CompileCare.Local PR #5, paired with Compilecare.Doc PR #50:** documents the Npgsql 10 GSSAPI fallback message and scopes `GSS Encryption Mode=Disable` to the local Docker connection string only. Production connection settings and the separate SSL/TLS mode are unchanged.
+- **Local observability dashboards — CompileCare.Local PR #6:** adds an optional Docker Compose overlay to route API metrics/traces through the OpenTelemetry Collector, API metrics into Prometheus, traces into Jaeger and Serilog logs into Elasticsearch/Kibana. Before this PR is verified, the current local stack only provides console logs and the raw API `/metrics` endpoint; it does not yet provide the dashboards. The default local stack remains unchanged without the overlay.
+- **Playwright HTML report — CompileCare.Web PR #28:** configures a Playwright HTML report with per-test screenshots, failure traces/videos and CI artifact upload. The current E2E suite mocks OIDC/API calls; it is UI regression evidence, not real Keycloak/API/PostgreSQL acceptance.
 
 ### Hosted-runner allocation blocker
 
