@@ -32,6 +32,7 @@ CompileCare is an India-focused hospital information and management platform for
 - [Engineering standards](engineering/standards.md)
 - [Definition of Done](engineering/definition-of-done.md)
 - [Existing repository assessment](engineering/repository-assessment.md)
+- [Local development setup and troubleshooting](engineering/local-development-setup.md) — Docker Compose, Keycloak/OIDC, private NuGet restore, observed issues, fixes and remaining local acceptance checks.
 
 ## Delivery status
 
