@@ -70,8 +70,9 @@ The first increment does not generate diagnoses, treatment suggestions, triage s
 1. A clinician searches within the department assigned to their active tenant membership using the hospital's department-scoped patient lookup endpoint.
 2. The API verifies the requested hospital and department against the caller's persisted organization scope; a department ID supplied by the caller does not grant access.
 3. Search results include only patients with a hospital registration and at least one queue entry in that same hospital and assigned department. Registration at the hospital alone does not expose the patient to every department.
-4. Results use bounded pagination and the existing patient identity-read permission. Hospital-wide reception search remains a separate permission and endpoint.
-5. A clinician assigned to another department, or to no matching department, receives no patient results (not-found for an out-of-scope department).
+4. When opening a queue-linked encounter, the client retrieves the patient's identity through the department-scoped detail route. The API returns the patient only when the caller is assigned to that department and the patient has queue history there.
+5. Search and detail reads require the existing patient identity-read permission. Hospital-wide reception search and detail reads remain separate permissioned endpoints.
+6. A clinician assigned to another department, or to no matching department, receives no patient results (not-found for an out-of-scope department or patient).
 
 The initial implementation is intended for clinical continuity through department queue history. It does not enable cross-hospital patient discovery or grant access to clinical notes by itself; OPD encounter permissions and encounter department checks remain independently enforced.
 
