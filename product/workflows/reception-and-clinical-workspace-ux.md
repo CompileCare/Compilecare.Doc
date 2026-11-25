@@ -1,6 +1,6 @@
 # Workflow: reception and clinical workspace UX foundation
 
-**Status:** Reception, appointment/arrival, queue, OPD clinical and initial billing workspaces are implemented and merged. Browser-level billing recovery and full walk-in-to-billing journey coverage are merged; appointment-booking browser coverage and remaining operational workflows are next. Staff/provider administration remains gated on hospital-user validation.  
+**Status:** Reception, appointment/arrival, queue, OPD clinical and initial billing workspaces are implemented and merged. Browser-level billing recovery, full walk-in-to-billing journey, appointment booking/check-in and successful OIDC silent-renewal coverage are merged. Availability-conflict recovery, renewal-failure/re-authentication behavior and remaining operational workflows are next. Staff/provider administration remains gated on hospital-user validation.  
 **Phase:** 5 — User experience  
 **Related workflows:** [Patient registration](patient-registration.md), [Appointments and queue](appointments-and-queue.md), [OPD encounter and clinical documentation](opd-encounter-and-clinical-documentation.md)  
 **Related architecture:** [ADR-005 — Frontend architecture](../../architecture/decisions/ADR-005-frontend-architecture.md)
@@ -146,8 +146,9 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 6. **Clinical workspace — implemented:** scoped clinical queue discovery, queue-linked encounter create/resume, draft note editing, signing, append-only amendments, cancellation and closure against the existing OPD API (CompileCare.Web PR #9). The clinical UI does not expose patient details in queue rows or represent unsupported vitals, diagnoses, prescriptions or diagnostic orders.
 7. **Billing workspace — implemented:** department-scoped visit selection, invoice create/resume, partial/full payment capture, payment history, receipt retrieval/reprint, service catalogue and daily collection (CompileCare.Web PRs #10–#11). API permission and department boundaries remain authoritative.
 8. **Browser acceptance — implemented for the walk-in path:** Playwright Chromium tests cover billing recovery after refresh and permission-denied navigation (Web PR #12), plus patient registration/MRN → walk-in token → queue call/start → clinical identity check and sign/close → queue completion → invoice and payment (Web PR #13). API workflow correctness remains covered by PostgreSQL-backed integration tests.
-9. **Next browser acceptance:** add the appointment-booking/check-in path and session-renewal recovery, while keeping synthetic data and no real patient information in browser tests.
-10. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
+9. **Appointment and check-in browser acceptance — implemented:** Web PR #14 verifies hospital patient selection, API-published availability and slot selection, booking confirmation and check-in with a server-issued queue token.
+10. **OIDC session renewal browser acceptance — implemented:** Web PR #15 verifies the short-lived synthetic OIDC session obtains a refreshed access token through the refresh-token grant and uses it on subsequent API requests. No real identity provider, credentials or patient data are used.
+11. **Next browser acceptance:** cover availability conflict/slot contention recovery and renewal failure/re-authentication behavior. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
 
 Each increment should be a small vertical slice with tests and documentation updates. Do not implement all screens against mocked contracts and then retrofit API behavior.
 
@@ -167,7 +168,8 @@ Each increment should be a small vertical slice with tests and documentation upd
 
 ## Open product and design questions
 
-- Validate the appointment-booking and check-in browser journey with the pilot workflow; add it to the Playwright suite without replacing the PostgreSQL API tests.
+- Validate appointment availability conflict and rescheduling/check-in edge cases with the pilot workflow; add them to the Playwright suite without replacing the PostgreSQL API tests.
+- Confirm the approved silent-renew failure, access-token expiry and workstation re-authentication experience with hospital IT/security.
 - Validate the staff/provider administration workflow with hospital stakeholders before building the workforce UI. Profile-to-account linking, credentialing and clinical privileging remain separate decisions.
 
 - Which hospital roles map to the existing appointment, queue and clinical permissions for the pilot?
