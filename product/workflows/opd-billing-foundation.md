@@ -1,10 +1,10 @@
 # OPD billing foundation
 
-**Status:** Backend billing foundation and settlement lifecycle are merged; the permission-driven Web billing workspace is implemented and under CI/Docker verification. Pilot policy validation remains required before production use.
+**Status:** Backend billing foundation, settlement lifecycle and permission-driven Web billing workspace are merged and CI/Docker verified. Pilot policy validation remains required before production use.
 
 ## Implementation status — 2026-11-24
 
-The backend foundation is merged, including explicit `Issued`, `PartiallyPaid` and `Paid` settlement states (CompileCare.Api PR #39) and a permission-scoped lookup for an existing invoice by OPD visit (CompileCare.Api PR #40). The Web billing workspace is implemented in CompileCare.Web PR #10 and is being verified independently. The workspace covers billable visit selection, catalogue-based invoice issue, partial/full payment capture, receipt retrieval and daily collection reporting. CI and Docker verification passed for the API changes; the Web branch has passed its unit tests, production build and Docker smoke test. The deferred policy decisions below remain out of scope and must be validated with the pilot hospital before production activation.
+The backend foundation is merged, including explicit `Issued`, `PartiallyPaid` and `Paid` settlement states (CompileCare.Api PR #39) and a permission-scoped lookup for an existing invoice by OPD visit (CompileCare.Api PR #40). The Web billing workspace is merged in CompileCare.Web PR #10. The workspace covers billable visit selection, catalogue-based invoice issue, partial/full payment capture, receipt retrieval and daily collection reporting. CI and Docker verification passed for the API and Web changes. The deferred policy decisions below remain out of scope and must be validated with the pilot hospital before production activation.
 
 ## Purpose
 
@@ -40,6 +40,8 @@ The API exposes three invoice states:
 - `Issued`: an invoice has a positive outstanding balance and no payments have been recorded.
 - `PartiallyPaid`: one or more payments have been recorded, but a positive balance remains.
 - `Paid`: the outstanding balance is exactly zero. A zero-total invoice is marked paid when issued.
+
+The Web client retrieves an existing invoice through `GET /api/v1/hospitals/{hospitalId}/billing/visits/{queueEntryId}/invoice` before allowing invoice creation. This resumes an issued invoice after navigation or reload; the API independently enforces hospital and department scope.
 
 The payment record, invoice status transition and invoice payment-sequence update are committed atomically. A payment larger than the outstanding balance or a further payment against a fully paid invoice is rejected with HTTP 409. The invoice status is a summary of the append-only payment ledger; the ledger remains the source for payment and receipt history.
 
