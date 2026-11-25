@@ -1,10 +1,10 @@
 # OPD billing foundation
 
-**Status:** Initial backend implementation merged in CompileCare.Api PR #23; pilot policy validation and frontend billing workspace remain required before production use.
+**Status:** Backend billing foundation, settlement lifecycle and permission-driven Web billing workspace are merged and CI/Docker verified. Pilot policy validation remains required before production use.
 
 ## Implementation status — 2026-11-24
 
-The first backend baseline is merged in CompileCare.Api PR #23 (merge commit `9fd10c12145d2022f6ac8d49d4c35bd1b9db4e38`). The merged API provides service catalogue management, hospital tariffs, queue-visit-linked invoices with immutable line snapshots, append-only partial/full payments, receipt retrieval and daily collection reporting. CI, EF model-drift validation, PostgreSQL integration tests and Docker Integration Verification passed. No billing user interface is included yet. The deferred policy decisions below remain out of scope and must be validated with the pilot hospital before production activation.
+The backend foundation is merged, including explicit `Issued`, `PartiallyPaid` and `Paid` settlement states (CompileCare.Api PR #39) and a permission-scoped lookup for an existing invoice by OPD visit (CompileCare.Api PR #40). The Web billing workspace is merged in CompileCare.Web PR #10. The workspace covers billable visit selection, catalogue-based invoice issue, partial/full payment capture, receipt retrieval and daily collection reporting. CI and Docker verification passed for the API and Web changes. The deferred policy decisions below remain out of scope and must be validated with the pilot hospital before production activation.
 
 ## Purpose
 
@@ -41,9 +41,21 @@ The API exposes three invoice states:
 - `PartiallyPaid`: one or more payments have been recorded, but a positive balance remains.
 - `Paid`: the outstanding balance is exactly zero. A zero-total invoice is marked paid when issued.
 
-The billing client retrieves an existing invoice by OPD visit through `GET /api/v1/hospitals/{hospitalId}/billing/visits/{queueEntryId}/invoice`. This prevents the UI from issuing duplicate invoices after navigation or reload; the lookup remains constrained to the visit's hospital and department scope.
+The Web client retrieves an existing invoice through `GET /api/v1/hospitals/{hospitalId}/billing/visits/{queueEntryId}/invoice` before allowing invoice creation. This resumes an issued invoice after navigation or reload without relying only on client state; the API enforces the invoice's hospital and department scope.
 
 The payment record, invoice status transition and invoice payment-sequence update are committed atomically. A payment larger than the outstanding balance or a further payment against a fully paid invoice is rejected with HTTP 409. The invoice status is a summary of the append-only payment ledger; the ledger remains the source for payment and receipt history.
+
+## Reception billing workspace
+
+The Web workspace is available only when the selected tenant membership has one or more billing permissions. Each capability is rendered from the effective permission identifiers returned by the API; the API independently enforces authorization on every request.
+
+1. A cashier selects a department and hospital-local business date, then loads queue entries in `InProgress` or `Completed` status. The selector shows the visit token and status, not patient clinical information.
+2. On selecting a visit, the client calls the visit-to-invoice lookup. If an invoice already exists, the client displays that invoice and its current settlement state. This is the normal resume path and avoids asking the cashier to issue another invoice after reloading or navigating away.
+3. If no invoice exists, an authorized user selects active catalogue items and quantities. The API calculates totals and creates the invoice with immutable line snapshots. Only one initial invoice per visit is supported by the existing unique constraint.
+4. An authorized cashier records a payment using Cash, UPI, Card or BankTransfer. The client then reloads the invoice and retrieves the receipt. A remaining balance leaves the invoice `PartiallyPaid`; exact settlement moves it to `Paid`.
+5. Users with the reporting permission can request a daily collection summary by business date and time zone. Users with catalogue-management permission can add hospital-specific service items.
+
+The initial Web workspace intentionally avoids displaying patient names in the billing visit selector. Patient identity and clinical records remain subject to their separate patient/clinical permissions. It is not a cashier shift-close or reconciliation system.
 
 ## Access and audit
 
