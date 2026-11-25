@@ -91,6 +91,17 @@ For each user-visible slice:
 - No full rewrite of the current application component before a staged component decomposition plan is reviewed.
 - No production-readiness or WCAG conformance claim without the corresponding verification evidence.
 
-## 8. Success criteria
+## 8. Current implementation baseline — 2026-11-25
+
+The first shared foundation is under review in [CompileCare.Web PR #29](https://github.com/CompileCare/CompileCare.Web/pull/29). Its current branch contains:
+- Shared design tokens for canvas/surface, typography, text, borders, primary/focus/semantic status colors, spacing, radii and elevation.
+- Consistent shell, navigation, page header, context panel, forms, status, queue, clinical and billing surface styling.
+- Permission-driven active navigation with `aria-current`, a direct Patient registration link only when the signed-in context includes the required registration permissions, and a keyboard skip-to-main-content link.
+- Mobile navigation overflow handling that retains the module links rather than wrapping them into an unstable multi-row menu.
+- A component test assertion for the skip link.
+
+This is a foundation increment, not completion of the uplift. Build, test, Docker, real-browser visual review and desktop/tablet/mobile evidence are still required. The current hosted Web CI run failed before runner allocation (`runner_id=0`, no runner name and zero steps); it did not execute the build or tests. Do not merge until the required checks actually execute and pass.
+
+## 9. Success criteria
 
 The workspace looks and behaves like one coherent enterprise product; staff can scan and complete core workflows efficiently; the active tenant/hospital context is always clear; controls and feedback are consistent; essential workflows are keyboard-complete and responsive; and every implementation remains aligned with existing API contracts, data minimization and tenant/organization authorization.
