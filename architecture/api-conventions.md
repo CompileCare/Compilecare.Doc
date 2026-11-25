@@ -35,6 +35,19 @@ Validation may include an errors object mapping fields to safe messages. Do not 
 - Scope every data query and relationship by authorized tenant and organizational permissions.
 - Return the same not-found semantics for absent and out-of-scope resources to reduce cross-tenant enumeration.
 
+## Current-user tenant context and effective permissions
+
+The authenticated UI discovers the user's active tenant memberships through `GET /api/v1/me/tenant-contexts`. Each returned tenant context includes:
+
+- Tenant identity and display metadata.
+- The persisted membership role.
+- The authorized organization scopes (tenant, hospital and/or department).
+- The effective permission identifiers derived by the API from its server-side role-to-permission mapping.
+
+The permission list is a presentation contract for feature navigation and control visibility. The frontend may use it to hide unavailable modules, actions and navigation entries, but it must never treat a client-side permission check as authorization. Every protected API operation independently enforces its server-side permission and organization scope. Never infer permissions from token role claims or hard-code role-to-feature mappings in the browser; use the returned permission identifiers for the selected tenant context.
+
+Tenant context discovery is identity-scoped and returns only active memberships for the validated issuer/subject. The response is paginated and must be refreshed after the user switches tenant context or an administrator changes membership role/scope. The endpoint does not issue, refresh or extend OIDC tokens; token renewal remains the identity provider/client responsibility.
+
 ## Concurrency and idempotency
 - Use optimistic concurrency for mutable tenant-owned records.
 - Map known concurrency/uniqueness/business conflicts consistently to 409.
