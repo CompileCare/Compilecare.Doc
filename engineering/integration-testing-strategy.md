@@ -52,6 +52,7 @@ The facility API integration suite uses the real ASP.NET Core JWT Bearer handler
 
 Coverage includes:
 - Valid token without membership is authenticated but denied tenant access.
+- A valid hospital-scoped membership in tenant A cannot read a patient registered in tenant B; the API returns not-found and audit metadata is attributed to tenant A (API PR #46; PostgreSQL CI #779 and Docker Integration Verification #161).
 - Wrong issuer, wrong audience, expired token, missing subject and invalid subject shape are rejected.
 - Missing or malformed tenant selection is rejected.
 - A tenant ID without a matching active membership and an inactive membership are denied.
@@ -75,6 +76,8 @@ Current browser coverage includes:
 - Full walk-in OPD user journey: patient registration and duplicate review, hospital-local MRN assignment, patient search, walk-in queue token, call/start transitions, department-scoped identity verification, encounter note/sign/close, queue completion and invoice/payment.
 - Appointment booking: hospital-registered patient search, provider availability discovery, slot selection, booking confirmation, check-in and server-issued queue token.
 - OIDC silent session renewal: a synthetic short-lived session exchanges its refresh token at a controlled identity-provider endpoint; the workspace remains signed in and subsequent API requests use the renewed bearer token.
+- OIDC renewal failure: a controlled `invalid_grant` refresh-token response causes the UI to display the safe re-authentication warning while the existing access token remains unexpired.
+- Appointment slot contention: the first booking request returns 409; the UI clears the stale selection, reloads the session's slots, disables the claimed slot and allows booking the next available time.
 
 The browser tests install a synthetic OIDC session and intercept the API with deterministic in-memory fixtures. They validate user-visible workflows and permission-driven feature gating; they do not replace API integration tests, real JWT/tenant membership tests or PostgreSQL persistence/concurrency checks. Never use real patient data, credentials, identity-provider tokens or production APIs in browser fixtures.
 
