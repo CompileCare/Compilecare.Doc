@@ -88,3 +88,18 @@ The initial implementation is intended for clinical continuity through departmen
 ## Out of scope
 
 Diagnosis catalogues and coding, allergy/medication reconciliation, prescriptions, lab/radiology orders, referrals, procedures, clinical decision support, triage, emergency and inpatient workflows, discharge summaries, patient portal access, attachments and external interoperability.
+
+
+## Clinical queue row presentation — 2026-11-25
+
+The clinical queue presentation is extracted into `ClinicalQueueRow` in [CompileCare.Web PR #33](https://github.com/CompileCare/CompileCare.Web/pull/33).
+
+- Rows are named by their operational queue token, not patient identity.
+- The API-returned status is announced as a labelled status region.
+- The open/resume action has an accessible name that identifies the queue token and distinguishes an in-progress encounter from a completed visit.
+- The action is disabled while the selected encounter is opening or the clinical workspace reports a busy operation.
+- The row passes the original server-returned `QueueEntry` to the existing `openEncounter` handler. It does not create an encounter, infer its state or change lifecycle transitions.
+
+This is a presentation-only change. The existing identity verification step remains mandatory before clinical note content is displayed or edited. Draft saving, signing, closing, cancellation and append-only amendments retain their existing permission checks and API contracts. Do not add patient names or note content to the clinical queue list, browser storage, general logs or telemetry.
+
+Verification includes keyboard operation, status announcements, desktop/tablet/375px layouts, and busy/opening states. API integration and real Keycloak authorization are verified separately from mocked Web component tests.
