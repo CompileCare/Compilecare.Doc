@@ -33,6 +33,16 @@ This is an implementation baseline, not a claim of statutory tax-invoice complia
 - Internal invoice and receipt references are operational identifiers only until the pilot confirms statutory numbering and tax requirements.
 - No patient clinical note, diagnosis, prescription, contact data or other unnecessary sensitive information is stored in billing rows.
 
+## Invoice settlement lifecycle
+
+The API exposes three invoice states:
+
+- `Issued`: an invoice has a positive outstanding balance and no payments have been recorded.
+- `PartiallyPaid`: one or more payments have been recorded, but a positive balance remains.
+- `Paid`: the outstanding balance is exactly zero. A zero-total invoice is marked paid when issued.
+
+The payment record, invoice status transition and invoice payment-sequence update are committed atomically. A payment larger than the outstanding balance or a further payment against a fully paid invoice is rejected with HTTP 409. The invoice status is a summary of the append-only payment ledger; the ledger remains the source for payment and receipt history.
+
 ## Access and audit
 
 - All data is tenant- and hospital-scoped, with relational constraints tying invoice, queue entry and patient registration to the same tenant and hospital.
