@@ -18,6 +18,8 @@ Keep product documentation aligned with the real authenticated hospital workspac
 3. Appointment booking, availability and review/confirmation.
 4. Walk-in registration and server-issued queue token confirmation.
 5. Department queue in Waiting, Called and InProgress states, including the permitted actions for each state.
+6. Clinical queue with in-progress and completed entries, minimal synthetic patient identity banner and explicit identity-confirmation step.
+7. Draft clinical note with the approved five sections, signed read-only note, and append-only amendment history.
 
 Capture each view at a desktop viewport (1440×900), tablet viewport (1024×768) and narrow viewport (390×844), where the workflow remains meaningful. Include keyboard focus in at least one representative capture and keep labels/statuses legible.
 
