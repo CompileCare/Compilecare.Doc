@@ -130,7 +130,9 @@ A successful Keycloak login is not proof that the API authorized the identity, a
 
 The local launcher generates a random 256-bit `PLATFORM_BOOTSTRAP_SECRET` when the setting is missing or still has the example placeholder. It stores the value only in `local/.env` and prints it once so the developer can enter it into the first-run setup screen. Treat it like a password; do not commit it or paste it into issues/chat.
 
-After signing in to Keycloak with a normal user in the `compilecare` realm:
+Create a normal local user in Keycloak before first sign-in: open the admin console, select the `compilecare` realm, choose **Users → Create user**, save the account, then use **Credentials → Set password** and turn **Temporary** off. The `admin` account configured by `KEYCLOAK_ADMIN` is for the Keycloak admin console, not for hospital workspace use.
+
+After signing in to Keycloak with that normal user in the `compilecare` realm:
 
 1. Open the CompileCare workspace. If the identity has no active tenant memberships, the first-run setup panel is shown.
 2. Enter the one-time bootstrap secret. The authenticated API call is available only when the API runs in Development and only while no platform operator exists.
