@@ -112,3 +112,12 @@ The component has focused tests for accessible naming, selected state, activatio
 ## 10. Success criteria
 
 The workspace looks and behaves like one coherent enterprise product; staff can scan and complete core workflows efficiently; the active tenant/hospital context is always clear; controls and feedback are consistent; essential workflows are keyboard-complete and responsive; and every implementation remains aligned with existing API contracts, data minimization and tenant/organization authorization.
+
+
+## Appointment slot selection refinement — 2026-11-25
+
+The follow-on [CompileCare.Web PR #31](https://github.com/CompileCare/CompileCare.Web/pull/31), stacked behind shell PR #29 and Reception PR #30, extracts the time-slot controls into an `AppointmentSlotGrid` component. It presents available and unavailable slots as native buttons, exposes selected state with `aria-pressed` and visible “Selected” text, and names each control with its formatted time and availability. Times are formatted using the selected provider availability session's IANA timezone. Slot changes are disabled while a workflow operation is in progress and after the booking has been confirmed.
+
+The component consumes only the existing slot list returned by the selected hospital/department/provider-session availability API. It does not decide availability, publish slots, reserve a slot, alter scheduling rules or change the booking API. The API remains the authority for concurrency, registration, authorization and reservation.
+
+Focused tests cover accessible names, availability/disabled state, selected-state semantics, selection callback, in-flight disabling and empty slots. Test fixtures use UTC explicitly for deterministic formatting. Build, browser and Docker verification remain required before merge.

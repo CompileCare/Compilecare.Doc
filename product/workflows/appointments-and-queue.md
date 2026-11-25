@@ -166,3 +166,19 @@ Queue token is an operational daily identifier, not a patient identifier or MRN.
 ## Deferred
 
 Patient self-booking, recurring rosters, leave integration, waitlists, service catalogue/tariffs, payments, reminders, external calendar sync, queue prioritization, triage, emergency workflow, clinical encounters and cross-tenant patient discovery.
+
+
+## Appointment slot selection UI — 2026-11-25
+
+The workspace uses the reusable `AppointmentSlotGrid` component from [CompileCare.Web PR #31](https://github.com/CompileCare/CompileCare.Web/pull/31) to render the slots returned by the existing availability API.
+
+- Every slot is a native button with an accessible name that includes the appointment time and whether the slot is available.
+- Unavailable slots are disabled and cannot be selected.
+- The selected slot exposes `aria-pressed="true"` and visible “Selected” text.
+- Displayed slot times use the IANA timezone from the selected provider availability session. The final booking review also shows the timezone so reception can verify the scheduled local time before confirming.
+- Slot selection is disabled while availability/booking or another workspace operation is in progress, and after a booking is confirmed.
+- The component is presentation only. It receives the existing server-generated slot list and returns the chosen UTC start instant. It does not calculate availability, reserve slots, resolve conflicts or create appointments.
+
+The API remains responsible for validating active hospital registration, tenant/hospital/department context, provider assignment, slot availability and concurrent reservation in a transaction. A visible available slot is not a guarantee that a booking will succeed; a conflict must be shown as an actionable error and availability should be refreshed using the existing flow.
+
+Verification for the UI increment includes keyboard and pointer selection, available/unavailable/selected states, 375px and desktop layouts, hospital timezone display, in-flight/confirmed disabling and booking-conflict recovery. CI and Docker checks must execute and pass before merge. Keep mocked UI tests separate from real Keycloak/API/PostgreSQL acceptance.
