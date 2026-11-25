@@ -41,6 +41,8 @@ The API exposes three invoice states:
 - `PartiallyPaid`: one or more payments have been recorded, but a positive balance remains.
 - `Paid`: the outstanding balance is exactly zero. A zero-total invoice is marked paid when issued.
 
+The billing client retrieves an existing invoice by OPD visit through `GET /api/v1/hospitals/{hospitalId}/billing/visits/{queueEntryId}/invoice`. This prevents the UI from issuing duplicate invoices after navigation or reload; the lookup remains constrained to the visit's hospital and department scope.
+
 The payment record, invoice status transition and invoice payment-sequence update are committed atomically. A payment larger than the outstanding balance or a further payment against a fully paid invoice is rejected with HTTP 409. The invoice status is a summary of the append-only payment ledger; the ledger remains the source for payment and receipt history.
 
 ## Access and audit
