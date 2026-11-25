@@ -31,7 +31,7 @@ The macOS launcher is `local/Start CompileCare.command`; the Windows launcher is
 ## 2. First-time setup
 
 1. Install and start Docker Desktop.
-2. Install GitHub CLI and authenticate with an account that can read the private CompileCare NuGet packages:
+2. Install Python 3, GitHub CLI and authenticate with an account that can read the private CompileCare NuGet packages:
    `brew install gh`, then `gh auth login`.
 3. From `CompileCare.Local`, start the launcher:
    `./local/Start\ CompileCare.command`
@@ -48,6 +48,7 @@ OIDC_AUDIENCE=compilecare-api
 OIDC_CLIENT_ID=compilecare-web
 OIDC_SCOPE=openid profile
 OIDC_REQUIRE_HTTPS_METADATA=false
+PLATFORM_BOOTSTRAP_SECRET=<generated-by-local-launcher>
 KEYCLOAK_ADMIN=admin
 KEYCLOAK_ADMIN_PASSWORD=<choose-a-local-password>
 POSTGRES_PASSWORD=<choose-a-local-password>
@@ -94,7 +95,7 @@ The realm import is maintained at `local/keycloak/compilecare-realm.json`. The i
 - API audience: `compilecare-api`, supplied by the default `compilecare-api-audience` client scope
 - Issuer/authority: `http://keycloak.localhost:8082/realms/compilecare`
 
-The API audience mapper must remain enabled for access tokens. Do not remove the `compilecare-api-audience` default client scope or weaken API issuer/audience/signature validation to make local sign-in appear successful.
+The API audience mapper must remain enabled for access tokens. Do not remove the `compilecare-api-audience` default client scope or weaken API issuer/audience/signature validation to make local sign-in appear successful. The local realm import now defines explicit `profile` and `email` scopes with claim mappers and assigns both, together with `compilecare-api-audience`, as default scopes. The local CI validates these scope definitions and the Docker Keycloak import.
 
 ### Observed local scope issue (2026-11-25)
 
@@ -105,13 +106,13 @@ error=invalid_scope
 error_description=Invalid scopes: openid profile
 ```
 
-For diagnostic progress only, the local `.env` scope was changed to:
+For diagnostic progress only, the local `.env` scope was temporarily changed to:
 
 ```dotenv
 OIDC_SCOPE=openid
 ```
 
-After rebuilding the Web image, the sign-in flow advanced to the workspace. This is a **temporary local workaround**, not the final OIDC configuration. It may omit profile claims and must not be treated as a completed realm setup. Restore the intended scopes only after the realm's built-in scopes and client assignments are correctly provisioned and tested. Keep the API audience mapper intact.
+After rebuilding the Web image, the sign-in flow advanced to the workspace. This was a **temporary local workaround**, not the final OIDC configuration. It omits profile claims and must not be treated as a completed realm setup. The updated local realm explicitly imports the `profile` and `email` scopes, and the launcher/build should use `OIDC_SCOPE=openid profile`. After pulling the local setup fix, rebuild Keycloak/Web and verify the new realm scopes. Existing named Keycloak volumes do not automatically re-import a realm over an already existing realm; use the safe realm update/import procedure described below rather than deleting the whole volume. Keep the API audience mapper intact.
 
 ### API returned 401 after the workspace loaded
 
@@ -125,7 +126,30 @@ The workspace displayed `Your sign-in session is not authorized for the API.` Th
 
 A successful Keycloak login is not proof that the API authorized the identity, and API authorization is not proof that the user has an active tenant membership.
 
-## 5. Issues encountered and fixes
+## 5. First platform operator and first hospital onboarding
+
+The local launcher generates a random 256-bit `PLATFORM_BOOTSTRAP_SECRET` when the setting is missing or still has the example placeholder. It stores the value only in `local/.env` and prints it once so the developer can enter it into the first-run setup screen. Treat it like a password; do not commit it or paste it into issues/chat.
+
+Create a normal local user in Keycloak before first sign-in: open the admin console, select the `compilecare` realm, choose **Users → Create user**, save the account, then use **Credentials → Set password** and turn **Temporary** off. The `admin` account configured by `KEYCLOAK_ADMIN` is for the Keycloak admin console, not for hospital workspace use.
+
+After signing in to Keycloak with that normal user in the `compilecare` realm:
+
+1. Open the CompileCare workspace. If the identity has no active tenant memberships, the first-run setup panel is shown.
+2. Enter the one-time bootstrap secret. The authenticated API call is available only when the API runs in Development and only while no platform operator exists.
+3. Create the first tenant. It is created in `Provisioning` state.
+4. Provision the signed-in identity as the initial tenant-wide `HospitalAdmin`, then activate the tenant. The initial-administrator endpoint is platform-operator protected and validates the configured issuer.
+5. Create the first hospital and department through the normal tenant-scoped facility APIs.
+6. The workspace reloads the signed-in user's tenant contexts and hospital/department selection.
+
+The bootstrap route is intentionally not mapped outside Development. It requires a valid API access token (issuer, signature, audience and expiry validation remain enabled), a separate high-entropy secret and a one-time database check. It binds the operator record to the validated access token issuer and subject; no client-supplied subject is accepted by the bootstrap route. Once any platform operator exists, bootstrap is permanently closed for that database. Tenant creation, initial administrator assignment and tenant activation are separate audited operations; do not bypass them with direct SQL.
+
+If the bootstrap route reports that it is already initialized, continue only if the signed-in identity is already a persisted platform operator. The next platform tenant operation is the authorization check. A 403 means this identity is not authorized; do not retry bootstrap by clearing database records.
+
+### Existing Keycloak realm volume
+
+Keycloak's `--import-realm` imports a realm only when that realm does not already exist. Updating `local/keycloak/compilecare-realm.json` alone does not overwrite an existing realm stored in the named volume. The launcher therefore runs `local/scripts/configure-keycloak.py` after Compose starts. It authenticates to the local Keycloak admin API, creates or reconciles the `profile`, `email` and `compilecare-api-audience` scopes, and ensures all three are assigned as Default to `compilecare-web`. The script is idempotent and preserves the realm, users and persistent volume. Do not delete the whole Keycloak or PostgreSQL volume as a shortcut.
+
+## 6. Issues encountered and fixes
 
 ### A. Placeholder identity-provider hostname
 
@@ -236,7 +260,7 @@ The reception shell rendered, but tenant-context discovery displayed `Your sign-
 
 Not yet resolved in the recorded local session. The remaining work is to verify the access token's issuer/audience and the API's effective configuration, then provision a trusted platform operator, tenant, initial tenant administrator, hospital, departments and user organization scopes. Do not create database records manually or bypass authorization as a workaround.
 
-## 6. Safe rebuild and restart commands
+## 7. Safe rebuild and restart commands
 
 After changing OIDC settings, rebuild the Web image:
 
@@ -262,7 +286,7 @@ docker compose --env-file local/.env -f local/docker-compose.yml ps
 
 Use `docker compose down` only when a full stop is required. Do not add `-v` unless intentionally resetting all local database and identity-provider data.
 
-## 7. Remaining local acceptance checklist
+## 8. Remaining local acceptance checklist
 
 - [x] Docker Compose stack definition and launchers merged.
 - [x] Keycloak realm import and PKCE/audience configuration added.
@@ -270,15 +294,15 @@ Use `docker compose down` only when a full stop is required. Do not add `-v` unl
 - [x] Private GitHub NuGet restore uses a BuildKit secret.
 - [x] Local PostgreSQL and Keycloak health checks passed on the developer Mac.
 - [x] Web shell loaded after setting the local authority and temporarily narrowing scope to `openid`.
-- [ ] Restore and verify standard OIDC client scopes (`profile`, `email`, roles and related defaults) in a fresh realm import.
+- [ ] Verify the launcher reconciles `profile`, `email` and audience scopes in both fresh and existing persistent Keycloak realms (Docker CI coverage added; developer Mac verification pending).
 - [ ] Verify the Web obtains an access token with the expected issuer and `compilecare-api` audience.
 - [ ] Verify authenticated API requests succeed; diagnose the observed 401 before claiming local setup complete.
-- [ ] Bootstrap a trusted platform operator and provision the first tenant and initial administrator through supported APIs.
-- [ ] Create a hospital, departments and membership organization scopes through supported workflows.
+- [ ] Bootstrap a trusted platform operator and provision the first tenant and initial administrator through supported APIs (implementation merged; local execution still required).
+- [ ] Create a hospital, departments and membership organization scopes through supported workflows (guided UI implemented; local execution still required).
 - [ ] Complete browser-level reception patient search, registration, appointment and queue smoke tests.
 - [ ] Validate the macOS launcher end-to-end without manual environment exports; validate Windows launcher separately.
 
-## 8. Security and data handling reminders
+## 9. Security and data handling reminders
 
 - Never commit `local/.env`, `local/.secrets/` or PATs/passwords.
 - Never paste access tokens, refresh tokens, passwords or private credentials into issues, PRs or chat.
