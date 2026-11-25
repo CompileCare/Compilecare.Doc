@@ -137,7 +137,7 @@ Once runner allocation is restored, rerun the required CI and Docker/PostgreSQL 
 
 ## Phase 5 experience quality uplift — new priority
 
-**Status: Approved planning priority; implementation begins in CompileCare.Web after the baseline and design foundations are established.** This is an improvement to the quality of the existing hospital workspace, not a change to the hospital product scope or backend authorization model.
+**Status: Approved planning priority; initial shared visual-foundation implementation is in review in [CompileCare.Web PR #29](https://github.com/CompileCare/CompileCare.Web/pull/29). The implementation has not yet passed build, browser, Docker or visual review; the remaining module refinements follow after this foundation is verified.** This is an improvement to the quality of the existing hospital workspace, not a change to the hospital product scope or backend authorization model.
 
 The current authenticated UI has delivered the first operational workflows, but feature completeness alone is not the product quality bar. The workspace must evolve into a polished, cohesive, enterprise-grade hospital application that feels consistent across Reception, Appointments, Queue, Clinical and Billing. Follow [Enterprise experience uplift](design/enterprise-experience-uplift.md) and the existing [experience quality bar](design/experience-quality-bar.md).
 
