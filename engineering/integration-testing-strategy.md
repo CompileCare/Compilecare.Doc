@@ -73,7 +73,9 @@ Current browser coverage includes:
 - Billing workspace navigation is hidden when the selected membership has no billing permission.
 - Invoice issue, payment capture, reload, payment-history recovery, prior receipt retrieval and print.
 - Full walk-in OPD user journey: patient registration and duplicate review, hospital-local MRN assignment, patient search, walk-in queue token, call/start transitions, department-scoped identity verification, encounter note/sign/close, queue completion and invoice/payment.
+- Appointment booking: hospital-registered patient search, provider availability discovery, slot selection, booking confirmation, check-in and server-issued queue token.
+- OIDC silent session renewal: a synthetic short-lived session exchanges its refresh token at a controlled identity-provider endpoint; the workspace remains signed in and subsequent API requests use the renewed bearer token.
 
 The browser tests install a synthetic OIDC session and intercept the API with deterministic in-memory fixtures. They validate user-visible workflows and permission-driven feature gating; they do not replace API integration tests, real JWT/tenant membership tests or PostgreSQL persistence/concurrency checks. Never use real patient data, credentials, identity-provider tokens or production APIs in browser fixtures.
 
-Vitest discovery is limited to `src/**/*.{test,spec}.{ts,tsx}`; Playwright discovery is limited to `e2e`. Keep the runners separate so each executes only its intended tests. The Web CI gate runs unit/component tests, TypeScript/Vite production build, Chromium browser tests and Docker build/startup smoke tests.
+Vitest discovery is limited to `src/**/*.{test,spec}.{ts,tsx}`; Playwright discovery is limited to `e2e`. Keep the runners separate so each executes only its intended tests. The Web CI gate runs unit/component tests, TypeScript/Vite production build, Chromium browser tests and Docker build/startup smoke tests. OIDC tests must use synthetic sessions and intercepted discovery/token endpoints; never connect browser tests to a real identity provider or include real credentials.
