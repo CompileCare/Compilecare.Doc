@@ -1,6 +1,6 @@
 # Workflow: reception and clinical workspace UX foundation
 
-**Status:** Reception, appointment/arrival, queue, OPD clinical and initial billing workspaces are implemented and merged. Browser-level billing recovery, full walk-in-to-billing journey, appointment booking/check-in and successful OIDC silent-renewal coverage are merged. Availability-conflict recovery, renewal-failure/re-authentication behavior and remaining operational workflows are next. Staff/provider administration remains gated on hospital-user validation.  
+**Status:** Reception, appointment/arrival, queue, OPD clinical and initial billing workspaces are implemented and merged. Browser-level billing recovery, full walk-in-to-billing journey, appointment booking/check-in and successful OIDC silent-renewal coverage are merged. Availability-conflict recovery and failed-renewal warning are implemented and covered; actual expired-session re-authentication and accessibility review are next. Staff/provider administration remains gated on hospital-user validation.  
 **Phase:** 5 — User experience  
 **Related workflows:** [Patient registration](patient-registration.md), [Appointments and queue](appointments-and-queue.md), [OPD encounter and clinical documentation](opd-encounter-and-clinical-documentation.md)  
 **Related architecture:** [ADR-005 — Frontend architecture](../../architecture/decisions/ADR-005-frontend-architecture.md)
@@ -148,7 +148,7 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 8. **Browser acceptance — implemented for the walk-in path:** Playwright Chromium tests cover billing recovery after refresh and permission-denied navigation (Web PR #12), plus patient registration/MRN → walk-in token → queue call/start → clinical identity check and sign/close → queue completion → invoice and payment (Web PR #13). API workflow correctness remains covered by PostgreSQL-backed integration tests.
 9. **Appointment and check-in browser acceptance — implemented:** Web PR #14 verifies hospital patient selection, API-published availability and slot selection, booking confirmation and check-in with a server-issued queue token.
 10. **OIDC session renewal browser acceptance — implemented:** Web PR #15 verifies the short-lived synthetic OIDC session obtains a refreshed access token through the refresh-token grant and uses it on subsequent API requests. No real identity provider, credentials or patient data are used.
-11. **Next browser acceptance:** cover availability conflict/slot contention recovery and renewal failure/re-authentication behavior. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
+11. **Next browser acceptance:** verify an actually expired access-token session returns to the sign-in state, then review keyboard navigation, visible focus, semantic labels and responsive behavior across the main staff workflows. **Hardening:** authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
 
 Each increment should be a small vertical slice with tests and documentation updates. Do not implement all screens against mocked contracts and then retrofit API behavior.
 
@@ -169,7 +169,7 @@ Each increment should be a small vertical slice with tests and documentation upd
 ## Open product and design questions
 
 - Validate appointment availability conflict and rescheduling/check-in edge cases with the pilot workflow; add them to the Playwright suite without replacing the PostgreSQL API tests.
-- Confirm the approved silent-renew failure, access-token expiry and workstation re-authentication experience with hospital IT/security.
+- Confirm the approved access-token expiry and workstation re-authentication experience with hospital IT/security; the silent-renew failure warning is now covered by browser tests.
 - Validate the staff/provider administration workflow with hospital stakeholders before building the workforce UI. Profile-to-account linking, credentialing and clinical privileging remain separate decisions.
 
 - Which hospital roles map to the existing appointment, queue and clinical permissions for the pilot?
