@@ -63,3 +63,17 @@ The test signing key and issuer are synthetic and must never be configured in de
 
 ## CI gates
 A PR must restore, build, run unit tests, run API/client integration tests, validate OpenAPI/contracts, and complete applicable code/security scans. Report the exact tests executed and the database/provider used.
+
+
+## 6. Browser end-to-end tests
+
+The authenticated web application uses Playwright with Chromium. The suite lives in `CompileCare.Web/e2e` and is run in CI through `npm run test:e2e` after installing the pinned browser runtime.
+
+Current browser coverage includes:
+- Billing workspace navigation is hidden when the selected membership has no billing permission.
+- Invoice issue, payment capture, reload, payment-history recovery, prior receipt retrieval and print.
+- Full walk-in OPD user journey: patient registration and duplicate review, hospital-local MRN assignment, patient search, walk-in queue token, call/start transitions, department-scoped identity verification, encounter note/sign/close, queue completion and invoice/payment.
+
+The browser tests install a synthetic OIDC session and intercept the API with deterministic in-memory fixtures. They validate user-visible workflows and permission-driven feature gating; they do not replace API integration tests, real JWT/tenant membership tests or PostgreSQL persistence/concurrency checks. Never use real patient data, credentials, identity-provider tokens or production APIs in browser fixtures.
+
+Vitest discovery is limited to `src/**/*.{test,spec}.{ts,tsx}`; Playwright discovery is limited to `e2e`. Keep the runners separate so each executes only its intended tests. The Web CI gate runs unit/component tests, TypeScript/Vite production build, Chromium browser tests and Docker build/startup smoke tests.

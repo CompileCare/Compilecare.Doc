@@ -1,13 +1,13 @@
 # Workflow: reception and clinical workspace UX foundation
 
-**Status:** Reception, appointment/arrival and queue lifecycle controls are merged; OPD clinical workspace UI is in implementation; remaining workflows require pilot validation  
+**Status:** Reception, appointment/arrival, queue, OPD clinical and initial billing workspaces are implemented and merged. Browser-level billing recovery and full walk-in-to-billing journey coverage are merged; appointment-booking browser coverage and remaining operational workflows are next. Staff/provider administration remains gated on hospital-user validation.  
 **Phase:** 5 — User experience  
 **Related workflows:** [Patient registration](patient-registration.md), [Appointments and queue](appointments-and-queue.md), [OPD encounter and clinical documentation](opd-encounter-and-clinical-documentation.md)  
 **Related architecture:** [ADR-005 — Frontend architecture](../../architecture/decisions/ADR-005-frontend-architecture.md)
 
 ## Purpose and boundaries
 
-Define the first authenticated web workspace around the already implemented patient registration, appointment/queue and OPD encounter APIs. The first vertical slice is staff-assisted outpatient care from patient lookup through reception hand-off and clinician documentation.
+Define the authenticated hospital workspace around patient registration, appointment/queue, OPD encounter and initial billing APIs. The delivered outpatient slice runs from patient lookup and reception hand-off through clinician documentation, invoice settlement and receipt recovery.
 
 This document specifies user tasks, screen responsibilities, information boundaries and interaction states. It does not invent new backend capabilities, grant permissions, define clinical policy or approve a final visual design. Server-side authorization and workflow state remain authoritative.
 
@@ -20,6 +20,7 @@ The existing `CompileCare.Web` repository is the authenticated hospital applicat
 | Reception / registration | Search patient, complete registration when authorized, book appointment, register walk-in, check in, view queue | Assigned tenant, hospital and permitted departments; patient and appointment permissions are server-enforced |
 | Queue operator | View operational queue, call/recall, start and complete hand-off, resolve permitted queue actions | Assigned hospital/department and queue permissions |
 | Clinical user | Open an in-progress queue entry, create/read encounter, edit draft note, sign or append amendment when separately permitted | Explicit clinical permission plus tenant/hospital/department scope |
+| Cashier / billing operator | Select a completed visit, issue or resume an invoice, record payment, view payment history, retrieve/reprint receipt and view daily collection | Explicit billing permissions plus tenant/hospital/department scope; financial data is not shown in reception or clinical summaries |
 | Hospital administrator | Navigate facility context and manage only capabilities already exposed by authorized APIs | Explicit provisioned permissions; administrator status must not imply clinical permissions |
 | Auditor | Future controlled review of audit records | Not part of the first interactive workspace until an approved audit-query contract exists |
 
@@ -30,12 +31,12 @@ A user may hold multiple roles. The UI must render capabilities from the authent
 The authenticated application shell should provide:
 
 - **Tenant and facility context:** visible active organization/hospital and, where supported, department context. Switching context must be explicit and must not silently carry a stale resource selection across facilities.
-- **Primary navigation:** Reception, Queue and Clinical workspace entries only when the user is authorized for their underlying capabilities.
+- **Primary navigation:** Reception, Queue, Clinical workspace and Billing entries only when the selected tenant membership has the effective permission identifiers for those capabilities.
 - **Patient context:** a patient summary is shown only inside an authorized workflow and only with fields returned by the relevant API contract.
 - **Session controls:** authenticated user identity and sign-out; do not display raw tokens or identity-provider claims.
 - **System feedback:** clear loading, empty, validation, conflict, forbidden, not-found and service-unavailable states.
 
-The initial release should not add patient self-service, billing, pharmacy, diagnostics, inpatient, workforce administration or a patient portal.
+The initial release includes the minimal OPD billing workflow described below. Patient self-service, pharmacy, diagnostics, inpatient, workforce administration and a patient portal remain deferred.
 
 ## Screen inventory and responsibilities
 
@@ -101,6 +102,17 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 - Closing/cancelling follows the API lifecycle and must not imply queue completion.
 - Do not introduce diagnosis, vitals, prescriptions, orders, referrals, triage, clinical decision support or emergency workflows in this UX increment.
 
+### 8. Billing, payment history and receipt recovery
+
+- Show the billing workspace only when the selected membership has the relevant billing permissions. The API enforces each read and mutation independently.
+- Load billable visits from the department queue and only allow invoice creation for the supported in-progress/completed visit states validated by the API.
+- Retrieve an existing invoice by visit before offering invoice creation. Reopening a visit must resume the original invoice rather than presenting a second-issue action.
+- Render immutable invoice line snapshots, subtotal, paid amount, balance due and the API settlement state (`Issued`, `PartiallyPaid`, `Paid`).
+- Record only supported payment methods and references accepted by the API; never infer payment success from client state.
+- Re-fetch invoice state and payment history after a successful payment. Allow prior receipt retrieval and print the selected API receipt record without printing unrelated workspace content.
+- Keep service catalogue administration and daily collection reporting behind their distinct permissions. Do not display clinical notes or unnecessary patient demographics in the billable-visit selector.
+- GST/tax, discounts/waivers, refunds/credit notes, insurance/TPA, gateway/accounting integration, deposits/advances and cashier shift reconciliation are not represented as available until separately designed and approved.
+
 ## Interaction and accessibility requirements
 
 - Keyboard operation for all navigation, search, selection, forms, dialogs and workflow actions.
@@ -131,8 +143,11 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 3. **Reception patient lookup and registration — implemented:** Web PR #2 uses the hospital-scoped patient search API with bounded pagination. Patient registration, duplicate-candidate review and hospital-local MRN assignment are merged in Web PR #3 with paired documentation in Doc PR #30. Search results remain in component memory, not browser storage; the API remains authoritative for patient permissions and hospital scope.
 4. **Appointment and arrival — implemented:** booking, walk-in, check-in and queue-token confirmation are merged in Web PR #4 with paired documentation in Doc PR #31.
 5. **Queue operations — implemented:** scoped queue view and permitted lifecycle actions, merged in CompileCare.Web PR #5 with paired documentation in Compilecare.Doc PR #32.
-6. **Clinical workspace — active implementation:** scoped clinical queue discovery, queue-linked encounter create/resume, draft note editing, signing, append-only amendments, cancellation and closure against the existing OPD API. The clinical UI must not expose patient details in queue rows or represent unsupported vitals, diagnoses, prescriptions or diagnostic orders.
-7. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
+6. **Clinical workspace — implemented:** scoped clinical queue discovery, queue-linked encounter create/resume, draft note editing, signing, append-only amendments, cancellation and closure against the existing OPD API (CompileCare.Web PR #9). The clinical UI does not expose patient details in queue rows or represent unsupported vitals, diagnoses, prescriptions or diagnostic orders.
+7. **Billing workspace — implemented:** department-scoped visit selection, invoice create/resume, partial/full payment capture, payment history, receipt retrieval/reprint, service catalogue and daily collection (CompileCare.Web PRs #10–#11). API permission and department boundaries remain authoritative.
+8. **Browser acceptance — implemented for the walk-in path:** Playwright Chromium tests cover billing recovery after refresh and permission-denied navigation (Web PR #12), plus patient registration/MRN → walk-in token → queue call/start → clinical identity check and sign/close → queue completion → invoice and payment (Web PR #13). API workflow correctness remains covered by PostgreSQL-backed integration tests.
+9. **Next browser acceptance:** add the appointment-booking/check-in path and session-renewal recovery, while keeping synthetic data and no real patient information in browser tests.
+10. **Hardening:** keyboard/accessibility review, responsive checks, authorization-state tests, API contract tests and Docker-based verification where supported by the repository.
 
 Each increment should be a small vertical slice with tests and documentation updates. Do not implement all screens against mocked contracts and then retrofit API behavior.
 
@@ -144,12 +159,16 @@ Each increment should be a small vertical slice with tests and documentation upd
 - Patient registration and appointment booking preserve the existing hospital-registration prerequisite.
 - Queue actions and encounter lifecycle are presented as separate workflows.
 - Signed clinical note content is never editable in place; amendments are append-only.
-- No unimplemented billing, contact capture, vitals, diagnoses, prescriptions, diagnostic orders or patient-facing workflows are represented as available.
+- The delivered invoice/payment/receipt capabilities are permission-gated and use API-generated amounts, settlement state and receipt records. Deferred tax, discounts/waivers, refunds/credit notes, insurance/TPA, external payment gateways, accounting, deposits/advances and cashier shift reconciliation are not represented as available.
+- No unimplemented contact capture, vitals, diagnoses, prescriptions, diagnostic orders or patient-facing workflows are represented as available.
 - Accessibility, keyboard operation, responsive behavior and data-minimization requirements are included in implementation tests/review.
 - Server-side authorization remains authoritative and is exercised for both allowed and denied UI/API paths.
 - Build, automated tests and Docker-based verification pass before a UI increment is merged.
 
 ## Open product and design questions
+
+- Validate the appointment-booking and check-in browser journey with the pilot workflow; add it to the Playwright suite without replacing the PostgreSQL API tests.
+- Validate the staff/provider administration workflow with hospital stakeholders before building the workforce UI. Profile-to-account linking, credentialing and clinical privileging remain separate decisions.
 
 - Which hospital roles map to the existing appointment, queue and clinical permissions for the pilot?
 - Which patient demographic fields are necessary in reception search results and the patient banner?
