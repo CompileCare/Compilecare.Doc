@@ -243,3 +243,15 @@ The Phase 5 visual foundation in [CompileCare.Web PR #29](https://github.com/Com
 - The selected tenant, hospital, and API-derived permissions remain the source for module availability; this is presentation/navigation state only and does not grant access.
 
 Verification remains pending until the Web unit/build/browser checks and Docker smoke checks execute successfully and the actual application is reviewed at desktop, tablet and 375px widths with keyboard-only navigation. The current PR CI attempt had no allocated GitHub runner and performed zero steps; that status is not evidence of a passing or failing implementation.
+
+
+## Active hospital and workspace orientation — 2026-11-25
+
+The shell refinement in [CompileCare.Web PR #29](https://github.com/CompileCare/CompileCare.Web/pull/29) makes the current place in the application and the selected operating context explicit:
+
+- The page heading follows the selected Reception, Patient registration, Appointments, Queue, Clinical or Billing section.
+- The organization context panel names the selected hospital when available; before a hospital is selected, it identifies the selected tenant or prompts the user to choose a context.
+- The panel presents the effective membership role and whether a hospital has been selected. These labels are informational and are populated from the existing API context and hospital responses.
+- Switching tenant or hospital continues to clear dependent selections and workflow state. The context summary must never imply that a resource is available merely because the user can see its name.
+
+This is presentation only. The API continues to validate tenant membership, hospital/department scope and permission on every request. The active heading, navigation hash and displayed role are not authorization inputs.
