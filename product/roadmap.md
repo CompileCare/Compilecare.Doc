@@ -104,6 +104,24 @@ The initial OPD vertical slice now includes reception and patient registration/M
 
 **Next recommended increment:** perform the remaining authenticated-workspace accessibility review across Reception, Appointments, Queue, Clinical and Billing: verify end-to-end keyboard completion, focus order, dialog behavior, semantic labels/live announcements, contrast and screen-reader output at desktop, tablet and mobile sizes. PRs #19–#26 provide an automated and keyboard-navigation baseline, not a complete WCAG 2.2 AA conformance claim. In parallel, continue Phase 3 operational hardening: migration deployment/rehearsal, backup/restore automation and recovery drills, signing-key rotation, secret management, encryption, retention/deletion, incident response and access reviews. Require equivalent tenant/organization binding, audit and isolation tests when background jobs, exports, caches or other asynchronous integrations are introduced; do not create those subsystems solely to satisfy a checklist. Exercise the local Docker/OIDC onboarding path on the developer Mac before declaring environment acceptance; GitHub CI cannot replace this environment-specific smoke test. Keep staff/provider UI gated on hospital-user workflow validation; do not invent workforce policy. Do not start GST/tax, refunds, credit notes, TPA, gateway or accounting integration until pilot policy decisions are recorded.
 
+
+## Active release-readiness work and verification blocker — 2026-11-25
+
+The following focused hardening changes are in review; they are **not complete or production-ready until their required checks execute and pass**:
+
+- **Membership administration audit coverage — CompileCare.Api PR #54:** adds PostgreSQL integration assertions for role/scope changes, deactivation/reactivation and rejected self-demotion. No runtime or schema change.
+- **Logical backup/restore tooling — CompileCare.Database PR #2:** adds provider-neutral PostgreSQL custom-format logical backup and guarded restore scripts, checksum/manifest sidecars and a PostgreSQL 16 Docker verification workflow. This is not provider-native physical backup/PITR, backup scheduling, retention or proof of production RPO/RTO.
+- **Tenant cache value isolation — CompileCare.Caching PR #5:** adds tests proving values and invalidation remain isolated across tenant namespaces and the global namespace. No API cache adoption or patient-data caching is included.
+- **Local Npgsql warning — CompileCare.Local PR #5, paired with Compilecare.Doc PR #50:** documents the Npgsql 10 GSSAPI fallback message and scopes `GSS Encryption Mode=Disable` to the local Docker connection string only. Production connection settings and the separate SSL/TLS mode are unchanged.
+
+### Hosted-runner allocation blocker
+
+As of this update, CI jobs for the API membership-audit PR, Database backup/restore PR, Caching isolation PR and Local Compose PR have repeatedly completed before execution with no assigned runner (`runner_id: 0`, empty runner name and no steps). These results are not failing unit/integration tests; the jobs did not reach test execution. The PRs remain open and must not be merged on the basis of these unexecuted checks.
+
+The CompileCare organization owner or billing manager should verify GitHub Actions included compute usage, payment/billing eligibility, and any organization, repository, cost-center or SKU-level budget configured to stop usage when its limit is reached. GitHub documents that an exhausted stop-usage budget can block all GitHub-hosted runners, and that the Actions budget is a relevant troubleshooting check for billing-related workflow failures. Confirm the actual account state before treating this as the root cause.
+
+Once runner allocation is restored, rerun the required CI and Docker/PostgreSQL checks for each PR. The local developer Mac must still complete the documented Docker/OIDC smoke test; hosted CI cannot substitute for that environment-specific acceptance.
+
 ## Release gates and working rules
 
 - Product workflow and ownership precede module/repository implementation.
