@@ -1,6 +1,6 @@
 # CompileCare Delivery Roadmap
 
-**Status:** Working product-first delivery plan, updated 2026-11-25. This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
+**Status:** Working product-first delivery plan, updated 2026-11-25. Phase 5 now includes a formal enterprise experience uplift, tracked separately from feature delivery. This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
 
 CompileCare is a hospital and healthcare information/management platform. This roadmap contains only hospital-system capabilities. The [Product Blueprint v1](blueprint-v1.md) is the source for product scope and patient workflows.
 
@@ -133,3 +133,33 @@ Once runner allocation is restored, rerun the required CI and Docker/PostgreSQL 
 - Every PR includes related docs, tests, security/privacy implications, migration/recovery notes and CI evidence.
 - A phase is complete only when its exit criteria are met and reviewed.
 - Keep the modular core simple; introduce separately deployed services only when documented needs justify them.
+
+
+## Phase 5 experience quality uplift — new priority
+
+**Status: Approved planning priority; implementation begins in CompileCare.Web after the baseline and design foundations are established.** This is an improvement to the quality of the existing hospital workspace, not a change to the hospital product scope or backend authorization model.
+
+The current authenticated UI has delivered the first operational workflows, but feature completeness alone is not the product quality bar. The workspace must evolve into a polished, cohesive, enterprise-grade hospital application that feels consistent across Reception, Appointments, Queue, Clinical and Billing. Follow [Enterprise experience uplift](design/enterprise-experience-uplift.md) and the existing [experience quality bar](design/experience-quality-bar.md).
+
+### Delivery sequence
+
+1. **Experience audit and baseline:** review every existing authenticated route and workflow at desktop, tablet and narrow viewports; record information hierarchy, density, navigation, responsive behavior, accessibility and consistency issues. Use real application captures with synthetic/local data only; do not fabricate screenshots or introduce mock business data.
+2. **Design foundation:** establish shared design tokens for typography, color, spacing, radii, elevation, focus and semantic status; consolidate reusable page headers, buttons, form controls, cards/panels, tables/lists, status chips, alerts, empty/loading/error states and confirmation patterns.
+3. **Application shell:** refine navigation hierarchy, active tenant/hospital/department context, page title and action regions, session controls, breadcrumbs where useful, responsive navigation and consistent content width. Preserve permission-driven module visibility and API-authoritative authorization.
+4. **Module-by-module refinement:** improve Reception/patient search and registration, Appointments, Queue, Clinical and Billing in focused vertical slices. Prioritize high-frequency staff tasks, readable operational density, predictable keyboard interaction and clear recovery from API errors.
+5. **Visual and accessibility verification:** validate desktop, tablet and 375px layouts; complete keyboard-only workflows; review focus order, semantic labels, contrast, status announcements and reduced-motion behavior. Add targeted component/browser tests and attach real screenshots to the paired documentation where safe.
+
+### Design and engineering constraints
+
+- Do not trade clinical clarity, data minimization, accessibility or speed for decoration.
+- Reuse existing API contracts and server-returned state; do not invent dashboards, KPIs, clinical data, permissions or workflows.
+- The API remains authoritative for identity, tenant/facility scope, validation and business transitions.
+- Do not place patient/clinical data in URLs, telemetry, browser storage or screenshots used outside the approved synthetic/local test context.
+- Keep visual primitives shared and feature code modular; avoid a wholesale rewrite of the large application component while workflow coverage is still being established.
+- Prefer small, reviewable PRs with paired documentation, tests and before/after evidence from the running application.
+
+### Exit criteria for the uplift
+
+The existing workflows share a consistent design language; core tasks are discoverable and efficient; layouts are usable at the supported desktop/tablet/narrow widths; keyboard-only completion and focus behavior are verified; loading, empty, validation, conflict, forbidden and server-error states are coherent; WCAG 2.2 AA is treated as a target for review rather than an unverified compliance claim; and the complete test suite/build/Docker smoke checks pass before each UI slice is merged.
+
+The uplift is incremental. It does not block ongoing Phase 3 security/operational hardening, and it does not authorize new hospital capabilities or changes to authentication and authorization.
