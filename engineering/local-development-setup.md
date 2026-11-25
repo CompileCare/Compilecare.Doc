@@ -31,7 +31,7 @@ The macOS launcher is `local/Start CompileCare.command`; the Windows launcher is
 ## 2. First-time setup
 
 1. Install and start Docker Desktop.
-2. Install GitHub CLI and authenticate with an account that can read the private CompileCare NuGet packages:
+2. Install Python 3, GitHub CLI and authenticate with an account that can read the private CompileCare NuGet packages:
    `brew install gh`, then `gh auth login`.
 3. From `CompileCare.Local`, start the launcher:
    `./local/Start\ CompileCare.command`
@@ -145,7 +145,7 @@ If the bootstrap route reports that it is already initialized, continue only if 
 
 ### Existing Keycloak realm volume
 
-Keycloak's `--import-realm` imports a realm only when that realm does not already exist. Updating `local/keycloak/compilecare-realm.json` does not overwrite an existing `compilecare` realm stored in the named volume. For an existing developer environment, add/update the `profile` and `email` client scopes and ensure the `compilecare-web` client has both plus `compilecare-api-audience` as Default. Do not delete the whole Keycloak or PostgreSQL volume as a shortcut. A dedicated realm export/restore or documented realm re-import procedure should be used if a reset is intentionally required.
+Keycloak's `--import-realm` imports a realm only when that realm does not already exist. Updating `local/keycloak/compilecare-realm.json` alone does not overwrite an existing realm stored in the named volume. The launcher therefore runs `local/scripts/configure-keycloak.py` after Compose starts. It authenticates to the local Keycloak admin API, creates or reconciles the `profile`, `email` and `compilecare-api-audience` scopes, and ensures all three are assigned as Default to `compilecare-web`. The script is idempotent and preserves the realm, users and persistent volume. Do not delete the whole Keycloak or PostgreSQL volume as a shortcut.
 
 ## 6. Issues encountered and fixes
 
@@ -292,7 +292,7 @@ Use `docker compose down` only when a full stop is required. Do not add `-v` unl
 - [x] Private GitHub NuGet restore uses a BuildKit secret.
 - [x] Local PostgreSQL and Keycloak health checks passed on the developer Mac.
 - [x] Web shell loaded after setting the local authority and temporarily narrowing scope to `openid`.
-- [ ] Verify the new `profile` and `email` scopes in a fresh realm import and in an existing persistent Keycloak realm.
+- [ ] Verify the launcher reconciles `profile`, `email` and audience scopes in both fresh and existing persistent Keycloak realms (Docker CI coverage added; developer Mac verification pending).
 - [ ] Verify the Web obtains an access token with the expected issuer and `compilecare-api` audience.
 - [ ] Verify authenticated API requests succeed; diagnose the observed 401 before claiming local setup complete.
 - [ ] Bootstrap a trusted platform operator and provision the first tenant and initial administrator through supported APIs (implementation merged; local execution still required).
