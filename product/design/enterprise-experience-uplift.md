@@ -128,3 +128,12 @@ Focused tests cover accessible names, availability/disabled state, selected-stat
 The follow-on [CompileCare.Web PR #32](https://github.com/CompileCare/CompileCare.Web/pull/32), stacked behind shell, Reception and appointment refinements, extracts each displayed queue entry into a reusable `QueueEntryRow` component. The token row is a named article, its server-returned status is an announced status region, and the transition actions are grouped under a descriptive accessible name. The existing action matrix and behavior are preserved: Waiting can be called/cancelled/marked no-show; Called can be recalled/started/cancelled/marked no-show; InProgress can be completed; terminal states have no transition controls. Cancellation and no-show remain disabled until a reason is present, and all actions remain disabled while a transition is in flight.
 
 Focused tests cover current status/action combinations, required-reason behavior, callback identity, in-flight disabling, terminal-state controls and the presentation for users without the queue-management capability. The component displays only API-returned queue records; the API remains authoritative for state transitions and authorization. Build, browser and Docker verification remain required before merge.
+
+
+## Clinical queue orientation refinement — 2026-11-25
+
+The follow-on [CompileCare.Web PR #33](https://github.com/CompileCare/CompileCare.Web/pull/33), stacked after the shared shell, Reception, appointment, and general queue-row slices, extracts the clinical queue item into a focused `ClinicalQueueRow` component. Each row is named by its operational token, the server-returned InProgress/Completed status is exposed as a status announcement, and the open/resume action receives a token-specific accessible name. The existing loading and busy state disables the action.
+
+This increment is deliberately limited to the clinical queue list. The identity confirmation required before viewing an encounter, department patient lookup, draft editing, signing, closing, cancellation, append-only amendment handling, and all API authorization flows remain in the existing clinical workflow and are not changed. The queue row continues to display operational tokens only; patient identity and clinical content are not added to queue lists.
+
+Tests cover row/status/action names, passing the selected API-returned QueueEntry to the existing open handler, completed-visit resume label and disabled states. Build, browser and Docker verification remain required before merge.
