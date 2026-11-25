@@ -16,6 +16,7 @@ CompileCare is an India-focused hospital information and management platform for
 - [Staff and provider management workflow](product/workflows/staff-and-provider-management.md)
 - [Appointments, walk-ins, check-in and queue workflow](product/workflows/appointments-and-queue.md)
 - [Reception and clinical workspace UX foundation](product/workflows/reception-and-clinical-workspace-ux.md)
+- [Enterprise experience uplift](product/design/enterprise-experience-uplift.md) — visual quality direction, design-system foundations and the Phase 5 refinement sequence.
 - [OPD billing foundation and deferred scope](product/workflows/opd-billing-foundation.md)
 - [ADR-014: Appointment scheduling and queue boundaries](architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md)
 - [ADR-013: Staff and provider profile boundaries](architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md)

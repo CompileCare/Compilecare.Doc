@@ -50,3 +50,10 @@ This document establishes the visual and interaction quality bar for the authent
 ## Explicit non-goals
 
 This quality bar does not authorize self-service booking, payment, insurance, triage, clinical recommendations, public patient details, or client-side authorization. The API remains the source of truth for identity, permissions, availability, registration, booking, check-in and queue state.
+
+
+## Enterprise experience uplift
+
+The [Enterprise experience uplift](enterprise-experience-uplift.md) adds an explicit product-wide refinement track for the authenticated hospital workspace. Apply this quality bar to the shared shell and every module, not only to new screens. The intent is a cohesive, premium enterprise experience: precise visual hierarchy, clear operational density, consistent reusable components, dependable feedback and polished responsive behavior. Aesthetic choices must remain subordinate to clinical clarity, accessibility, privacy and server-authoritative workflows.
+
+Treat screenshots as verification evidence from the real running application. Use synthetic/local data only, record the tested commit and viewport, and never capture credentials, tokens, real patient information or private identity-provider details.

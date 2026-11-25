@@ -16,4 +16,6 @@ A feature or fix is complete only when applicable items are satisfied:
 - [ ] CI build, tests, formatting, linting, and security checks pass.
 - [ ] No secrets, patient data, or unsafe generated artifacts committed.
 - [ ] Demo/acceptance evidence available for user-facing or workflow changes.
+- [ ] User-facing UI changes follow the experience quality bar; review desktop, tablet and narrow viewports, keyboard-only completion, visible focus, semantic labels, contrast and asynchronous states.
+- [ ] Visual evidence is captured from the actual application with synthetic/local data; do not use fabricated screens or expose patient data, tokens or credentials.
 - [ ] Release notes and deployment considerations included when required.
