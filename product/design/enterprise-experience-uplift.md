@@ -103,6 +103,12 @@ The first shared foundation is under review in [CompileCare.Web PR #29](https://
 
 This is a foundation increment, not completion of the uplift. Build, test, Docker, real-browser visual review and desktop/tablet/mobile evidence are still required. The current hosted Web CI run failed before runner allocation (`runner_id=0`, no runner name and zero steps); it did not execute the build or tests. Do not merge until the required checks actually execute and pass.
 
-## 9. Success criteria
+## Reception search component refinement — 2026-11-25
+
+The follow-on [CompileCare.Web PR #30](https://github.com/CompileCare/CompileCare.Web/pull/30), stacked on the shell foundation in PR #29, extracts the patient result list into a focused feature component. Each patient result is a native button with an exposed pressed/selected state; Enter and Space work through standard button behavior, and in-flight operations disable selection. This replaces a focusable `article role="button"` with manually implemented keyboard handling.
+
+The component has focused tests for accessible naming, selected state, activation, disabled state and empty results. The PR does not change patient data, server search, permissions or API contracts. Build, test and actual browser verification remain required before merge.
+
+## 10. Success criteria
 
 The workspace looks and behaves like one coherent enterprise product; staff can scan and complete core workflows efficiently; the active tenant/hospital context is always clear; controls and feedback are consistent; essential workflows are keyboard-complete and responsive; and every implementation remains aligned with existing API contracts, data minimization and tenant/organization authorization.
