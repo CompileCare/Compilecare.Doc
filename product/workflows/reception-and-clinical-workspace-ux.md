@@ -255,3 +255,16 @@ The shell refinement in [CompileCare.Web PR #29](https://github.com/CompileCare/
 - Switching tenant or hospital continues to clear dependent selections and workflow state. The context summary must never imply that a resource is available merely because the user can see its name.
 
 This is presentation only. The API continues to validate tenant membership, hospital/department scope and permission on every request. The active heading, navigation hash and displayed role are not authorization inputs.
+
+
+## Accessible patient search selection — 2026-11-25
+
+The follow-on [CompileCare.Web PR #30](https://github.com/CompileCare/CompileCare.Web/pull/30) moves the patient search result interaction into `PatientSearchResults`, a focused Reception feature component.
+
+- Each result is a native `button`, not a clickable article with a custom keyboard handler.
+- `aria-pressed` communicates the selected patient state; the visible label also changes to “Selected patient”.
+- Native keyboard activation supports Enter and Space.
+- Results are disabled while a workflow mutation or other protected operation is in flight, preventing accidental changes to the selected patient mid-operation.
+- The component tests cover accessible button naming, selected state, activation callback, disabled state and the empty-results state.
+
+The component receives only the patients returned by the existing hospital-scoped search API. It does not add fields, perform a broader search, store data or change API authorization. The selected patient remains in component memory, and every subsequent API operation remains tenant/hospital scoped and server-authorized.
