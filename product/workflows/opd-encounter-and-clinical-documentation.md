@@ -65,6 +65,16 @@ The first increment does not generate diagnoses, treatment suggestions, triage s
 - Cancellation is allowed only for an encounter that has not been signed and requires an explicit reason.
 - Queue completion remains a separate front-desk/operational action; signing an encounter does not silently complete or reorder the queue.
 
+## F. Department-scoped clinical patient discovery
+
+1. A clinician searches within the department assigned to their active tenant membership using the hospital's department-scoped patient lookup endpoint.
+2. The API verifies the requested hospital and department against the caller's persisted organization scope; a department ID supplied by the caller does not grant access.
+3. Search results include only patients with a hospital registration and at least one queue entry in that same hospital and assigned department. Registration at the hospital alone does not expose the patient to every department.
+4. Results use bounded pagination and the existing patient identity-read permission. Hospital-wide reception search remains a separate permission and endpoint.
+5. A clinician assigned to another department, or to no matching department, receives no patient results (not-found for an out-of-scope department).
+
+The initial implementation is intended for clinical continuity through department queue history. It does not enable cross-hospital patient discovery or grant access to clinical notes by itself; OPD encounter permissions and encounter department checks remain independently enforced.
+
 ## Security and privacy
 
 - All reads and writes are tenant-, hospital- and department-scoped.
