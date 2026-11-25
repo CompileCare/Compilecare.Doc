@@ -182,3 +182,19 @@ The workspace uses the reusable `AppointmentSlotGrid` component from [CompileCar
 The API remains responsible for validating active hospital registration, tenant/hospital/department context, provider assignment, slot availability and concurrent reservation in a transaction. A visible available slot is not a guarantee that a booking will succeed; a conflict must be shown as an actionable error and availability should be refreshed using the existing flow.
 
 Verification for the UI increment includes keyboard and pointer selection, available/unavailable/selected states, 375px and desktop layouts, hospital timezone display, in-flight/confirmed disabling and booking-conflict recovery. CI and Docker checks must execute and pass before merge. Keep mocked UI tests separate from real Keycloak/API/PostgreSQL acceptance.
+
+
+## Queue row presentation and accessible status — 2026-11-25
+
+The follow-on [CompileCare.Web PR #32](https://github.com/CompileCare/CompileCare.Web/pull/32) extracts the queue row into `QueueEntryRow` without changing the appointment/queue/encounter boundaries or the server-side transition rules.
+
+- Each queue entry is exposed as a named article using its queue token number.
+- The current status is rendered as a named status region so changes can be announced to assistive technology.
+- Queue transition controls are in a labelled group associated with the token number.
+- The current action matrix remains unchanged: Waiting → Call/Cancel/No-show; Called → Recall/Start/Cancel/No-show; InProgress → Complete; terminal states → no actions.
+- Cancel and No-show remain disabled until the required reason is supplied. Every queue action remains disabled while a transition request is in flight.
+- Users without the existing queue-management capability can read the returned queue status but do not receive transition controls.
+
+The row component receives only entries returned by the existing selected tenant/hospital/department queue query. It does not calculate or advance queue state, expose patient identifiers or create a new API. The API continues to validate the transition, role and scope for every action.
+
+Verification for the UI increment includes keyboard navigation through the action group, status announcement, responsive desktop/tablet/375px layout, reason gating and in-flight disabling. Server-side/API integration checks remain separate from the mocked Web UI suite.
