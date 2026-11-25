@@ -268,3 +268,10 @@ The follow-on [CompileCare.Web PR #30](https://github.com/CompileCare/CompileCar
 - The component tests cover accessible button naming, selected state, activation callback, disabled state and the empty-results state.
 
 The component receives only the patients returned by the existing hospital-scoped search API. It does not add fields, perform a broader search, store data or change API authorization. The selected patient remains in component memory, and every subsequent API operation remains tenant/hospital scoped and server-authorized.
+
+
+### Navigation state after a context or permission change
+
+The sidebar and page heading may follow a location hash for convenient section navigation, but the hash is never trusted by itself. The client compares it with the set of modules exposed by the currently loaded API-derived tenant membership context. If the hash does not correspond to a module currently available to that membership, the visual active state falls back to the first available module (or no module when none is assigned). Switching tenant/hospital and receiving a different effective permission set must not leave a hidden module labelled as active.
+
+This is presentation state only. Hiding an item or rejecting a stale hash does not grant or enforce access; every API request continues to perform its own identity, tenant, hospital/department scope and permission validation.

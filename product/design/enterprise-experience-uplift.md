@@ -97,7 +97,7 @@ The first shared foundation is under review in [CompileCare.Web PR #29](https://
 - Shared design tokens for canvas/surface, typography, text, borders, primary/focus/semantic status colors, spacing, radii and elevation.
 - Consistent shell, navigation, page header, context panel, forms, status, queue, clinical and billing surface styling.
 - Permission-driven active navigation with `aria-current`, a direct Patient registration link only when the signed-in context includes the required registration permissions, and a keyboard skip-to-main-content link.
-- The page heading follows the selected workspace section, while the context panel identifies the selected hospital (or tenant while hospital selection is pending) and shows the membership role plus context-selection state.
+- The page heading follows the selected workspace section, while the context panel identifies the selected hospital (or tenant while hospital selection is pending) and shows the membership role plus context-selection state. The section hash is accepted only when it matches a module exposed by the current permission context; a stale hash cannot label a hidden module as active.
 - Mobile navigation overflow handling that retains the module links rather than wrapping them into an unstable multi-row menu.
 - A component test assertion for the skip link.
 
