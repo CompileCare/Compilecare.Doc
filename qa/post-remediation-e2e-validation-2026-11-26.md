@@ -112,6 +112,8 @@ The 404 responses should be reviewed against intended API semantics and the UI's
 
 - [x] Implement an enforced, configurable Web CSP with startup validation and CI header/invalid-origin checks (Web PR #56; CI run `45838673174`).
 - [x] Enforce production HTTPS-only CORS allowlist validation with unit/integration coverage (API PR #81; CI `45841339836`, Docker `45841339388`, migration rehearsal `45841339328`).
+- [x] Require a configured PostgreSQL connection string and Npgsql `SSL Mode=VerifyFull` outside Development/Testing (API PR #82; CI `45843760937`, Docker `45843760927`, migration rehearsal `45843760942`).
+- [ ] Configure the selected provider's trusted CA and verify an actual production-network PostgreSQL TLS connection with hostname validation.
 - [ ] Set the exact production Web/API origins and verify CORS preflight plus authenticated browser requests through the selected ingress.
 - [x] Verify CompileCare.Local emits the expected CSP through the full nine-service stack and real Keycloak Authorization Code + PKCE browser acceptance (Local PR #20 merged as `792196a2d19afeb128e8bf40205977d6b05e607a`; latest workflow run `45839528532` passed both jobs).
 - [ ] Define exact production Keycloak/API origins and browser-test CSP through real production-style OIDC login, callback, silent renewal and API requests; configure TLS/HSTS and trusted reverse-proxy addresses.
