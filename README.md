@@ -61,5 +61,6 @@ Use short-lived branches, focused commits, reviewable pull requests, automated t
 ## Operations and security
 
 - [Backup, Restore and Disaster-Recovery Operational Baseline](operations/backup-restore-disaster-recovery.md)
+- [Production Ingress and Network-Security Acceptance Checklist](operations/production-ingress-and-network-checklist.md)
 - [Security and Privacy](security/security-and-privacy.md)
 - [Application Threat Model](security/threat-model.md)
