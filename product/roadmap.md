@@ -313,7 +313,7 @@ CompileCare.Web PR #38 merged as `23e84efaaa02ed61d18696fd8a9318db2df1862b`. The
 This section complements the milestone checklist above. It distinguishes current implementation, remaining acceptance work and intentionally deferred product scope. Do not mark a milestone complete from PR count or hosted CI alone.
 
 ### Immediate priority: stabilization and acceptance
-- [ ] Resolve the currently failing Web security-response-header PR/checks before merge; preserve security assertions and capture the root cause.
+- [x] Merge Web response-security headers with Docker-verified assertions while retaining `X-Frame-Options: DENY` (Web PR #46). Content-Security-Policy remains deferred until deployment-specific OIDC/API origins are allow-listed.
 - [ ] Run the merged one-click local Docker launcher on the developer Mac and record service health.
 - [ ] Complete authenticated Keycloak/API/PostgreSQL regression with synthetic tenants, users, roles and patient records.
 - [ ] Verify cross-tenant and cross-hospital denial using persisted membership and changed resource identifiers.
@@ -364,3 +364,43 @@ Implementation must be staged in focused Web PRs. Do not combine this with backe
 Stabilize and validate the outpatient journey → route-based Web architecture and OPD completion → security/operations/pilot gates → IPD → pharmacy → LIS/RIS-PACS → inventory/procurement → advanced revenue cycle → workforce/patient engagement → interoperability/analytics. Reorder only with documented pilot evidence and explicit dependency review.
 
 Every completed capability must update the blueprint, module catalogue, workflow documentation, API contracts, tests and release evidence. Keep future work visible as Deferred rather than silently removing it from scope.
+
+
+## Stabilization evidence update — 2026-11-26 (post full-platform regression)
+
+This is an evidence update to the original Antigravity report. It records code/CI remediation separately from developer-machine acceptance. A green hosted workflow does not prove that the user's nine-container stack or authenticated browser session has been revalidated.
+
+### Defects addressed in code and merged
+
+| QA item | Remediation merged | Verification | Remaining acceptance |
+|---|---|---|---|
+| API-001 — malformed requests returning 500 | API PR #76 preserves the 4xx status carried by `BadHttpRequestException` and adds malformed audit-query/empty-body integration cases | Release CI, PostgreSQL integration, Docker test and migration rehearsal passed | Re-run the live local API request cases |
+| API-002 — concurrent patient booking deadlock | API PR #77 adds a transaction-scoped tenant/patient advisory lock before the overlap check; the exclusion constraint remains the final guard; the race test now runs eight concurrent requests | Release CI, PostgreSQL integration, Docker test and migration rehearsal passed | Re-run repeated booking race in the local full stack |
+| WEB-001 — wrong default workspace | Web PR #45 makes Reception the default for staff with patient-search access | Vitest, TypeScript/build, Chromium E2E and Docker smoke passed | Authenticated local browser visual confirmation |
+| WEB-002 — 390px horizontal overflow | Web PR #45 adds narrow-screen layout constraints and an authenticated 390×844 Playwright regression | Chromium E2E and Web CI passed | Confirm the actual Mac/browser viewport and capture screenshots |
+| WEB-003 — cancellation contrast | Web PR #45 adds high-contrast destructive styling and a component assertion | Vitest and Web CI passed | Visual confirmation in the local authenticated workspace |
+| OBS-001 — broken API OTLP traces/metrics | Observability PR #4 fixes the exporter to OTLP/gRPC and publishes package 1.0.1; API PR #78 consumes it and adds Npgsql instrumentation; Local PR #11 points the API to port 4317 and upgrades `verify-stack.sh` to assert API Jaeger/Npgsql operations and Collector-fed API metrics | Observability build/test/format/package publish, API build/test/Docker/migration, and Local Docker tooling/OTel pipeline workflows passed | **Not yet closed:** run the merged nine-container launcher and `bash local/scripts/verify-stack.sh` on the developer Mac; retain Jaeger trace + Npgsql child-operation + Collector metric evidence |
+| OBS-002 — missing Kibana data view | Local PR #12 adds idempotent `CompileCare Logs` provisioning for `compilecare-logs-*` with `@timestamp` and wires it into stack verification | Python syntax and Docker observability CI, including Kibana data-view API assertion, passed | Verify the view and Discover experience in the local Kibana instance |
+
+### Security and operations — current state
+
+- Web PR #46 adds response headers (`nosniff`, Referrer-Policy, `X-Frame-Options: DENY`, CORP and Permissions-Policy); Docker smoke asserts them. This is defence-in-depth, not a complete browser security policy.
+- SEC-001 (API rate limiting, HSTS and trusted proxy processing) is tracked in API PR #79. It is **not merged** until the latest head's build/test, Docker and migration-rehearsal workflows all pass. Configure `ReverseProxy:KnownProxies` with the actual trusted ingress proxy addresses before deployment. The built-in rate limiter is per API process/instance; it is not a fleet-global quota.
+- SEC-002 is only partially addressed: CSP remains deferred pending exact production Keycloak/API origins and policy testing. The Web repository still needs a reproducible npm lockfile and a successful dependency audit; do not report supply-chain auditability as complete.
+- The previous NU1902 on the OTLP exporter version 1.12.0 was addressed by the Observability 1.0.1 update to exporter 1.15.3.
+- GAP-001 (Audit Review UI) remains outstanding. API audit search/export capability does not equal a usable, permission-controlled Audit Review workspace.
+
+### Acceptance gates still open
+
+- [ ] Execute the merged `CompileCare.Local` macOS one-click startup against current `main`, without deleting persistent Docker volumes.
+- [ ] Run the full `verify-stack.sh` check after the latest API/Local merges and save Jaeger service/operation and Collector metrics evidence.
+- [ ] Repeat authenticated Keycloak/API/PostgreSQL user journeys for at least two synthetic tenants, including membership revocation and cross-tenant negative tests.
+- [ ] Re-run the eight-way concurrent appointment booking scenario repeatedly against PostgreSQL.
+- [ ] Capture authenticated desktop/tablet/390px screenshots, console/network output and keyboard/accessibility evidence.
+- [ ] Complete Audit Review UI requirements, permission model, search/export UX and workflow acceptance before implementing it.
+- [ ] Resolve CSP origins/policy and npm lockfile/dependency audit; complete secret rotation, backup/PITR/restore, audit retention and production ingress configuration.
+- [ ] Complete hospital pilot acceptance, security/privacy review and applicable legal/regulatory assessment.
+
+### Release decision
+
+The code-level remediation above reduces the original defect set, but the platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until the remaining local authenticated acceptance and security/operational gates are evidenced. Do not declare OBS-001 closed based solely on the hosted synthetic Collector pipeline test. Keep new hospital modules deferred while these gates remain open.
