@@ -190,3 +190,11 @@ These hosted checks strengthen the security regression suite but do not replace 
 - Verify CSV values beginning with spreadsheet formula characters are neutralized. Inspect exported columns to ensure no request/response body, patient clinical note, or other clinical payload is present.
 - Hosted Release CI and Docker integration verification passed for the merged commit. This is hosted verification, not a substitute for local Docker acceptance on the developer workstation.
 - **Production follow-up still open:** define and implement retention enforcement, monitor/review audit exports, establish access review and retention policy, and complete privacy/legal review. Do not treat this feature as production sign-off.
+
+
+## 19. Audit export hardening — 2026-11-26
+
+- API PR #72 merged as `0fc8cfee33290986c798bf0285dc6cf6861a9422`.
+- PostgreSQL integration tests verify leading tab/control-character spreadsheet formula protection in exported actor metadata and verify that the export request itself is captured as `ExportAuditEvents` and visible in a subsequent audit query.
+- Hosted Release CI and Docker integration verification passed. Repeat on local Docker with synthetic test identities; do not use real patient data for export tests.
+- Retention enforcement, export monitoring/access review and privacy/legal policy remain separate production readiness gates.
