@@ -550,3 +550,11 @@ CompileCare.Api PR #81 is merged as `2af5bfc2c9e576cd92010b49e622922f6b29a8e5`. 
 The API now validates `Cors:AllowedOrigins` during startup outside Development. Configured origins must be explicit HTTPS origins without wildcard hosts, credentials, paths, query strings or fragments; trailing slashes are normalized and duplicates removed. HTTP remains available only for Development. An empty list is valid for same-origin Web/API deployment. Integration tests cover accepted, rejected, normalized, Development and same-origin cases.
 
 **Still open for deployment:** the hosting operator must provide the exact production Web origin (and any additional browser origins actually required), set the allowlist and test preflight and authenticated API requests through the selected ingress. This code change does not choose or configure production domains, TLS certificates, HSTS at the edge or trusted proxy IPs.
+
+### Production PostgreSQL TLS enforcement — 2026-11-26
+
+CompileCare.Api PR #82 is merged as `dc07866a064855dce72880bc24c1cc13c393be40`. The API now fails startup outside Development and the isolated Testing host if `ConnectionStrings:CompileCare` is missing or PostgreSQL is not configured with Npgsql `SSL Mode=VerifyFull`. This validates the certificate chain and server hostname. Development keeps its local plaintext PostgreSQL setup; the Testing exception is limited to the isolated integration-test host.
+
+All three final hosted workflows passed: CI `45843760937` (Release build, EF model-drift and full test suite), Docker Integration Verification `45843760927`, and PostgreSQL Migration Rehearsal `45843760942`. The Docker suite also exercises the production HSTS/forwarded-header middleware using the non-Development Testing environment and a synthetic, non-connected database configuration.
+
+**Still open for deployment:** select the hosting provider, securely mount its trusted CA if required, configure the real PostgreSQL hostname and `VerifyFull` connection string, and prove a successful TLS connection with hostname validation from the deployed API network. Encryption-at-rest, KMS ownership/rotation, encrypted backups/PITR and restore drills remain separate gates.
