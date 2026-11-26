@@ -271,3 +271,100 @@ Each step gets requirements, workflow, acceptance criteria, module design, tests
 ## 13. Governance
 
 Distinguish implemented facts, accepted decisions, proposals, assumptions and open questions. Hospital stakeholders validate workflows; technical owners approve architecture/security. Requirements follow the [Requirements Lifecycle](requirements-lifecycle.md). Update MVP scope, module catalogue, workflows, roadmap, security/NFR documents and API contracts as decisions are approved. Never claim compliance, production readiness or phase completion from merged code or green CI alone.
+
+
+## 14. Delivery roadmap — implemented foundation, MVP completion and future scope
+
+This section makes the long-term hospital product plan explicit. A capability listed as planned is not an assertion that it is implemented. Current delivery status must be checked against repository code, merged PRs, CI and authenticated local acceptance.
+
+### 14.1 Immediate stabilization and pilot-readiness work
+
+Before expanding the clinical domain, complete the following gates:
+
+1. **Regression baseline:** run the full local Docker stack, API and Web automated suites, authenticated Keycloak workflows, PostgreSQL persistence checks, tenant-isolation negative tests and observability end-to-end checks. Use synthetic data only.
+2. **Defect closure:** investigate every failing or skipped test; fix root causes without weakening assertions, authorization or security controls. Record PASS, FAIL, BLOCKED and NOT TESTED distinctly.
+3. **Security and operations:** complete audit coverage/retention governance, secret and signing-key lifecycle, encryption review, backup/PITR and restore rehearsal, migration/rollback runbooks, rate/abuse controls, dependency/container scanning and incident response.
+4. **Real acceptance:** obtain role-based hospital stakeholder acceptance and qualified clinical, privacy, legal and security review before any production-readiness claim.
+5. **Observability:** verify a real CompileCare.Api request produces safely redacted logs, metrics and traces through the shared OpenTelemetry pipeline into the local/target backends. Telemetry must not contain PHI, secrets or high-cardinality patient identifiers.
+
+### 14.2 Web information architecture and application experience
+
+The Web application must evolve from a single workspace composition into a route-based, modular hospital application. The current single-workspace/hash-section implementation is an interim delivery state, not the target information architecture.
+
+**Target principles**
+- Use a shared authenticated application shell with independent route-level workspaces and feature-owned components.
+- Give each module a stable URL, page heading, navigation identity, loading/empty/error states and focused tests.
+- Keep tenant, hospital and applicable department context visible and consistent.
+- Build navigation from the authenticated membership's effective permissions and scope. Route guards improve user experience; server-side API authorization remains authoritative.
+- Preserve deep links, browser history, refresh behavior, safe session expiry and unauthorized/not-found handling.
+- Keep the platform control plane separate from tenant hospital workspaces.
+- Avoid a single oversized application component. Decompose incrementally by feature and route; do not perform an untested big-bang rewrite.
+- Meet responsive desktop/tablet/mobile requirements and target WCAG 2.2 AA, with evidence before claiming conformance.
+- Capture real authenticated screenshots using synthetic data. Mocked component/Playwright screenshots are not proof of local authenticated acceptance.
+
+**Proposed route map** (final route names may be refined during implementation; preserve backwards-compatible redirects where useful):
+
+| Workspace | Proposed route |
+|---|---|
+| Hospital overview | `/app/overview` |
+| Reception and patient search | `/app/reception` |
+| Patient registration | `/app/patients/register` |
+| Patient record (permission-controlled) | `/app/patients/:patientId` |
+| Appointment management | `/app/appointments` |
+| Queue operations | `/app/queue` |
+| Clinical/OPD | `/app/clinical` |
+| Billing | `/app/billing` |
+| Facilities | `/app/facilities` |
+| Staff and providers | `/app/staff` |
+| Membership administration | `/app/memberships` |
+| Patient identifier policy | `/app/settings/patient-identifiers` |
+| Platform tenant lifecycle | `/platform/tenants` |
+
+The exact module links shown to a user must follow the effective permission/context contract. Never rely on route hiding or client-side checks as an authorization boundary.
+
+**UI implementation sequence**
+1. Introduce the shared authenticated shell, route layout, navigation groups, breadcrumbs/page headings and active hospital context.
+2. Extract overview and reception/patient registration into independent route workspaces.
+3. Extract appointments and queue operations, preserving existing booking, check-in and queue lifecycle behavior.
+4. Extract clinical/OPD, preserving identity confirmation, draft/sign/close/amendment safeguards.
+5. Extract billing, facilities, staff, memberships and identifier-policy workspaces.
+6. Keep platform tenant lifecycle in its separate platform-operator control plane.
+7. Add route-level loading/error/forbidden/not-found behavior, keyboard navigation, responsive tests, browser visual regression and authenticated evidence.
+8. Remove legacy hash navigation only after redirects/deep links and regression coverage are in place.
+
+This work is a structural and usability improvement to existing capabilities. It does not authorize new clinical or financial features or invented dashboard metrics. See [Enterprise Experience Uplift](design/enterprise-experience-uplift.md).
+
+### 14.3 Future hospital implementation phases — explicitly deferred
+
+The following are retained product scope, not part of the first outpatient MVP. Each requires domain workflows, ownership boundaries, permissions, audit, data lifecycle, integration contracts, tests and hospital validation before implementation.
+
+| Future phase | Scope | Entry dependencies |
+|---|---|---|
+| IPD / inpatient | Admission, discharge and transfer; bed reservation/occupancy; ward and nursing workspaces; observations, care plans, handover, medication administration, discharge summaries | Facility/bed model, clinical governance, pilot nursing and admission workflows |
+| Pharmacy | Formulary/catalogue, prescription validation, dispensing, batch/expiry, stock movements, returns, suppliers and pharmacy settlement | Clinician order lifecycle, pharmacy policy, inventory and financial boundaries |
+| LIS | Test catalogue, diagnostic orders, specimen/barcode collection, worklists, processing, result validation, critical-result escalation and reports | Clinical order contracts, lab stakeholder validation, instrument integration requirements |
+| RIS/PACS | Imaging orders, scheduling, modality worklists, report approval, DICOM references, image storage/access and retention | Diagnostic order lifecycle, DICOM/PACS architecture, security and storage decisions |
+| Inventory and procurement | Stores, requisitions, purchase orders, vendors, receiving, batch/expiry, transfers, stock adjustments, assets and maintenance | Pharmacy/LIS/department consumption requirements and finance integration |
+| Advanced revenue cycle | Tax/statutory invoice rules, estimates, discounts/waivers, deposits, refunds/reversals/credit notes, insurance/TPA, preauthorization/claims, gateways, accounting and reconciliation | Pilot finance policy, qualified accounting/tax review, payment and payer contracts |
+| Workforce and HR | Verified staff-to-account linking, credential/license evidence and renewal, clinical privileges, rosters, shifts, attendance, leave, employee records, payroll integrations and governed multi-hospital workforce | Identity proofing, clinical governance, HR/legal/privacy decisions |
+| Patient engagement | Patient/guardian portal, mobile experience, self-booking, records/instructions access, consent-aware reminders and communication preferences | Patient identity, guardian/consent, security and support model |
+| Interoperability | ABDM/ABHA, FHIR/HL7, DICOM, identity, payment, messaging and external hospital systems | Validated use case, partner agreements, applicable approvals, conformance and security testing |
+| Analytics and intelligent assistance | Permissioned operational/financial reporting, exports, capacity/wait-time analytics and carefully governed AI-assisted workflows | Data quality, privacy controls, clinical safety review, explainability and human oversight |
+
+**Explicitly deferred until separately justified:** autonomous diagnosis, triage or prescribing; full ERP/HR/payroll engine; broad patient mobile app; multi-region active-active; and microservice extraction without measured deployment, scaling, ownership, security or resilience need.
+
+### 14.4 Recommended dependency order
+
+1. Stabilize and regression-test the current outpatient platform.
+2. Deliver the route-based Web application architecture and complete the existing OPD experience.
+3. Close pilot security, privacy, audit, observability, backup/recovery and operational readiness gates.
+4. Validate the outpatient pilot with hospital stakeholders.
+5. Implement IPD and nursing workflows.
+6. Implement pharmacy and its inventory boundaries.
+7. Implement LIS and RIS/PACS against explicit diagnostic-order contracts.
+8. Implement hospital-wide inventory, procurement and asset operations.
+9. Extend revenue cycle after finance policy validation.
+10. Deliver credentialed workforce/HR capabilities and patient engagement.
+11. Add validated interoperability and analytics capabilities.
+
+The sequence may be adjusted by pilot evidence, but dependencies and deferred decisions must remain visible in roadmap updates. Every delivered feature must update its workflow, module catalogue, API contract where applicable, tests and this blueprint. A merged PR or green CI is not, by itself, proof of complete workflow acceptance or production readiness.

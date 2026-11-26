@@ -306,3 +306,61 @@ CompileCare.Web PR #38 merged as `23e84efaaa02ed61d18696fd8a9318db2df1862b`. The
 ## Audit permission spoofing regression — 2026-11-26
 
 [CompileCare.Api PR #75](https://github.com/CompileCare/CompileCare.Api/pull/75) merged as `649d32636b9bc4bd5114dc08ca27974e50ce4d71`. PostgreSQL integration tests verify PatientRegistrar, ClinicalUser, FacilityManager and FacilityViewer memberships cannot list or export tenant audit events, even when a signed test token carries forged audit.read, tenant-role and standard role claims. This protects the rule that CompileCare permissions are derived from persisted membership, not caller-supplied token role/permission claims. Release CI and Docker integration verification passed.
+
+
+## Product delivery extension — UI architecture, pilot gates and deferred hospital modules (2026-11-26)
+
+This section complements the milestone checklist above. It distinguishes current implementation, remaining acceptance work and intentionally deferred product scope. Do not mark a milestone complete from PR count or hosted CI alone.
+
+### Immediate priority: stabilization and acceptance
+- [ ] Resolve the currently failing Web security-response-header PR/checks before merge; preserve security assertions and capture the root cause.
+- [ ] Run the merged one-click local Docker launcher on the developer Mac and record service health.
+- [ ] Complete authenticated Keycloak/API/PostgreSQL regression with synthetic tenants, users, roles and patient records.
+- [ ] Verify cross-tenant and cross-hospital denial using persisted membership and changed resource identifiers.
+- [ ] Verify real API logs, metrics and traces reach Elasticsearch/Kibana, Prometheus and Jaeger through the shared Collector; inspect redaction and export errors.
+- [ ] Capture authenticated desktop/tablet/mobile screenshots and keyboard/accessibility evidence.
+- [ ] Repeat local acceptance after fixes; record PASS/FAIL/BLOCKED/NOT TESTED and retain all skipped scenarios.
+- [ ] Complete backup/PITR and restore, migration/rollback, secrets/key rotation, audit retention, security and pilot acceptance gates.
+
+### Web experience architecture milestone
+**Goal:** move from the interim single Workspace/hash-section composition to independent route-level module workspaces under a shared authenticated shell.
+
+- [ ] Introduce route-based module layouts and stable URLs; retain safe redirects/deep links from existing hash URLs during migration.
+- [ ] Extract overview, reception and patient registration into independent route workspaces.
+- [ ] Extract appointments and queue workspaces without changing their API lifecycle semantics.
+- [ ] Extract clinical/OPD, retaining patient identity confirmation, signing, closing and append-only amendment safeguards.
+- [ ] Extract billing, facilities, staff, memberships and patient identifier policy.
+- [ ] Keep platform tenant lifecycle in a separate platform-operator control plane.
+- [ ] Use permission-aware navigation and user-friendly route guards while retaining API-side authorization as the only security boundary.
+- [ ] Add route-level loading, empty, error, forbidden and not-found states; verify refresh, browser history, session expiry and deep links.
+- [ ] Verify desktop/tablet/mobile, keyboard-only navigation, screen-reader semantics and WCAG 2.2 AA target criteria.
+- [ ] Capture real authenticated screenshots with synthetic data; mocked tests are not local acceptance evidence.
+
+Implementation must be staged in focused Web PRs. Do not combine this with backend/domain changes or a big-bang rewrite.
+
+### Deferred implementation phases — retained scope
+
+| Phase | Planned module | Major capabilities | Status |
+|---|---|---|---|
+| 6 | IPD / inpatient | ADT, admission, bed reservation/occupancy, ward/nursing, observations, care plans, handover, medication administration, discharge | Deferred |
+| 7 | Pharmacy | Formulary, prescription validation, dispensing, batches/expiry, stock, returns and supplier workflows | Deferred |
+| 8 | LIS | Diagnostic test catalogue/orders, specimen collection/barcodes, worklists, processing, result validation, critical-result escalation | Deferred |
+| 9 | RIS/PACS | Imaging orders/scheduling, modality worklists, DICOM, reports, image storage/access and retention | Deferred |
+| 10 | Inventory/procurement | Stores, requisitions, purchase orders, vendors, receipts, stock movement, assets and maintenance | Deferred |
+| 11 | Advanced revenue cycle | Statutory invoice/tax rules, deposits, discounts, refunds, credit notes, insurance/TPA, claims, payment/accounting integrations and reconciliation | Deferred |
+| 12 | Workforce/HR | Verified account linking, credentialing, clinical privileges, rostering, attendance, leave, employee records and payroll integrations | Partially scaffolded; extended capabilities deferred |
+| 13 | Patient engagement/interoperability | Patient/guardian portal and mobile, self-booking, consent-aware communications, ABDM/ABHA, FHIR/HL7, DICOM and external integrations | Deferred |
+| 14 | Advanced analytics/intelligent assistance | Permissioned operational/financial analytics, exports and governed AI-assisted workflows with human oversight | Deferred |
+
+### Deferred scope guardrails
+- Patient contact verification, identity merge/correction, guardian and emergency reconciliation require approved privacy, identity, consent, retention and security design.
+- Clinical credentialing and privileges require verified evidence and qualified clinical governance; a staff designation is not authority.
+- Advanced billing, GST/statutory treatment, refunds, insurance and claims require pilot finance policy and qualified review.
+- ABDM/ABHA, FHIR/HL7 and DICOM integrations require validated use cases, partner agreements, approvals and conformance/security testing.
+- Autonomous diagnosis, triage or prescribing is not in scope.
+- Full ERP/payroll, broad mobile delivery, multi-region active-active and microservice extraction remain gated by validated demand and architecture decisions.
+
+### Dependency order
+Stabilize and validate the outpatient journey → route-based Web architecture and OPD completion → security/operations/pilot gates → IPD → pharmacy → LIS/RIS-PACS → inventory/procurement → advanced revenue cycle → workforce/patient engagement → interoperability/analytics. Reorder only with documented pilot evidence and explicit dependency review.
+
+Every completed capability must update the blueprint, module catalogue, workflow documentation, API contracts, tests and release evidence. Keep future work visible as Deferred rather than silently removing it from scope.
