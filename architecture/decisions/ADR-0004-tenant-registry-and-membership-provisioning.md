@@ -43,6 +43,7 @@ A transition that is not in this table returns a conflict. A suspended or closed
 
 | Operation | Route |
 |---|---|
+| Current operator status (self only) | `GET /api/v1/platform/operator/status` | Returns only `isPlatformOperator` for the caller's validated identity; no subject lookup input |
 | Create tenant | `POST /api/v1/platform/tenants` |
 | List tenants | `GET /api/v1/platform/tenants` |
 | Read tenant | `GET /api/v1/platform/tenants/{id}` |
@@ -51,7 +52,7 @@ A transition that is not in this table returns a conflict. A suspended or closed
 | Suspend | `POST /api/v1/platform/tenants/{id}/suspend` |
 | Close | `POST /api/v1/platform/tenants/{id}/close` |
 
-The routes above require the persisted PlatformOperator authorization policy. A tenant HospitalAdmin is not a platform operator.
+All tenant registry/lifecycle routes above require the persisted PlatformOperator authorization policy. The self-status route requires authentication and returns only the caller's own operator boolean. A tenant HospitalAdmin is not a platform operator.
 
 ### Tenant membership routes
 
@@ -69,7 +70,7 @@ These routes require an active tenant membership with `membership.manage`; the s
 
 1. A trusted platform operator creates a tenant in `Provisioning` state.
 2. The platform operator provisions the initial administrator using the exact configured OIDC issuer and target user's subject.
-3. The tenant is activated only after the initial administrator membership succeeds.
+3. The API rejects activation with 409 until an active tenant-wide HospitalAdmin membership exists; the Web platform workspace provisions that membership first and activates the tenant only after provisioning succeeds.
 4. The HospitalAdmin signs in through OIDC and creates the first hospital and department through tenant-scoped APIs.
 5. Subsequent users are added through tenant membership administration. Their roles and scopes are checked by the API on every request.
 
@@ -81,8 +82,10 @@ The following API implementation is merged:
 - Tenant registry, slug validation, lifecycle transitions and active-tenant enforcement.
 - Persisted platform-operator registry and separate authorization policy.
 - Development-only one-time platform-operator bootstrap.
+- Authenticated platform-operator self-status endpoint (API PR #57, merge commit `916b75a9a8a81e37216d48562b65c23d07682fc1`).
 - Platform-only tenant create/list/get and lifecycle routes.
-- Initial tenant-wide HospitalAdmin provisioning.
+- Server-enforced initial tenant-wide HospitalAdmin prerequisite before activation (API PR #58, merge commit `2d74b412f6b26274381ebd0d0ed461eb1b75ead8`).
+- Platform tenant lifecycle workspace in [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36), merge commit `54589758db04848d25e2e078f3619c1932cc645a`.
 - Tenant-scoped membership administration with role/scope validation, self-management rejection, last-admin protection and metadata audit.
 - PostgreSQL integration coverage for platform-only access, lifecycle transitions, terminal closure, invalid/duplicate slugs, initial-admin concurrency, scoped membership operations and audit behavior.
 
