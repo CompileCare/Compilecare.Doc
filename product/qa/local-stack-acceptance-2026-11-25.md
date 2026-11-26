@@ -234,3 +234,12 @@ These hosted checks strengthen the security regression suite but do not replace 
 - In the Chromium browser suite, verify the skip link is the first keyboard stop, has a visible focus indicator, and pressing Enter moves focus to `main#workspace-main`.
 - Hosted Vitest, production build, Chromium E2E and Docker smoke passed (runs `45762291461` and `45762285239`).
 - Repeat with the real authenticated Docker/Keycloak/API workspace and keyboard-only navigation on desktop/tablet. Screen-reader review and complete WCAG 2.2 AA assessment remain outstanding; this test alone is not a conformance claim.
+
+
+## 24. Weekly synthetic logical backup/restore regression — 2026-11-26
+
+- Database PR #5 merged as `5e53afec375549f81fe05b9f6c8a9db733a24297`.
+- The PostgreSQL 16 Docker backup/restore workflow runs for relevant PRs, pushes to `main`, manual dispatch, and weekly on Mondays at 03:17 UTC.
+- The workflow uses disposable PostgreSQL and synthetic rows only. It validates archive checksum/manifest, successful isolated restore, no-overwrite guards and corrupted-archive rejection.
+- Hosted Docker verification passed on PR #5 (run `45762631339`).
+- This scheduled check does not touch production or prove provider-native physical backup/PITR, off-site storage, retention, RPO/RTO or production recovery. Those remain separate release gates.
