@@ -49,7 +49,7 @@ Suspension blocks tenant-scoped access until reactivation. Closure is terminal a
 
 ## API routes
 
-All global tenant registry/lifecycle routes require the persisted PlatformOperator policy and do not use `X-Tenant-ID`.
+All global tenant registry/lifecycle routes except the self-status discovery endpoint require the persisted PlatformOperator policy and do not use `X-Tenant-ID`. The self-status endpoint requires authentication only and returns a boolean for the caller's own identity.
 
 | Operation | Route |
 |---|---|
