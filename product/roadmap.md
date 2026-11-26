@@ -604,3 +604,9 @@ CompileCare.Api PR #85 is merged as `5b368f53a108dface6e43844d1be28b62bc3c509`. 
 All three hosted workflows passed: CI `45853970275` (Release build, EF model-drift check and 161 passing unit/integration tests: 12 unit + 149 integration), Docker Integration Verification `45853970325`, and PostgreSQL Migration Rehearsal `45853970298`. The tests cover local hostnames, `.localhost`, IPv4/IPv6 loopback and negative remote/wildcard/path/credential cases.
 
 This closes the Development CORS validation bypass at code/CI level. Production still requires the exact deployed Web origin to be configured when cross-origin, and actual CORS/CSP/OIDC flows must be verified behind the selected ingress.
+
+### Nginx version disclosure hardening — 2026-11-26
+
+Web PR #63 is merged as `b2e0916b38ed5fe8e031bbf7c5b754b133a6b538`. The Nginx server configuration sets `server_tokens off`, and Docker CI fails if the response exposes `Server: nginx/<version>`. CI run `45854681476` passed dependency audit, unit tests, production build, all browser E2E tests, real-OIDC suite discoverability and Docker smoke, including the strict-CSP browser suite and version-header assertion.
+
+This reduces version disclosure only; it does not replace timely Nginx base-image patching or production ingress hardening.
