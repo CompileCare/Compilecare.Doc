@@ -111,7 +111,7 @@ A failed or untested item remains an open deployment gate. Do not mark productio
 - API PR #83 implements one-year HSTS on trusted HTTPS requests and explicit trusted-proxy configuration.
 - API PR #84 validates production CORS as explicit HTTPS origins; API PR #85 restricts Development CORS to explicit loopback origins.
 - CompileCare.Local binds its published local ports to loopback and explicitly opts into HTTP only for local development.
-- Actual production domains, TLS provider/ingress, proxy IPs, public/private route rules, metrics access boundary, monitoring source, rate-limit sizing and real OIDC acceptance remain deployment-specific and are not yet evidenced.
+- API PR #86 now enforces explicit `Observability:Metrics:AllowedNetworks` CIDRs outside Development/Testing and returns 404 to untrusted sources after trusted forwarded-header processing. The selected ingress must still keep `/metrics` off public routes and use the actual monitoring source CIDRs; the application allowlist is not user authentication. Health endpoint exposure remains a separate ingress rule.
 
 ## 10. Ownership and change control
 
