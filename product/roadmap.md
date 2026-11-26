@@ -396,9 +396,9 @@ This is an evidence update to the original Antigravity report. It records code/C
 - [x] Run the full `verify-stack.sh` against all nine services in hosted Docker CI; Local PR #13 verified API-to-Jaeger traces including an Npgsql `postgresql` operation, plus Collector-fed ASP.NET Core request metrics.
 - [ ] Run the merged `verify-stack.sh` on the developer Mac and retain the local Jaeger/Collector evidence; hosted CI does not replace the local environment check.
 - [x] Verify real Keycloak-issued access tokens against the API issuer/audience/subject validation and exercise two PostgreSQL-persisted tenant memberships with different roles, hospital data isolation, cross-tenant membership mutation denial, and membership revocation/reactivation in Local PR #14 hosted Docker CI.
-- [ ] Run the browser Authorization Code + PKCE sign-in and authenticated Web workflows against the developer-Mac local stack; the hosted API identity test does not replace real browser/session acceptance.
+- [x] Verify the real browser Authorization Code + PKCE sign-in/callback and tenant switching against the full nine-service Docker stack in Local PR #15 hosted CI, using the actual Keycloak login page, Web client, API and persisted tenant memberships.
+- [ ] Run the merged one-click stack on the developer Mac and repeat browser sign-in, silent renewal/session lifecycle and role-based workflows there; capture desktop/tablet/390px screenshots, console/network evidence and keyboard/accessibility review.
 - [ ] Re-run the eight-way concurrent appointment booking scenario repeatedly against PostgreSQL.
-- [ ] Capture authenticated desktop/tablet/390px screenshots, console/network output and keyboard/accessibility evidence.
 - [ ] Complete Audit Review UI requirements, permission model, search/export UX and workflow acceptance before implementing it.
 - [ ] Resolve production CSP origins/policy and test the enforced policy; complete secret rotation, backup/PITR/restore, audit retention and production ingress configuration.
 - [ ] Configure exact ReverseProxy:KnownProxies ingress addresses and validate forwarded scheme/client-IP behavior in the target deployment; load-test and tune per-instance rate limits, and add gateway/shared quotas if multi-replica global limits are required.
@@ -406,7 +406,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 
 ### Release decision
 
-The code-level remediation above reduces the original defect set. OBS-001 has hosted full-stack evidence from Local PR #13, and Local PR #14 now verifies real Keycloak-issued user tokens and persisted two-tenant authorization/revocation against the PostgreSQL-backed API. The platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until developer-Mac execution, real browser Authorization Code + PKCE/session acceptance, actual UI visual/accessibility acceptance and remaining deployment/security/operational gates are evidenced. Hosted API identity tests do not prove the real browser experience. Keep new hospital modules deferred while these gates remain open.
+The code-level remediation above reduces the original defect set. OBS-001 has hosted full-stack evidence from Local PR #13; Local PR #14 verifies real Keycloak-issued tokens and persisted two-tenant authorization/revocation; and Local PR #15 now verifies browser Authorization Code + PKCE sign-in/callback and role-based tenant switching against the real hosted Docker stack. The platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until developer-Mac execution, local browser/session acceptance, actual hospital-user visual/accessibility review and remaining deployment/security/operational gates are evidenced. Hosted CI is not a substitute for the developer's local installation or final user-facing visual acceptance. Keep new hospital modules deferred while these gates remain open.
 
 
 ### Security and reproducible-build follow-up — 2026-11-26
@@ -443,4 +443,17 @@ The test uses a CI-only temporary Keycloak client with direct grants. The produc
 
 **Keycloak 26.2.5 configuration correction:** the local realm now assigns the built-in `basic` client scope to `compilecare-web`. The local reconciler verifies that its `oidc-sub-mapper` emits the `sub` claim in access tokens. It also assigns that scope to the temporary CI user client. This is required so the API can resolve persisted tenant memberships by validated issuer and subject. Validate the equivalent subject mapper/scope configuration in any separately managed production Keycloak realm; the local realm definition does not change a production identity provider.
 
-The remaining gate is a real browser-based Web Authorization Code + PKCE sign-in/session journey against the developer-Mac stack, plus role-based UI workflow and visual/accessibility acceptance. Keep those checks separate from hosted API-level identity acceptance.
+The hosted real browser Authorization Code + PKCE sign-in/callback and role-based tenant switching are verified in Local PR #15. The remaining gate is to run the merged stack on the developer Mac and repeat browser/session renewal there, then complete role-based hospital-user visual review, responsive screenshots and keyboard/screen-reader accessibility acceptance. Keep those checks separate from the hosted browser and API acceptance.
+
+
+### Real browser Authorization Code + PKCE acceptance — 2026-11-26
+
+Local PR #15 merged as `d6e1362642c8d1553c9680020395a92b88005144`. The successful Local PR CI run was `45795779615`, attempt 2. Both Local workflow jobs passed. The full-stack job:
+- Built and started the nine-service Compose stack, then passed the real Keycloak-issued identity and PostgreSQL-persisted two-tenant API checks.
+- Installed Chromium and ran the dedicated Web Playwright suite against the actual Docker Web application at `http://localhost:8080`.
+- Completed a real Authorization Code + PKCE redirect to the local Keycloak login page and returned through the Web OIDC callback.
+- Verified the same synthetic user could select tenant A (HospitalAdmin) and tenant B (FacilityViewer), saw CI Hospital A/B respectively, and had the correct role-based navigation (patient registration only for HospitalAdmin; facility read navigation for FacilityViewer).
+- Observed real API hospital-list requests carrying a bearer authorization header and the selected `X-Tenant-ID`; the test recorded only whether a bearer header was present and each tenant ID, never the token itself.
+- Removed the unique CI Compose project and volumes, plus the mode-0600 temporary browser credential file.
+
+This closes the **hosted browser OIDC/tenant-switch acceptance** gate. It does not close developer-Mac acceptance, repeat browser/session renewal on that machine, authenticated hospital-user visual review, screenshots, keyboard/screen-reader accessibility, or production identity-provider/ingress/CSP verification.

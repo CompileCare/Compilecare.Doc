@@ -263,7 +263,7 @@ These are hosted-CI verified corrections, not final visual acceptance. The user-
 - API PR #79 is merged: per-subject/per-IP API rate limiting, RFC 9457 429 + Retry-After, trusted X-Forwarded-For/X-Forwarded-Proto handling restricted to configured proxy IPs, one-hop/symmetry checks, HSTS outside Development, and Kestrel server banner suppression. The built-in limiter is per API instance, not a fleet-wide quota. Target deployment must configure the trusted proxy IPs and tune limits; use gateway/shared enforcement if multi-replica global quotas are required.
 - Web PR #47 is merged: the npm-generated lockfile is committed; CI and Docker use npm ci; npm audit is blocking. Final PR CI passed Vitest, TypeScript/production build, Chromium E2E and Docker header smoke; the lockfile audit reported zero vulnerabilities.
 - Production CSP remains deferred pending exact Keycloak/API origins and browser validation. This response-header and package-audit work must not be described as complete security compliance.
-- Hosted nine-service Docker and telemetry verification is merged in Local PR #13. Local PR #14 now also verifies real Keycloak-issued user tokens and PostgreSQL-persisted two-tenant roles, hospital isolation and membership revocation/reactivation against the actual API. Remaining acceptance is the developer-Mac stack run, browser Authorization Code + PKCE sign-in/session and authenticated Web journeys, desktop/tablet/mobile screenshots, keyboard/accessibility review and production CSP/ingress validation. See the roadmap stabilization gates.
+- Hosted nine-service Docker and telemetry verification is merged in Local PR #13. Local PR #14 verifies real Keycloak-issued user tokens and PostgreSQL-persisted two-tenant roles, hospital isolation and membership revocation/reactivation. Local PR #15 now also passes a real browser Authorization Code + PKCE sign-in/callback, tenant switch, role-based navigation and bearer/X-Tenant-ID API checks against the hosted nine-service stack. Remaining acceptance is the developer-Mac stack run, browser/session renewal there, authenticated hospital-user screenshots, keyboard/accessibility and visual review, and production CSP/ingress validation. See the roadmap stabilization gates.
 
 
 ## Full-stack telemetry verification — 2026-11-26
@@ -279,4 +279,13 @@ Local PR #14 is merged. Hosted full-stack CI used a temporary Keycloak client to
 
 The test exposed and corrected the local Keycloak subject-claim setup: the checked-in compilecare-web client now receives the built-in basic scope, and the local reconciler verifies its Subject (sub) mapper is enabled in access tokens. This is essential for the API to resolve tenant memberships using the validated issuer and subject. A separately managed production Keycloak realm must be checked independently.
 
-The hosted API identity test is not browser sign-in evidence. Browser Authorization Code + PKCE redirect/session behavior, real role-based UI workflows, visual review, accessibility and Mac-local acceptance remain open.
+The hosted API identity test on its own is not browser sign-in evidence; that separate gap is now covered at CI level by Local PR #15's real Authorization Code + PKCE login/callback and role-based tenant-switch suite. Developer-Mac acceptance, session renewal on that machine, real role-based hospital-user workflows beyond tenant selection, visual review, accessibility and production configuration remain open.
+
+
+## Real browser PKCE and tenant-switch acceptance — 2026-11-26
+
+Local PR #15 is merged. Hosted full-stack CI passed the real Authorization Code + PKCE browser flow against the actual Docker Web app, local Keycloak and CompileCare.Api. The synthetic user signed in through the Keycloak login page and Web OIDC callback, switched from HospitalAdmin in tenant A to FacilityViewer in tenant B, saw the correct CI Hospital A/B and role-specific navigation, and generated real API hospital-list requests with bearer authorization and the selected X-Tenant-ID.
+
+This complements the persisted PostgreSQL tenant isolation and revocation checks in Local PR #14. The test uses a temporary CI credential file with restrictive permissions and cleans it up; tokens and authorization codes are not logged.
+
+The hosted test closes the **browser PKCE + tenant switching CI** gate only. The developer-Mac run, browser session renewal and real local workflow validation, hospital-staff visual review, responsive screenshots, keyboard/screen-reader accessibility, and production CSP/ingress acceptance remain open.
