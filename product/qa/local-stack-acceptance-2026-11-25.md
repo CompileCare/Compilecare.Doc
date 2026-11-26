@@ -37,7 +37,7 @@ The 96% figure is 48/50 executed tests. The eight Not Run cases are not included
 - **Observed:** Patient search for a hospital ID belonging to another tenant returned HTTP 200 with an empty page. The report also observed the same response-contract issue on department collection listing for an out-of-scope hospital.
 - **Data exposure:** The report found zero patient/department rows returned; tenant query filters and department scoping prevented data leakage in the tested case.
 - **Expected contract:** Return 404 when the hospital is not visible in the caller's tenant and organization scope, consistent with single-resource anti-enumeration behavior.
-- **Correction:** API PR #55 is merged as `07fb9cea2dc6f706fc5c1a6fff67850f585b79d9`? No — see merge SHA below; it checks hospital visibility before patient search and returns a typed not-found result for inaccessible department collections. PostgreSQL cases cover tenant-wide foreign-tenant patient search and same-tenant out-of-scope/foreign-tenant department listing.
+- **Correction:** API PR #55 is merged as `07fb9cea2dc6f706fc5c1a6fff67850f585b79d9`; it checks hospital visibility before patient search and returns a typed not-found result for inaccessible department collections. PostgreSQL cases cover tenant-wide foreign-tenant patient search and same-tenant out-of-scope/foreign-tenant department listing.
 - **Hosted verification:** CI run 45739052864 passed restore, Release build, EF model-drift validation and all unit/integration tests; Docker Integration Verification run 45739052930 passed.
 - **Remaining local acceptance:** Repeat both real-stack cases on the updated local stack and confirm authorized hospital requests still return 200.
 
@@ -98,7 +98,7 @@ Do not merge an implementation PR based on a green-looking local report alone or
 - **Database and caching:** Database PR #2 backup/restore helpers and Caching PR #5 tenant isolation tests are merged after hosted Docker/test verification.
 - **Documentation:** PR #50 is merged, paired with Local PR #5. Keep future docs changes paired with implementation status.
 
-The number of open PRs is now 6: five deliberately stacked Web experience slices (#29–#33) and one independent Local observability overlay (#6). The API, Database, Caching, Web test and Local Keycloak/GSSAPI workstreams listed above have been merged; they are not duplicates or abandoned PRs.
+Six implementation PRs remain open: five deliberately stacked Web experience slices (#29–#33) and one independent Local observability overlay (#6). This QA/roadmap update is a separate documentation-only PR #70. The API, Database, Caching, Web test and Local Keycloak/GSSAPI workstreams listed above have been merged; they are not duplicates or abandoned PRs.
  
 ## 8. Evidence and source artifacts
 
