@@ -88,7 +88,7 @@ The following API implementation is merged:
 
 The tenant membership administration UI is merged in [CompileCare.Web PR #35](https://github.com/CompileCare/CompileCare.Web/pull/35), merge commit `b8e4a4ec8864884f5e71dc070a319a5f4df07185`. It supports tenant-scoped membership list/create/update/deactivate/reactivate for authorized HospitalAdmins. Its workflow is documented in [Tenant membership administration](../../product/workflows/tenant-membership-administration.md).
 
-The global platform tenant lifecycle UI is a separate follow-on. It must be shown only after a trusted platform-operator self-status signal is available and every global operation remains protected by the PlatformOperator API policy.
+The trusted platform-operator self-status API is merged in CompileCare.Api PR #57. The global platform tenant lifecycle UI is implemented in [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36), currently awaiting hosted browser/Docker verification. It shows the global workspace only after the API confirms the caller's persisted platform-operator identity. Every global operation remains protected by the PlatformOperator API policy; the UI is not an authorization boundary.
 
 ## Remaining operational acceptance
 
