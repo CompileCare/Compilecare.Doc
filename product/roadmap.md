@@ -296,3 +296,8 @@ CompileCare.Web PR #38 merged as `23e84efaaa02ed61d18696fd8a9318db2df1862b`. The
 ## Weekly synthetic logical backup/restore regression — 2026-11-26
 
 [CompileCare.Database PR #5](https://github.com/CompileCare/CompileCare.Database/pull/5) merged as `5e53afec375549f81fe05b9f6c8a9db733a24297`. The existing PostgreSQL 16 Docker logical backup/restore verification now also runs every Monday at 03:17 UTC, in addition to relevant PRs, pushes to `main` and manual dispatch. It uses disposable PostgreSQL and synthetic probe rows to validate archive/checksum/manifest, isolated restore, overwrite guards and corrupted-archive rejection. This is scheduled CI regression coverage only; it does not access production, prove provider-native physical backup/PITR or off-site storage, or replace a production restore drill. Provider selection, encryption/key ownership, retention, RPO/RTO and accountable recovery drills remain open.
+
+
+## Local infrastructure smoke helper — 2026-11-26
+
+[CompileCare.Local PR #9](https://github.com/CompileCare/CompileCare.Local/pull/9) merged as `d9e52044051b3fadb15e8ed3f679f0346ad31952`. Added `bash local/scripts/verify-stack.sh` to verify the four Compose services are running, PostgreSQL readiness, Web/API/OpenAPI reachability and Keycloak OIDC discovery/issuer consistency. Local CI passed shell syntax validation, Keycloak Docker import/reconciliation, Compose validation and the observability Docker smoke pipeline. The script does not perform real user authentication, tenant/RBAC checks or patient workflow acceptance; it must be run against the developer's local Docker stack before local environment acceptance can be closed.
