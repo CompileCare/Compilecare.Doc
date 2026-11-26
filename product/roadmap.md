@@ -500,3 +500,20 @@ The latest connected GitHub review found no remaining open PRs across Web, API, 
 **Next engineering priority:** continue Phase 3 security/operational hardening without bypassing ADR-016. The existing audit query/export API remains provisional. Do not implement customer-facing Audit Review UI, broaden audit scope, add bulk export, or invent retention rules until the pilot hospital's named-reader, scope, retention, legal-hold and export approvals are recorded. Safe engineering work may continue on test coverage, documentation, threat-model traceability and deployment-readiness automation that does not activate unapproved customer access.
 
 Developer-Mac execution, local browser/session renewal, authenticated visual/accessibility review (owned by Antigravity/user), production CSP and trusted-proxy configuration, provider-native backup/PITR and restore drills, and pilot/security/privacy sign-off remain outstanding. The hosted evidence is strong progress, not a production-readiness declaration.
+
+
+## Full-platform E2E validation and remediation — 2026-11-26
+
+**Status: Local full-stack baseline completed with CONDITIONAL PASS; first defect-remediation batch merged. This is not hospital-pilot or production approval.** The detailed evidence and defect register are recorded in [Full-platform E2E validation](../qa/e2e-validation-2026-11-26.md).
+
+Antigravity started the official macOS launcher in 109 seconds, built the API/Web images, reconciled Keycloak and verified all nine running containers. The live baseline recorded 58/59 full-stack checks (34/35 browser E2E and 24/24 security/RBAC/rate-limit checks), zero blocked checks and seven explicitly deferred/not-implemented areas. Observability evidence included API/Npgsql traces, Collector-fed metrics and synthetic logs in Elasticsearch/Kibana. The local latency measurements are a development baseline only.
+
+The following Web remediation is merged:
+
+- [PR #53](https://github.com/CompileCare/CompileCare.Web/pull/53), `e62d97a`: DEF-001 provider-directory refresh after staff mutations; DEF-002 same-tenant selection no-op; DEF-003 operation-neutral facility conflict copy; DEF-004 Chromium Unicode Sets-compatible MRN prefix pattern. CI run `45827629738` passed.
+- [PR #54](https://github.com/CompileCare/CompileCare.Web/pull/54), `0a3bb14`: DEF-005 Overview refresh on re-entry and tab-scoped tenant/hospital selection restoration, accepted only when still present in the authenticated membership and API-filtered hospital lists. CI run `45828086411` passed 113 unit tests, 16 Chromium E2E tests, production build, real-OIDC suite discoverability and Docker smoke.
+- [PR #55](https://github.com/CompileCare/CompileCare.Web/pull/55), `256c6df`: DEF-007 billing E2E synchronization with the successful queue API response. CI run `45828251071` passed 108 unit tests, all 16 Chromium E2E tests, production build, real-OIDC suite discoverability and Docker smoke.
+
+DEF-006 is reclassified rather than treated as one code defect: CSP remains a deployment-specific gate until exact production Keycloak/API origins are known; Audit Review UI remains deferred under ADR-016; and OtpService runtime integration remains deferred/not implemented. Do not broaden audit permissions or implement customer-facing audit browsing/export UX before hospital/compliance approval.
+
+**Next:** rerun Antigravity's full local E2E and visual evidence collection against the combined current Web main; review restored context with multiple/revoked memberships; complete hospital-user keyboard/screen-reader review; validate the Windows 10/11 launcher on a real host; and close production CSP/trusted-proxy, provider-native backup/PITR, RPO/RTO, restore-drill and pilot/security/privacy gates. The original local report remains the historical baseline; new validation must use a new dated evidence directory.
