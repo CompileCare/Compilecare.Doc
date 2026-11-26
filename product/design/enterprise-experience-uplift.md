@@ -263,7 +263,7 @@ These are hosted-CI verified corrections, not final visual acceptance. The user-
 - API PR #79 is merged: per-subject/per-IP API rate limiting, RFC 9457 429 + Retry-After, trusted X-Forwarded-For/X-Forwarded-Proto handling restricted to configured proxy IPs, one-hop/symmetry checks, HSTS outside Development, and Kestrel server banner suppression. The built-in limiter is per API instance, not a fleet-wide quota. Target deployment must configure the trusted proxy IPs and tune limits; use gateway/shared enforcement if multi-replica global quotas are required.
 - Web PR #47 is merged: the npm-generated lockfile is committed; CI and Docker use npm ci; npm audit is blocking. Final PR CI passed Vitest, TypeScript/production build, Chromium E2E and Docker header smoke; the lockfile audit reported zero vulnerabilities.
 - Production CSP remains deferred pending exact Keycloak/API origins and browser validation. This response-header and package-audit work must not be described as complete security compliance.
-- The hosted nine-service Docker verification is now merged in Local PR #13 and confirmed API-to-Jaeger traces including an Npgsql database operation plus Collector-fed ASP.NET Core request metrics. Remaining acceptance is the developer-Mac stack run, authenticated OIDC/API and multi-tenant flows, desktop/tablet/mobile screenshots, keyboard/accessibility review and production CSP/ingress validation. See the roadmap stabilization gates.
+- Hosted nine-service Docker and telemetry verification is merged in Local PR #13. Local PR #14 now also verifies real Keycloak-issued user tokens and PostgreSQL-persisted two-tenant roles, hospital isolation and membership revocation/reactivation against the actual API. Remaining acceptance is the developer-Mac stack run, browser Authorization Code + PKCE sign-in/session and authenticated Web journeys, desktop/tablet/mobile screenshots, keyboard/accessibility review and production CSP/ingress validation. See the roadmap stabilization gates.
 
 
 ## Full-stack telemetry verification — 2026-11-26
@@ -271,3 +271,12 @@ These are hosted-CI verified corrections, not final visual acceptance. The user-
 Local PR #13 is merged. Hosted Docker CI built and started all nine local services and passed the full `verify-stack.sh`: PostgreSQL, Keycloak, API, Web, OTel Collector, Jaeger, Prometheus, Elasticsearch and Kibana. It confirmed CompileCare.Api traces in Jaeger including an Npgsql `postgresql` operation, and ASP.NET Core request metrics through the Collector exporter. The Kibana Logs data view was provisioned.
 
 This removes the prior hosted-integration evidence gap. It does not replace the developer-Mac stack check or authenticated browser workflows, screenshots, keyboard/accessibility review or production security acceptance.
+
+
+## Real Keycloak and persisted multi-tenant API acceptance — 2026-11-26
+
+Local PR #14 is merged. Hosted full-stack CI used a temporary Keycloak client to obtain real user tokens and verified the API issuer/audience/subject contract, platform bootstrap, two PostgreSQL-backed tenants and distinct persisted roles for the same user. It passed the tenant context/permissions, hospital data-isolation, cross-tenant membership mutation denial, and immediate membership revocation/reactivation assertions.
+
+The test exposed and corrected the local Keycloak subject-claim setup: the checked-in compilecare-web client now receives the built-in basic scope, and the local reconciler verifies its Subject (sub) mapper is enabled in access tokens. This is essential for the API to resolve tenant memberships using the validated issuer and subject. A separately managed production Keycloak realm must be checked independently.
+
+The hosted API identity test is not browser sign-in evidence. Browser Authorization Code + PKCE redirect/session behavior, real role-based UI workflows, visual review, accessibility and Mac-local acceptance remain open.

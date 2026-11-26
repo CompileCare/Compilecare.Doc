@@ -395,7 +395,8 @@ This is an evidence update to the original Antigravity report. It records code/C
 - [ ] Execute the merged `CompileCare.Local` macOS one-click startup against current `main`, without deleting persistent Docker volumes.
 - [x] Run the full `verify-stack.sh` against all nine services in hosted Docker CI; Local PR #13 verified API-to-Jaeger traces including an Npgsql `postgresql` operation, plus Collector-fed ASP.NET Core request metrics.
 - [ ] Run the merged `verify-stack.sh` on the developer Mac and retain the local Jaeger/Collector evidence; hosted CI does not replace the local environment check.
-- [ ] Repeat authenticated Keycloak/API/PostgreSQL user journeys for at least two synthetic tenants, including membership revocation and cross-tenant negative tests.
+- [x] Verify real Keycloak-issued access tokens against the API issuer/audience/subject validation and exercise two PostgreSQL-persisted tenant memberships with different roles, hospital data isolation, cross-tenant membership mutation denial, and membership revocation/reactivation in Local PR #14 hosted Docker CI.
+- [ ] Run the browser Authorization Code + PKCE sign-in and authenticated Web workflows against the developer-Mac local stack; the hosted API identity test does not replace real browser/session acceptance.
 - [ ] Re-run the eight-way concurrent appointment booking scenario repeatedly against PostgreSQL.
 - [ ] Capture authenticated desktop/tablet/390px screenshots, console/network output and keyboard/accessibility evidence.
 - [ ] Complete Audit Review UI requirements, permission model, search/export UX and workflow acceptance before implementing it.
@@ -405,7 +406,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 
 ### Release decision
 
-The code-level remediation above reduces the original defect set, and OBS-001 now has hosted full-stack evidence from Local PR #13 (real API traces, Npgsql database operation and Collector-fed request metrics). The platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until developer-Mac execution, authenticated multi-tenant workflows, actual UI visual/accessibility acceptance and remaining security/operational gates are evidenced. Hosted CI does not replace those environment-specific checks. Keep new hospital modules deferred while these gates remain open.
+The code-level remediation above reduces the original defect set. OBS-001 has hosted full-stack evidence from Local PR #13, and Local PR #14 now verifies real Keycloak-issued user tokens and persisted two-tenant authorization/revocation against the PostgreSQL-backed API. The platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until developer-Mac execution, real browser Authorization Code + PKCE/session acceptance, actual UI visual/accessibility acceptance and remaining deployment/security/operational gates are evidenced. Hosted API identity tests do not prove the real browser experience. Keep new hospital modules deferred while these gates remain open.
 
 
 ### Security and reproducible-build follow-up — 2026-11-26
@@ -426,3 +427,20 @@ Local PR #13 merged as `bc609fc67f9656e444bc486a47fa047999bd33fa`. Its PR CI run
 - The uniquely named CI Compose project, volumes and generated local secrets were removed successfully.
 
 This closes the **hosted integration verification** portion of OBS-001. It does not prove the developer's Mac installation, authenticated sign-in/tenant workflows, actual production ingress configuration, or browser visual/accessibility acceptance. Those remain explicit gates.
+
+
+### Real Keycloak identity and persisted multi-tenant acceptance — 2026-11-26
+
+Local PR #14 merged as `02888b4994fed2c2e8aa119e3202cf0470205849`. Its PR CI run `45792658639` passed both Local jobs, including the full nine-service Docker stack and the real authenticated tenancy script. The acceptance log confirms:
+- Real access tokens issued by the CompileCare Keycloak realm passed the API's configured issuer, audience and subject validation.
+- A platform operator was bootstrapped and two tenants were provisioned in PostgreSQL.
+- The same synthetic Keycloak user had a persisted HospitalAdmin membership in tenant A and a persisted FacilityViewer membership in tenant B; the user-context endpoint returned both roles/permission sets.
+- Hospital records remained isolated between the two tenants; cross-tenant reads and cross-tenant membership updates were denied; the FacilityViewer could not create a hospital.
+- Deactivating the tenant-B membership immediately denied tenant-B access while tenant-A access remained; reactivation restored tenant-B access.
+- The full-stack run also continued to verify the nine services, API-to-Jaeger/Npgsql traces, Collector-fed request metrics and Kibana Logs data view.
+
+The test uses a CI-only temporary Keycloak client with direct grants. The production-style local Web client remains Authorization Code + PKCE; the test does **not** exercise browser login, refresh/session behavior or real Web UI flows.
+
+**Keycloak 26.2.5 configuration correction:** the local realm now assigns the built-in `basic` client scope to `compilecare-web`. The local reconciler verifies that its `oidc-sub-mapper` emits the `sub` claim in access tokens. It also assigns that scope to the temporary CI user client. This is required so the API can resolve persisted tenant memberships by validated issuer and subject. Validate the equivalent subject mapper/scope configuration in any separately managed production Keycloak realm; the local realm definition does not change a production identity provider.
+
+The remaining gate is a real browser-based Web Authorization Code + PKCE sign-in/session journey against the developer-Mac stack, plus role-based UI workflow and visual/accessibility acceptance. Keep those checks separate from hosted API-level identity acceptance.
