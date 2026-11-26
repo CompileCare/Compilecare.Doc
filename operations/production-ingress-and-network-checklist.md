@@ -6,7 +6,7 @@
 
 CompileCare consists of a browser workspace, ASP.NET Core API, PostgreSQL persistence, OIDC identity provider, and internal observability services. The browser-facing Web and API origins are separate trust boundaries unless deliberately deployed same-origin.
 
-The API currently maps `/metrics` through `MapPrometheusScrapingEndpoint()` without endpoint-level authorization metadata. Treat this as an internal monitoring endpoint: **do not expose `/metrics` through the public Internet ingress**. Permit access only from the approved monitoring network or an authenticated internal scrape path. The application currently does not provide an ingress-independent public/private network boundary for this endpoint; enforce and test the boundary in the selected deployment.
+The API maps `/metrics` through `MapPrometheusScrapingEndpoint()` without user-authentication metadata, but outside Development/Testing it requires explicit `Observability:Metrics:AllowedNetworks` CIDRs. The middleware normalizes IPv4-mapped IPv6 peers before matching IPv4 CIDRs, rejects missing remote addresses, and returns 404 for sources outside the allowlist. Treat this as an internal monitoring endpoint: **do not expose `/metrics` through the public Internet ingress**. Permit access only from the approved monitoring network or an authenticated internal scrape path. The application CIDR guard is defense in depth; it does not replace the ingress/network boundary.
 
 The API also exposes liveness/readiness endpoints through the shared observability package. Decide which probes must be reachable by the platform load balancer and prevent unrelated public access. Do not expose Development-only OpenAPI in production.
 

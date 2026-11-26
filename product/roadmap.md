@@ -624,3 +624,9 @@ CompileCare.Api PR #86 is merged as `1a5a722a3342cf5fbaf439418717570189e808ea`. 
 All hosted checks passed on the merged change: CI `45856072221` (Release build, EF model-drift check, 12 unit tests and 162 integration tests), Docker Integration Verification `45856072556`, and PostgreSQL Migration Rehearsal `45856072217`.
 
 **Still open:** select the actual production monitoring source CIDRs, configure exact trusted proxy IPs, and enforce the route as private at the selected ingress. This is a network allowlist, not user authentication. Health endpoint exposure and production ingress behavior remain deployment-specific acceptance gates; no actual hosting topology has been validated.
+
+### Metrics allowlist address-family compatibility — 2026-11-26
+
+API PR #88 is merged as `d67b2d77ae6d4f1db56de3150b77d0284a388984`. The metrics guard now normalizes IPv4-mapped IPv6 remote addresses before comparing against configured IPv4 CIDRs and explicitly denies requests with no remote address. Regression tests cover both cases; the configured CIDR allowlist is unchanged.
+
+All hosted checks passed: CI `45856806161` (12 unit and 164 integration tests), Docker Integration Verification `45856806071`, and PostgreSQL Migration Rehearsal `45856806255`.
