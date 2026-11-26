@@ -399,7 +399,6 @@ This is an evidence update to the original Antigravity report. It records code/C
 - [x] Verify the real browser Authorization Code + PKCE sign-in/callback and tenant switching against the full nine-service Docker stack in Local PR #15 hosted CI, using the actual Keycloak login page, Web client, API and persisted tenant memberships.
 - [ ] Run the merged one-click stack on the developer Mac and repeat browser sign-in, silent renewal/session lifecycle and role-based workflows there; capture desktop/tablet/390px screenshots, console/network evidence and keyboard/accessibility review.
 - [ ] Re-run the eight-way concurrent appointment booking scenario repeatedly against PostgreSQL.
-- [ ] Capture authenticated desktop/tablet/390px screenshots, console/network output and keyboard/accessibility evidence.
 - [ ] Complete Audit Review UI requirements, permission model, search/export UX and workflow acceptance before implementing it.
 - [ ] Resolve production CSP origins/policy and test the enforced policy; complete secret rotation, backup/PITR/restore, audit retention and production ingress configuration.
 - [ ] Configure exact ReverseProxy:KnownProxies ingress addresses and validate forwarded scheme/client-IP behavior in the target deployment; load-test and tune per-instance rate limits, and add gateway/shared quotas if multi-replica global limits are required.
@@ -444,7 +443,7 @@ The test uses a CI-only temporary Keycloak client with direct grants. The produc
 
 **Keycloak 26.2.5 configuration correction:** the local realm now assigns the built-in `basic` client scope to `compilecare-web`. The local reconciler verifies that its `oidc-sub-mapper` emits the `sub` claim in access tokens. It also assigns that scope to the temporary CI user client. This is required so the API can resolve persisted tenant memberships by validated issuer and subject. Validate the equivalent subject mapper/scope configuration in any separately managed production Keycloak realm; the local realm definition does not change a production identity provider.
 
-The remaining gate is a real browser-based Web Authorization Code + PKCE sign-in/session journey against the developer-Mac stack, plus role-based UI workflow and visual/accessibility acceptance. Keep those checks separate from hosted API-level identity acceptance.
+The hosted real browser Authorization Code + PKCE sign-in/callback and role-based tenant switching are verified in Local PR #15. The remaining gate is to run the merged stack on the developer Mac and repeat browser/session renewal there, then complete role-based hospital-user visual review, responsive screenshots and keyboard/screen-reader accessibility acceptance. Keep those checks separate from the hosted browser and API acceptance.
 
 
 ### Real browser Authorization Code + PKCE acceptance — 2026-11-26
