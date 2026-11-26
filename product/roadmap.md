@@ -397,6 +397,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 - [ ] Run the merged `verify-stack.sh` on the developer Mac and retain the local Jaeger/Collector evidence; hosted CI does not replace the local environment check.
 - [x] Verify real Keycloak-issued access tokens against the API issuer/audience/subject validation and exercise two PostgreSQL-persisted tenant memberships with different roles, hospital data isolation, cross-tenant membership mutation denial, and membership revocation/reactivation in Local PR #14 hosted Docker CI.
 - [x] Verify the real browser Authorization Code + PKCE sign-in/callback and tenant switching against the full nine-service Docker stack in Local PR #15 hosted CI, using the actual Keycloak login page, Web client, API and persisted tenant memberships.
+- [x] Verify real reception patient registration and search for HospitalAdmin in tenant A, including duplicate review and persisted API creation; verify FacilityViewer in tenant B has no registration UI and receives HTTP 403 for a direct patient-registration API request (Local PR #16 hosted full-stack CI).
 - [ ] Run the merged one-click stack on the developer Mac and repeat browser sign-in, silent renewal/session lifecycle and role-based workflows there; capture desktop/tablet/390px screenshots, console/network evidence and keyboard/accessibility review.
 - [x] Verify the eight-way concurrent appointment booking race repeatedly against PostgreSQL: `ConcurrentAppointmentBookingAllowsOnlyOneWinnerAcrossRepeatedWaves` executes three successive eight-request waves, asserting one `201 Created`, seven `409 Conflict` responses per slot, and persisted appointment consistency. API `main` CI run `45781581764` passed all 117 PostgreSQL integration tests (zero skipped).
 - [ ] Complete Audit Review UI requirements, permission model, search/export UX and workflow acceptance before implementing it.
@@ -406,7 +407,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 
 ### Release decision
 
-The code-level remediation above reduces the original defect set. OBS-001 has hosted full-stack evidence from Local PR #13; Local PR #14 verifies real Keycloak-issued tokens and persisted two-tenant authorization/revocation; and Local PR #15 now verifies browser Authorization Code + PKCE sign-in/callback and role-based tenant switching against the real hosted Docker stack. The platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until developer-Mac execution, local browser/session acceptance, actual hospital-user visual/accessibility review and remaining deployment/security/operational gates are evidenced. Hosted CI is not a substitute for the developer's local installation or final user-facing visual acceptance. Keep new hospital modules deferred while these gates remain open.
+The code-level remediation above reduces the original defect set. OBS-001 has hosted full-stack evidence from Local PR #13; Local PR #14 verifies real Keycloak-issued tokens and persisted two-tenant authorization/revocation; Local PR #15 verifies browser Authorization Code + PKCE sign-in/callback and tenant switching; and Local PR #16 verifies the real reception patient registration/search workflow plus FacilityViewer's server-side 403 denial against the hosted Docker stack. The platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until developer-Mac execution, browser/session renewal on that machine, broader appointment/queue/clinical/billing workflow acceptance, actual hospital-user visual/accessibility review and remaining deployment/security/operational gates are evidenced. Hosted CI is not a substitute for the developer's local installation or final user-facing visual acceptance. Keep new hospital modules deferred while these gates remain open.
 
 
 ### Security and reproducible-build follow-up — 2026-11-26
@@ -464,3 +465,16 @@ This closes the **hosted browser OIDC/tenant-switch acceptance** gate. It does n
 The existing PostgreSQL integration test `AppointmentSchedulingApiTests.ConcurrentAppointmentBookingAllowsOnlyOneWinnerAcrossRepeatedWaves` is already the required stress regression. It creates six half-hour slots, then executes three successive waves of eight simultaneous booking attempts against a single slot, using a different registered synthetic patient for each wave. Every wave asserts exactly one successful booking and seven conflicts, with the final appointment list matching the three successful records.
 
 API `main` workflow run `45781581764` passed on merge commit `403b633418eba5aa82b5c34384d969b8a217be9a`: all 117 PostgreSQL integration tests passed, zero skipped. This closes the hosted repeatable concurrency-regression gate; it does not replace any further load testing required by a deployment or hospital pilot.
+
+
+### Real reception patient registration and search acceptance — 2026-11-26
+
+Local PR #16 merged as `35880086060049bf3ebf49e48e7e5f205ec98b69`. Successful Local PR CI run `45807187585`, attempt 2, passed both workflow jobs. The full-stack job checked out CompileCare.Web main at `300afedcf2e0fdcd8e33ef3d2b7b63b28efa133b` (Web PR #50) and verified:
+
+- The real Keycloak Authorization Code + PKCE browser sign-in/callback and persisted two-tenant membership selection.
+- In HospitalAdmin tenant A, the browser completed the patient registration form, performed the hospital-local duplicate review, acknowledged the synthetic new-patient result, submitted registration through the real API and searched for the newly registered patient in Reception.
+- The browser test observed real patient API method/path, tenant header and bearer-token presence only; it did not capture or log access tokens or patient request payloads.
+- In FacilityViewer tenant B, patient registration navigation was absent. The backend acceptance script also submitted a valid synthetic patient-registration request directly to the selected hospital using the FacilityViewer token and asserted HTTP 403.
+- The same run retained the real API issuer/audience/subject checks, PostgreSQL-persisted membership roles, tenant data isolation, cross-tenant membership mutation denial, membership revocation/reactivation, and nine-service telemetry checks.
+
+This closes the **hosted reception patient registration/search and FacilityViewer patient-registration authorization** gates. It does not complete appointments, queue, OPD/clinical or billing browser workflows; it does not prove local Mac/browser session renewal, hospital-user visual/accessibility acceptance, or production configuration. All records used in CI are synthetic.
