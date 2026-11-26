@@ -217,3 +217,12 @@ These hosted checks strengthen the security regression suite but do not replace 
 - Verify Compose fails when `POSTGRES_PASSWORD` is absent and no weak password fallback is used.
 - Verify existing `.env` credentials are preserved when persistent volumes may exist. Do not rotate only the `.env` value: update the PostgreSQL role or Keycloak admin password in the running service first, then update `.env` and restart dependent services.
 - Hosted Local CI passed shell/PowerShell syntax, Keycloak Docker import/reconciliation, Compose configuration and Docker observability smoke checks. This does not validate the user's existing local volumes or replace local acceptance.
+
+
+## 22. Logical backup/restore integrity — 2026-11-26
+
+- Database PR #4 merged as `245c42fcc4e19a51a391b7203087de88a144cf3d`.
+- The PostgreSQL 16 Docker verification now checks the archive SHA-256 against its sidecar, verifies manifest format/source database metadata and asserts mode `0600` for the archive, checksum and manifest.
+- Existing tests verify successful restore into a new database, reject source-database and existing-target restores, and reject a corrupted archive without creating the target database.
+- Hosted Docker backup/restore verification passed. Repeat with synthetic data in the local Docker environment.
+- **Still outstanding for production:** provider-native physical backup/PITR, encryption and key ownership, off-site storage, retention, defined RPO/RTO, scheduled restore drills and accountable operator sign-off. The logical helper test is not production recovery approval.
