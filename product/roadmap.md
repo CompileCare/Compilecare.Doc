@@ -565,6 +565,16 @@ Web PR #58 is merged as `a480b0eea462afcf955b44da278a3817ef3ca6bf`; CI run `4584
 
 This is an automated public-shell baseline only. It does not constitute WCAG 2.2 AA conformance or validate authenticated role-specific clinical workflows with screen readers. Keep the manual hospital-user keyboard, screen-reader, zoom/contrast and assistive-technology review as an explicit pilot gate; extend automated coverage as authenticated fixtures become available.
 
+
+
+### Production CORS origin validation — 2026-11-26
+
+CompileCare.Api PR #84 is merged as `e72feea2daf633d82cefa876e753536b0af4c3ac`. API startup now validates configured `Cors:AllowedOrigins` outside Development: only explicit HTTPS origins are accepted; wildcards, credentials, paths, queries, fragments and HTTP are rejected. Trailing slash normalization and duplicate removal are covered. Development retains the local loopback HTTP configuration. Same-origin deployments may omit the CORS list.
+
+All three hosted workflows passed: CI `45851265491` (Release restore/build, EF model-drift check and full test suite), Docker Integration Verification `45851265298`, and PostgreSQL Migration Rehearsal `45851265489` (upgrade and fresh-database rehearsal). Tests cover valid HTTPS origins, invalid/insecure origins, Development HTTP and same-origin empty configuration.
+
+**Still open:** set the exact deployed Web origin in `Cors:AllowedOrigins` only for cross-origin deployments; verify CORS and CSP together through the actual OIDC callback, silent renewal and API workflows behind the selected ingress. This validation does not configure TLS termination, edge HSTS or trusted proxy addresses.
+
 ### API HSTS and trusted forwarded-header hardening — 2026-11-26
 
 CompileCare.Api PR #83 is merged as `afcafdce72ca6aff0e904a1a343911930040cb1d`. The API now emits a one-year HSTS max-age on non-Development requests only after the request scheme is trusted as HTTPS. `includeSubDomains` and `preload` remain disabled pending domain-wide review. The existing forwarded-header policy remains restricted to explicit `ReverseProxy:KnownProxies` IPs, one hop and symmetric headers.
@@ -572,3 +582,9 @@ CompileCare.Api PR #83 is merged as `afcafdce72ca6aff0e904a1a343911930040cb1d`. 
 All three hosted workflows passed: CI `45846891145`, Docker Integration Verification `45846891086`, and PostgreSQL Migration Rehearsal `45846891178`. Integration tests assert the exact one-year HSTS duration, absence of subdomain/preload directives, and that an untrusted forwarded scheme cannot enable HSTS.
 
 **Still open:** the API does not terminate TLS. The selected ingress must install valid certificates, redirect HTTP to HTTPS, set edge HSTS, and provide the exact trusted proxy IPs. Do not enable HSTS preload or includeSubDomains until every affected hostname is confirmed HTTPS-only.
+
+### Backup, restore and disaster-recovery operational baseline — 2026-11-26
+
+Added `operations/backup-restore-disaster-recovery.md` as the required deployment-independent operational baseline. It inventories PostgreSQL, identity, object/document storage, key custody, configuration/secrets, audit logs and rebuildable indexes; defines the decisions required for RPO/RTO, backup frequency, retention, geographic resilience and restore-drill cadence; and sets minimum encryption, access, isolation, validation and approval controls. It explicitly distinguishes local migration rehearsal from provider-native backup/PITR and a successful disaster-recovery exercise.
+
+**Still open and release-blocking:** select the hosting provider and database/storage topology; approve per-deployment RPO/RTO and retention; configure provider-native encrypted backups and WAL/PITR where required; establish KMS/HSM custody and break-glass recovery; and complete a successful isolated restore drill. Tenant-level recovery is not implemented or evidenced and must not be promised. The starting recommendation is a monthly restore drill, subject to formal owner approval.

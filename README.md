@@ -57,3 +57,9 @@ CompileCare is exclusively a hospital and healthcare systems product. Unrelated 
 ## Contributing
 
 Use short-lived branches, focused commits, reviewable pull requests, automated tests and documentation updates. Follow [Engineering Standards](engineering/standards.md) and [Definition of Done](engineering/definition-of-done.md).
+
+## Operations and security
+
+- [Backup, Restore and Disaster-Recovery Operational Baseline](operations/backup-restore-disaster-recovery.md)
+- [Security and Privacy](security/security-and-privacy.md)
+- [Application Threat Model](security/threat-model.md)
