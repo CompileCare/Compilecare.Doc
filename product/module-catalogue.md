@@ -38,3 +38,33 @@ ABDM/ABHA subject to approved requirements; FHIR/HL7; DICOM; payment providers/U
 
 ## Proposed delivery order
 Foundation → Patient + Staff/Provider → Appointments + Walk-ins + Check-in/Queue → OPD/Clinical → Billing (if pilot requires) → Pharmacy → Lab → IPD → integrations and advanced operations.
+
+
+## Deferred hospital modules and capability boundaries (2026-11-26)
+
+The following modules are retained in the CompileCare product plan. They are not part of the initial OPD MVP merely because their high-level capability appears in the catalogue.
+
+| Module | Bounded responsibilities | Planned capability increments | Status |
+|---|---|---|---|
+| Inpatient (IPD) | Admission lifecycle, bed occupancy, ward and nursing operations, discharge | ADT, reservation/assignment, transfer, nursing observations, care plans, handover, medication administration, discharge | Deferred |
+| Pharmacy | Formulary, prescription validation, dispensing and pharmacy stock | Catalogue, dispense/return, batch/expiry, stock movements, supplier and purchase workflows | Deferred |
+| Laboratory (LIS) | Diagnostic orders, specimens, laboratory worklists and validated results | Test catalogue, barcode/sample tracking, processing, result approval, critical-result escalation | Deferred |
+| Radiology (RIS/PACS) | Imaging orders, scheduling, modality workflow, reports and image references | Worklists, DICOM integration, PACS storage/access, report approval and retention | Deferred |
+| Inventory and procurement | Stores, vendors, purchasing, stock and assets | Requisitions, purchase orders, receiving, transfers, adjustments, expiry, assets and maintenance | Deferred |
+| Advanced revenue cycle | Financial rules and reconciliation across OPD/IPD/services | Tax/statutory invoices, deposits, discounts, refunds, credit notes, insurance/TPA, claims, gateways and accounting integration | Deferred |
+| Workforce and HR | Staff identity, credentialing, privileges and workforce operations | Verified membership linking, licence renewal, rosters, attendance, leave, employee records and payroll integrations | Foundation exists; extensions deferred |
+| Patient engagement | Patient/guardian self-service and communication | Portal/mobile, appointment self-booking, approved records/instructions, reminders and consent preferences | Deferred |
+| Interoperability | External healthcare and enterprise contracts | ABDM/ABHA, FHIR/HL7, DICOM, identity, payment, messaging and hospital integrations | Validate per pilot |
+| Analytics and intelligent assistance | Permission-controlled operational/financial insight and governed assistance | Reporting/export, capacity/wait-time analysis and human-reviewed AI-assisted workflows | Deferred |
+
+### Cross-module constraints
+- Modules own their domain rules, data writes, authorization checks and audit events. Do not allow direct writes into another module's tables.
+- Use explicit application contracts and versioned integration events where justified. Do not introduce a broker or microservice solely because a module is listed here.
+- Patient, clinical and financial data must remain tenant- and organization-scoped with least-privilege access.
+- Diagnostics, prescriptions, medication administration and clinical privileges require qualified hospital governance.
+- Pharmacy and inventory require batch, expiry, stock movement and reconciliation invariants.
+- Financial extensions require approved customer policies and qualified statutory/accounting review.
+- External integrations require validated use cases, partner agreements, privacy/security assessment and conformance testing.
+- AI-assisted capabilities must preserve human accountability and must not autonomously diagnose, triage or prescribe.
+
+See [Product Blueprint — delivery roadmap](blueprint-v1.md#14-delivery-roadmap--implemented-foundation-mvp-completion-and-future-scope) for sequencing and entry dependencies.
