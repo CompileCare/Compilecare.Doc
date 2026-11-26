@@ -187,7 +187,7 @@ Tenant-scoped membership administration is documented in [Tenant membership admi
 
 The complete Web experience, facility and tenant administration stack (#29–#36) is merged into `main`. Final facility-workspace verification on head `b36c7115003384eee8f809511a0b6808b36e76f2` passed 67 Vitest tests, all 14 Chromium E2E tests, production build and Docker smoke (runs 45744960504 and 45744951178). Tenant membership administration PR #35 passed 75 Vitest tests, all 14 Chromium E2E tests, production build and Docker smoke (runs 45745881098 and 45746024118). Platform tenant lifecycle PR #36 passed 85 Vitest tests, all 14 Chromium E2E tests, production build and Docker smoke (runs 45747601458 and 45747606834).
 
-No open implementation PRs remain in the CompileCare organization. All 11 repositories are public, and API issue #56 about Actions runner allocation is closed as resolved. Remaining acceptance work is to capture authenticated screenshots with synthetic data and exercise facility CRUD, tenant membership, platform tenant lifecycle, Keycloak renewal, SEC-002 and real API telemetry against the updated local Docker stack.
+The stabilization PRs for malformed API request handling, concurrent booking, route landing/responsive UI/contrast, OTLP/Npgsql telemetry integration, Kibana data-view provisioning, API rate limiting/HSTS/trusted proxies, and the Web npm lockfile/reproducible install are merged. Remaining acceptance work is to capture authenticated screenshots with synthetic data and exercise facility CRUD, tenant membership, platform tenant lifecycle, Keycloak renewal, production CSP policy, trusted ingress configuration, and real API telemetry against the updated local Docker stack. Hosted CI remains distinct from developer-Mac authenticated acceptance.
 
 
 ## 11. Route-based module architecture — new product requirement (2026-11-26)
@@ -256,3 +256,11 @@ The first responsive/landing/contrast corrections are merged in Web PR #45:
 Static workspace response hardening is merged in Web PR #46 and covered by a Docker header check: `nosniff`, strict-origin referrer policy, `X-Frame-Options: DENY`, permitted cross-domain policy, same-origin CORP and restrictive Permissions-Policy. CSP remains intentionally deferred until deployment-specific identity and API origins are known and tested.
 
 These are hosted-CI verified corrections, not final visual acceptance. The user-local authenticated experience still needs desktop/tablet/mobile screenshots, keyboard/screen-reader review and confirmation against the actual OIDC/API environment. The route-based module migration described above is still future work; the current single-workspace/hash-selected composition remains an interim architecture. See [the roadmap stabilization evidence](../roadmap.md#stabilization-evidence-update--2026-11-26-post-full-platform-regression).
+
+
+## Security and supply-chain follow-up — 2026-11-26
+
+- API PR #79 is merged: per-subject/per-IP API rate limiting, RFC 9457 429 + Retry-After, trusted X-Forwarded-For/X-Forwarded-Proto handling restricted to configured proxy IPs, one-hop/symmetry checks, HSTS outside Development, and Kestrel server banner suppression. The built-in limiter is per API instance, not a fleet-wide quota. Target deployment must configure the trusted proxy IPs and tune limits; use gateway/shared enforcement if multi-replica global quotas are required.
+- Web PR #47 is merged: the npm-generated lockfile is committed; CI and Docker use npm ci; npm audit is blocking. Final PR CI passed Vitest, TypeScript/production build, Chromium E2E and Docker header smoke; the lockfile audit reported zero vulnerabilities.
+- Production CSP remains deferred pending exact Keycloak/API origins and browser validation. This response-header and package-audit work must not be described as complete security compliance.
+- The local authenticated OIDC/API flows, screenshots, keyboard/accessibility review and actual API-to-Jaeger/Npgsql plus Collector-metrics evidence remain required. See the roadmap stabilization gates.
