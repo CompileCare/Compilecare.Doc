@@ -596,3 +596,11 @@ Web PR #61 removed the last `unsafe-inline` CSP allowance after inspection of th
 Web PR #62 added a dedicated Playwright configuration and Compose override so the same 20 browser workflow tests run against the built static image served by Nginx under the actual enforced CSP. CI run `45853231713` passed all 20 tests, all CSP response-header assertions and all fail-closed startup checks (wildcard, HTTP without local opt-in, and missing required origins). Test fixtures now derive their mocked CORS allow-origin from the actual browser request, so both Vite and Docker-served origins are covered.
 
 This closes the repository/CI production-container browser acceptance gap for the test origins. It does not validate actual production hostnames, TLS termination, trusted proxy configuration, the hospital's real identity provider, third-party origin inventory or production ingress. Those remain deployment gates.
+
+### Development CORS loopback hardening — 2026-11-26
+
+CompileCare.Api PR #85 is merged as `5b368f53a108dface6e43844d1be28b62bc3c509`. CORS validation no longer bypasses checks in Development: only explicit HTTP(S) loopback origins are accepted (`localhost`, `*.localhost`, IPv4/IPv6 loopback). Remote hosts, wildcards, credentials, paths, queries and fragments are rejected in every environment. Origins are normalized and deduplicated. CompileCare.Local's `http://localhost:8080` origin remains supported.
+
+All three hosted workflows passed: CI `45853970275` (Release build, EF model-drift check and 161 passing unit/integration tests: 12 unit + 149 integration), Docker Integration Verification `45853970325`, and PostgreSQL Migration Rehearsal `45853970298`. The tests cover local hostnames, `.localhost`, IPv4/IPv6 loopback and negative remote/wildcard/path/credential cases.
+
+This closes the Development CORS validation bypass at code/CI level. Production still requires the exact deployed Web origin to be configured when cross-origin, and actual CORS/CSP/OIDC flows must be verified behind the selected ingress.
