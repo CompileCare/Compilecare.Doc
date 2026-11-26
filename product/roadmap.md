@@ -616,3 +616,11 @@ This reduces version disclosure only; it does not replace timely Nginx base-imag
 Added `operations/production-ingress-and-network-checklist.md` to translate the existing API/Web controls into deployment acceptance requirements. It covers exact hostnames, TLS/HTTPS/HSTS, trusted proxies, CORS/CSP alignment, route exposure, private database/identity/observability networks, egress, edge rate limiting and evidence/sign-off.
 
 **New explicit deployment gate:** `/metrics` is mapped without endpoint-level authorization metadata and is intended for Prometheus only. The selected ingress/network must prevent public access and permit only the approved monitoring source or an authenticated internal scrape path. Health endpoints must be restricted to approved orchestrator/monitoring sources. No production ingress or network policy has yet been selected or validated.
+
+### Prometheus metrics source-network restriction — 2026-11-26
+
+CompileCare.Api PR #86 is merged as `1a5a722a3342cf5fbaf439418717570189e808ea`. Outside Development and Testing, API startup now requires explicit `Observability:Metrics:AllowedNetworks` CIDRs. A middleware guard runs after trusted forwarded-header processing and returns 404 for `/metrics` requests whose effective remote address is outside those networks. Missing, malformed, whitespace-ambiguous and unrestricted `/0` CIDRs are rejected. CompileCare.Local Development and isolated Testing retain their existing scrape behavior.
+
+All hosted checks passed on the merged change: CI `45856072221` (Release build, EF model-drift check, 12 unit tests and 162 integration tests), Docker Integration Verification `45856072556`, and PostgreSQL Migration Rehearsal `45856072217`.
+
+**Still open:** select the actual production monitoring source CIDRs, configure exact trusted proxy IPs, and enforce the route as private at the selected ingress. This is a network allowlist, not user authentication. Health endpoint exposure and production ingress behavior remain deployment-specific acceptance gates; no actual hosting topology has been validated.
