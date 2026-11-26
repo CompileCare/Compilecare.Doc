@@ -279,7 +279,7 @@ Local PR #14 is merged. Hosted full-stack CI used a temporary Keycloak client to
 
 The test exposed and corrected the local Keycloak subject-claim setup: the checked-in compilecare-web client now receives the built-in basic scope, and the local reconciler verifies its Subject (sub) mapper is enabled in access tokens. This is essential for the API to resolve tenant memberships using the validated issuer and subject. A separately managed production Keycloak realm must be checked independently.
 
-The hosted API identity test is not browser sign-in evidence. Browser Authorization Code + PKCE redirect/session behavior, real role-based UI workflows, visual review, accessibility and Mac-local acceptance remain open.
+The hosted API identity test on its own is not browser sign-in evidence; that separate gap is now covered at CI level by Local PR #15's real Authorization Code + PKCE login/callback and role-based tenant-switch suite. Developer-Mac acceptance, session renewal on that machine, real role-based hospital-user workflows beyond tenant selection, visual review, accessibility and production configuration remain open.
 
 
 ## Real browser PKCE and tenant-switch acceptance — 2026-11-26
