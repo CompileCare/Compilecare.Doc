@@ -263,4 +263,11 @@ These are hosted-CI verified corrections, not final visual acceptance. The user-
 - API PR #79 is merged: per-subject/per-IP API rate limiting, RFC 9457 429 + Retry-After, trusted X-Forwarded-For/X-Forwarded-Proto handling restricted to configured proxy IPs, one-hop/symmetry checks, HSTS outside Development, and Kestrel server banner suppression. The built-in limiter is per API instance, not a fleet-wide quota. Target deployment must configure the trusted proxy IPs and tune limits; use gateway/shared enforcement if multi-replica global quotas are required.
 - Web PR #47 is merged: the npm-generated lockfile is committed; CI and Docker use npm ci; npm audit is blocking. Final PR CI passed Vitest, TypeScript/production build, Chromium E2E and Docker header smoke; the lockfile audit reported zero vulnerabilities.
 - Production CSP remains deferred pending exact Keycloak/API origins and browser validation. This response-header and package-audit work must not be described as complete security compliance.
-- The local authenticated OIDC/API flows, screenshots, keyboard/accessibility review and actual API-to-Jaeger/Npgsql plus Collector-metrics evidence remain required. See the roadmap stabilization gates.
+- The hosted nine-service Docker verification is now merged in Local PR #13 and confirmed API-to-Jaeger traces including an Npgsql database operation plus Collector-fed ASP.NET Core request metrics. Remaining acceptance is the developer-Mac stack run, authenticated OIDC/API and multi-tenant flows, desktop/tablet/mobile screenshots, keyboard/accessibility review and production CSP/ingress validation. See the roadmap stabilization gates.
+
+
+## Full-stack telemetry verification — 2026-11-26
+
+Local PR #13 is merged. Hosted Docker CI built and started all nine local services and passed the full `verify-stack.sh`: PostgreSQL, Keycloak, API, Web, OTel Collector, Jaeger, Prometheus, Elasticsearch and Kibana. It confirmed CompileCare.Api traces in Jaeger including an Npgsql `postgresql` operation, and ASP.NET Core request metrics through the Collector exporter. The Kibana Logs data view was provisioned.
+
+This removes the prior hosted-integration evidence gap. It does not replace the developer-Mac stack check or authenticated browser workflows, screenshots, keyboard/accessibility review or production security acceptance.
