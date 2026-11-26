@@ -381,6 +381,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 | WEB-003 — cancellation contrast | Web PR #45 adds high-contrast destructive styling and a component assertion | Vitest and Web CI passed | Visual confirmation in the local authenticated workspace |
 | OBS-001 — broken API OTLP traces/metrics | Observability PR #4 fixes the exporter to OTLP/gRPC and publishes package 1.0.1; API PR #78 consumes it and adds Npgsql instrumentation; Local PR #11 configures port 4317 and Local PR #13 runs the complete nine-service Compose stack and `verify-stack.sh` in hosted CI | Observability, API and Local CI passed. Local PR #13 verified all nine services, API traces in Jaeger including a `postgresql` operation, and ASP.NET Core request metrics through the OTLP Collector exporter | **Hosted integration verified.** Still run the merged launcher and `verify-stack.sh` on the developer Mac and retain local evidence; this is separate from authenticated browser acceptance |
 | OBS-002 — missing Kibana data view | Local PR #12 adds idempotent `CompileCare Logs` provisioning for `compilecare-logs-*` with `@timestamp` and wires it into stack verification | Python syntax and Docker observability CI, including Kibana data-view API assertion, passed | Verify the view and Discover experience in the local Kibana instance |
+| WIN-001 — Windows local stack missing observability | Local PR #19 brings the Windows one-click launcher and stop command to the same nine-service Compose overlay as macOS, with PostgreSQL/API/Keycloak/observability readiness checks and Kibana data-view provisioning | PowerShell syntax/static launcher checks and full nine-service Docker, persisted tenant/RBAC, telemetry and real PKCE browser workflow passed in run `45815836344` | Actual Windows Docker Desktop execution remains a host-specific acceptance item |
 
 ### Security and operations — current state
 
@@ -393,6 +394,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 ### Acceptance gates still open
 
 - [ ] Execute the merged `CompileCare.Local` macOS one-click startup against current `main`, without deleting persistent Docker volumes.
+- [ ] Execute the merged `CompileCare.Local` Windows one-click startup on Windows 10/11 Docker Desktop and verify the nine services, Keycloak sign-in, Kibana data view and retained volumes; Linux CI does not replace Windows-host acceptance.
 - [x] Run the full `verify-stack.sh` against all nine services in hosted Docker CI; Local PR #13 verified API-to-Jaeger traces including an Npgsql `postgresql` operation, plus Collector-fed ASP.NET Core request metrics.
 - [ ] Run the merged `verify-stack.sh` on the developer Mac and retain the local Jaeger/Collector evidence; hosted CI does not replace the local environment check.
 - [x] Verify real Keycloak-issued access tokens against the API issuer/audience/subject validation and exercise two PostgreSQL-persisted tenant memberships with different roles, hospital data isolation, cross-tenant membership mutation denial, and membership revocation/reactivation in Local PR #14 hosted Docker CI.
