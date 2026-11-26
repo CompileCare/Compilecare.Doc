@@ -379,7 +379,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 | WEB-001 — wrong default workspace | Web PR #45 makes Reception the default for staff with patient-search access | Vitest, TypeScript/build, Chromium E2E and Docker smoke passed | Authenticated local browser visual confirmation |
 | WEB-002 — 390px horizontal overflow | Web PR #45 adds narrow-screen layout constraints and an authenticated 390×844 Playwright regression | Chromium E2E and Web CI passed | Confirm the actual Mac/browser viewport and capture screenshots |
 | WEB-003 — cancellation contrast | Web PR #45 adds high-contrast destructive styling and a component assertion | Vitest and Web CI passed | Visual confirmation in the local authenticated workspace |
-| OBS-001 — broken API OTLP traces/metrics | Observability PR #4 fixes the exporter to OTLP/gRPC and publishes package 1.0.1; API PR #78 consumes it and adds Npgsql instrumentation; Local PR #11 points the API to port 4317 and upgrades `verify-stack.sh` to assert API Jaeger/Npgsql operations and Collector-fed API metrics | Observability build/test/format/package publish, API build/test/Docker/migration, and Local Docker tooling/OTel pipeline workflows passed | **Not yet closed:** run the merged nine-container launcher and `bash local/scripts/verify-stack.sh` on the developer Mac; retain Jaeger trace + Npgsql child-operation + Collector metric evidence |
+| OBS-001 — broken API OTLP traces/metrics | Observability PR #4 fixes the exporter to OTLP/gRPC and publishes package 1.0.1; API PR #78 consumes it and adds Npgsql instrumentation; Local PR #11 configures port 4317 and Local PR #13 runs the complete nine-service Compose stack and `verify-stack.sh` in hosted CI | Observability, API and Local CI passed. Local PR #13 verified all nine services, API traces in Jaeger including a `postgresql` operation, and ASP.NET Core request metrics through the OTLP Collector exporter | **Hosted integration verified.** Still run the merged launcher and `verify-stack.sh` on the developer Mac and retain local evidence; this is separate from authenticated browser acceptance |
 | OBS-002 — missing Kibana data view | Local PR #12 adds idempotent `CompileCare Logs` provisioning for `compilecare-logs-*` with `@timestamp` and wires it into stack verification | Python syntax and Docker observability CI, including Kibana data-view API assertion, passed | Verify the view and Discover experience in the local Kibana instance |
 
 ### Security and operations — current state
@@ -393,7 +393,8 @@ This is an evidence update to the original Antigravity report. It records code/C
 ### Acceptance gates still open
 
 - [ ] Execute the merged `CompileCare.Local` macOS one-click startup against current `main`, without deleting persistent Docker volumes.
-- [ ] Run the full `verify-stack.sh` check after the latest API/Local merges and save Jaeger service/operation and Collector metrics evidence.
+- [x] Run the full `verify-stack.sh` against all nine services in hosted Docker CI; Local PR #13 verified API-to-Jaeger traces including an Npgsql `postgresql` operation, plus Collector-fed ASP.NET Core request metrics.
+- [ ] Run the merged `verify-stack.sh` on the developer Mac and retain the local Jaeger/Collector evidence; hosted CI does not replace the local environment check.
 - [ ] Repeat authenticated Keycloak/API/PostgreSQL user journeys for at least two synthetic tenants, including membership revocation and cross-tenant negative tests.
 - [ ] Re-run the eight-way concurrent appointment booking scenario repeatedly against PostgreSQL.
 - [ ] Capture authenticated desktop/tablet/390px screenshots, console/network output and keyboard/accessibility evidence.
@@ -404,7 +405,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 
 ### Release decision
 
-The code-level remediation above reduces the original defect set, but the platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until the remaining local authenticated acceptance and security/operational gates are evidenced. Do not declare OBS-001 closed based solely on the hosted synthetic Collector pipeline test. Keep new hospital modules deferred while these gates remain open.
+The code-level remediation above reduces the original defect set, and OBS-001 now has hosted full-stack evidence from Local PR #13 (real API traces, Npgsql database operation and Collector-fed request metrics). The platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until developer-Mac execution, authenticated multi-tenant workflows, actual UI visual/accessibility acceptance and remaining security/operational gates are evidenced. Hosted CI does not replace those environment-specific checks. Keep new hospital modules deferred while these gates remain open.
 
 
 ### Security and reproducible-build follow-up — 2026-11-26
@@ -414,3 +415,14 @@ The subsequent remediation is now merged:
 - Web PR #47 (merge commit 0732352) commits the npm-generated v3 lockfile and uses npm ci in both Web CI and the Docker build. The PR's blocking npm audit, Vitest, TypeScript/production build, Chromium E2E and Docker/header smoke all passed. The generating CI audit reported zero vulnerabilities.
 
 These changes close the original API rate-limit code gap and the Web lockfile/ENOLOCK auditability gap at repository/CI level. They do not close deployment acceptance: operators must set the exact trusted proxy IPs, calibrate per-instance rate limits, define a shared quota strategy if strict multi-replica limits are required, and complete CSP policy testing for the actual production OIDC/API origins.
+
+
+### Full nine-service hosted Docker evidence — 2026-11-26
+
+Local PR #13 merged as `bc609fc67f9656e444bc486a47fa047999bd33fa`. Its PR CI run `45785200869` passed both jobs:
+- Full nine-service Compose job: all nine services running; PostgreSQL readiness; Web/API readiness and OpenAPI; Keycloak OIDC discovery; Kibana Logs data view provisioning; API metrics endpoint.
+- Real application telemetry: Jaeger contained CompileCare.Api operations including the Npgsql `postgresql` database operation; ASP.NET Core request-duration metrics reached the OpenTelemetry Collector Prometheus exporter.
+- The isolated observability pipeline, Keycloak import/reconciliation, configuration and shell validation also passed.
+- The uniquely named CI Compose project, volumes and generated local secrets were removed successfully.
+
+This closes the **hosted integration verification** portion of OBS-001. It does not prove the developer's Mac installation, authenticated sign-in/tenant workflows, actual production ingress configuration, or browser visual/accessibility acceptance. Those remain explicit gates.
