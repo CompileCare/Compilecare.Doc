@@ -616,3 +616,9 @@ This reduces version disclosure only; it does not replace timely Nginx base-imag
 Added `operations/production-ingress-and-network-checklist.md` to translate the existing API/Web controls into deployment acceptance requirements. It covers exact hostnames, TLS/HTTPS/HSTS, trusted proxies, CORS/CSP alignment, route exposure, private database/identity/observability networks, egress, edge rate limiting and evidence/sign-off.
 
 **New explicit deployment gate:** `/metrics` is mapped without endpoint-level authorization metadata and is intended for Prometheus only. The selected ingress/network must prevent public access and permit only the approved monitoring source or an authenticated internal scrape path. Health endpoints must be restricted to approved orchestrator/monitoring sources. No production ingress or network policy has yet been selected or validated.
+
+### Internal Prometheus metrics endpoint network guard — 2026-11-26
+
+CompileCare.Api PR #86 is merged as `1a5a722a3342cf5fbaf439418717570189e808ea`. Outside Development and Testing, API startup now requires explicit `Observability:Metrics:AllowedNetworks` CIDRs. The middleware applies after trusted forwarded-header processing and returns 404 for `/metrics` requests outside the configured networks, including the trailing-slash path. Missing, malformed, whitespace-padded and unrestricted `/0` networks are rejected. The local Development and isolated Testing hosts remain compatible without this setting.
+
+All three hosted workflows passed: CI `45856072221` (Release build, EF model-drift check, 12 unit tests and 162 integration tests), Docker Integration Verification `45856072556`, and PostgreSQL Migration Rehearsal `45856072217`. The actual monitoring CIDR remains an operator-supplied production value; the production ingress must also block public access to `/metrics`.
