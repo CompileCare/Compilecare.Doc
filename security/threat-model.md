@@ -110,6 +110,7 @@ These controls are present in the current code or verified hosted workflows; the
 - Web PR #57 — negative startup tests reject wildcard, insecure HTTP without local opt-in, and missing CSP origins.
 - Web PR #61 — strict `style-src 'self'`; no `unsafe-inline` in the enforced policy.
 - Web PR #62 — complete 20-test browser E2E suite passes against the production Nginx container with enforced CSP (CI run `45853231713`). The test uses synthetic data and mocked API/OIDC endpoints; production-origin acceptance remains open.
+- Web PR #63 — Nginx `server_tokens off` removes the exact Nginx version from the Web response header; CI run `45854681476` verifies the response does not contain `Server: nginx/<version>` while rerunning the strict-CSP Docker browser suite.
 - Database PR #4/#5 — logical backup/restore integrity and weekly synthetic CI regression.
 - Local PR #9 — local infrastructure smoke script merged as d9e52044051b3fadb15e8ed3f679f0346ad31952; shell syntax, Keycloak Docker import/reconciliation, Compose validation and observability Docker smoke passed. The script itself still needs to be run on the developer Mac.
 
