@@ -398,7 +398,7 @@ This is an evidence update to the original Antigravity report. It records code/C
 - [x] Verify real Keycloak-issued access tokens against the API issuer/audience/subject validation and exercise two PostgreSQL-persisted tenant memberships with different roles, hospital data isolation, cross-tenant membership mutation denial, and membership revocation/reactivation in Local PR #14 hosted Docker CI.
 - [x] Verify the real browser Authorization Code + PKCE sign-in/callback and tenant switching against the full nine-service Docker stack in Local PR #15 hosted CI, using the actual Keycloak login page, Web client, API and persisted tenant memberships.
 - [ ] Run the merged one-click stack on the developer Mac and repeat browser sign-in, silent renewal/session lifecycle and role-based workflows there; capture desktop/tablet/390px screenshots, console/network evidence and keyboard/accessibility review.
-- [ ] Re-run the eight-way concurrent appointment booking scenario repeatedly against PostgreSQL.
+- [x] Verify the eight-way concurrent appointment booking race repeatedly against PostgreSQL: `ConcurrentAppointmentBookingAllowsOnlyOneWinnerAcrossRepeatedWaves` executes three successive eight-request waves, asserting one `201 Created`, seven `409 Conflict` responses per slot, and persisted appointment consistency. API `main` CI run `45781581764` passed all 117 PostgreSQL integration tests (zero skipped).
 - [ ] Complete Audit Review UI requirements, permission model, search/export UX and workflow acceptance before implementing it.
 - [ ] Resolve production CSP origins/policy and test the enforced policy; complete secret rotation, backup/PITR/restore, audit retention and production ingress configuration.
 - [ ] Configure exact ReverseProxy:KnownProxies ingress addresses and validate forwarded scheme/client-IP behavior in the target deployment; load-test and tune per-instance rate limits, and add gateway/shared quotas if multi-replica global limits are required.
@@ -457,3 +457,10 @@ Local PR #15 merged as `d6e1362642c8d1553c9680020395a92b88005144`. The successfu
 - Removed the unique CI Compose project and volumes, plus the mode-0600 temporary browser credential file.
 
 This closes the **hosted browser OIDC/tenant-switch acceptance** gate. It does not close developer-Mac acceptance, repeat browser/session renewal on that machine, authenticated hospital-user visual review, screenshots, keyboard/screen-reader accessibility, or production identity-provider/ingress/CSP verification.
+
+
+### Repeated concurrent appointment booking evidence — 2026-11-26
+
+The existing PostgreSQL integration test `AppointmentSchedulingApiTests.ConcurrentAppointmentBookingAllowsOnlyOneWinnerAcrossRepeatedWaves` is already the required stress regression. It creates six half-hour slots, then executes three successive waves of eight simultaneous booking attempts against a single slot, using a different registered synthetic patient for each wave. Every wave asserts exactly one successful booking and seven conflicts, with the final appointment list matching the three successful records.
+
+API `main` workflow run `45781581764` passed on merge commit `403b633418eba5aa82b5c34384d969b8a217be9a`: all 117 PostgreSQL integration tests passed, zero skipped. This closes the hosted repeatable concurrency-regression gate; it does not replace any further load testing required by a deployment or hospital pilot.
