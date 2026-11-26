@@ -301,3 +301,8 @@ CompileCare.Web PR #38 merged as `23e84efaaa02ed61d18696fd8a9318db2df1862b`. The
 ## Local infrastructure smoke helper — 2026-11-26
 
 [CompileCare.Local PR #9](https://github.com/CompileCare/CompileCare.Local/pull/9) merged as `d9e52044051b3fadb15e8ed3f679f0346ad31952`. Added `bash local/scripts/verify-stack.sh` to verify the four Compose services are running, PostgreSQL readiness, Web/API/OpenAPI reachability and Keycloak OIDC discovery/issuer consistency. Local CI passed shell syntax validation, Keycloak Docker import/reconciliation, Compose validation and the observability Docker smoke pipeline. The script does not perform real user authentication, tenant/RBAC checks or patient workflow acceptance; it must be run against the developer's local Docker stack before local environment acceptance can be closed.
+
+
+## Audit permission spoofing regression — 2026-11-26
+
+[CompileCare.Api PR #75](https://github.com/CompileCare/CompileCare.Api/pull/75) merged as `649d32636b9bc4bd5114dc08ca27974e50ce4d71`. PostgreSQL integration tests verify PatientRegistrar, ClinicalUser, FacilityManager and FacilityViewer memberships cannot list or export tenant audit events, even when a signed test token carries forged audit.read, tenant-role and standard role claims. This protects the rule that CompileCare permissions are derived from persisted membership, not caller-supplied token role/permission claims. Release CI and Docker integration verification passed.

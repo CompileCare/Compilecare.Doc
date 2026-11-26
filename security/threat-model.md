@@ -99,6 +99,7 @@ These controls are present in the current code or verified hosted workflows; the
 - API PR #67 — audit persistence failure rolls back business writes.
 - API PR #68/#69 — authenticated endpoint audit metadata coverage.
 - API PR #71/#72 — bounded tenant-wide audit query/export, export audit event and CSV formula/control-character hardening.
+- API PR #75 — PostgreSQL integration tests prove PatientRegistrar, ClinicalUser, FacilityManager and FacilityViewer cannot query or export audit events, even when the signed token contains forged audit.read, tenant-role and standard role claims; authorization remains derived from persisted membership.
 - API PR #73 — PostgreSQL migration rehearsal and integration-test isolation.
 - Web PR #43 — skip-link keyboard focus regression; hosted browser coverage is not a full WCAG or real-identity acceptance.
 - Database PR #4/#5 — logical backup/restore integrity and weekly synthetic CI regression.
