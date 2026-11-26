@@ -111,7 +111,7 @@ The 404 responses should be reviewed against intended API semantics and the UI's
 ## Remaining release gates
 
 - [x] Implement an enforced, configurable Web CSP with startup validation and CI header/invalid-origin checks (Web PR #56; CI run `45838673174`).
-- [ ] Verify CompileCare.Local emits the expected CSP through the full nine-service stack after Local PR #20 is rerun against Web main.
+- [x] Verify CompileCare.Local emits the expected CSP through the full nine-service stack and real Keycloak Authorization Code + PKCE browser acceptance (Local PR #20 merged as `792196a2d19afeb128e8bf40205977d6b05e607a`; latest workflow run `45839528532` passed both jobs).
 - [ ] Define exact production Keycloak/API origins and browser-test CSP through real production-style OIDC login, callback, silent renewal and API requests; configure TLS/HSTS and trusted reverse-proxy addresses.
 - [ ] Production KMS/secret ownership, rotation, encryption and operational access controls.
 - [ ] Elasticsearch/Kibana authentication and TLS for the target deployment.
@@ -132,3 +132,9 @@ The post-remediation evidence verifies all seven targeted functional/test defect
 ## Evidence artifacts received
 
 This report is based on the post-remediation files supplied in the conversation: `results.json`, `execution-summary.json`, `failed-tests.json`, `blocked-tests.json`, `not-implemented.json`, `security-results.json`, `observability-results.json`, `performance-results.json`, `console-errors.log`, `network-errors.log` and `index.html`. The original evidence bundle should be retained unchanged for traceability.
+
+### Follow-up local CSP integration acceptance
+
+After Web PR #56 merged, CompileCare.Local PR #20 was merged as `792196a2d19afeb128e8bf40205977d6b05e607a`. Latest Local workflow run `45839528532` passed both jobs. The full-stack job built and ran the nine-service Compose environment, passed persisted multi-tenant API acceptance and completed the real Keycloak Authorization Code + PKCE browser suite. The Local smoke script verified the Web response CSP contained the explicit local API and Keycloak origins. The validation job also passed Keycloak realm reconciliation, Compose configuration assertions, and the Docker observability pipeline smoke test.
+
+This is hosted local-stack integration evidence, not proof of the production CSP origins, production TLS/HSTS, ingress configuration or third-party origin inventory. The production CSP gate remains open until the exact deployed HTTPS origins are configured and the real sign-in, callback, silent-renew and API flows are validated in that deployment.
