@@ -173,3 +173,10 @@ These hosted checks strengthen the security regression suite but do not replace 
 - Web PR #41 merged as `c0cc89c06a847f4a93ce46b20e120199a048dc34`. Shared visual tokens, typography, surfaces, focus-visible states, responsive navigation, sticky shell and reduced-motion behavior refreshed. CSS-only; no permission/API behavior changes.
 - Hosted `build-test` runs 45756076512 and 45756064645 passed Vitest, production build, Chromium E2E and Docker build/smoke.
 - **Local visual/accessibility acceptance still required:** capture authenticated desktop (wide), tablet and mobile screenshots; verify all modules remain reachable through responsive navigation; keyboard-tab through navigation, forms, dialogs and action buttons; check visible focus indicators, zoom/reflow, contrast and reduced-motion behavior. Record any regressions with screenshots and viewport details. Hosted E2E does not replace real-device visual review.
+
+
+## 17. Hospital operations overview — 2026-11-26
+
+- Web PR #42 merged as `3243b658067b94f3a462d35527c58bff64653648`. Added selected-date appointment and queue totals scoped to the chosen department, plus hospital-wide daily collection metrics in the configured hospital time zone. Overview quick links are permission-gated; no patient identifiers or names are shown. Stale responses are ignored after scope/date changes.
+- Hosted `build-test` run 45756983905 passed Vitest, TypeScript/production build, Chromium E2E and Docker build/smoke.
+- **Local acceptance still required:** use synthetic data to reconcile appointment and queue totals against their module lists for selected department/date; reconcile daily collection total/payment count against billing reports for the hospital business date/time zone; switch tenant, hospital, department and date while requests are in flight and verify stale metrics do not overwrite the new scope; verify users without each permission do not receive the corresponding metric or shortcut. Capture desktop/tablet/mobile screenshots and confirm keyboard access to filters, refresh and shortcuts.
