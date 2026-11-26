@@ -63,7 +63,7 @@ These are scoped observations from the executed cases, not a full WCAG 2.2 AA co
 
 The report marks the following scenarios Not Run because the relevant UI capability is not implemented in the tested build or the capability is deferred by the MVP blueprint:
 
-1. Ongoing tenant lifecycle and membership administration screens.
+1. Ongoing tenant lifecycle and membership administration screens — Not Run in the original build; tenant membership UI is now merged in Web PR #35 and the global platform tenant lifecycle UI in Web PR #36. Authenticated local-stack acceptance remains pending for both.
 2. Facility hierarchy CRUD screens for hospitals, departments, wards, rooms and beds — Not Run in the original Antigravity-tested build; now implemented and merged in Web PR #34. Authenticated local-stack acceptance remains pending.
 3. Staff directory and provider assignment screens.
 4. MRN policy configuration and search-by-MRN screens.
@@ -72,7 +72,7 @@ The report marks the following scenarios Not Run because the relevant UI capabil
 7. Laboratory/radiology/PACS and pharmacy dispensing.
 8. Notifications, patient portal, workforce HR/payroll and ABDM/TPA integrations.
 
-These items were Not Run in the tested build and must not be reclassified as failures. Facility hierarchy CRUD is now implemented and merged in Web PR #34, but is not locally accepted until exercised against the authenticated local stack. The other seven scenarios remain roadmap scope decisions. Do not create implementation PRs solely to make the Not Run count disappear. Deliver remaining items in dependency order with approved product, security and operational requirements.
+These eight scenarios were Not Run in the original tested build and must not be reclassified as failures. Three are now implemented and merged: facility hierarchy CRUD (Web PR #34), tenant membership administration (Web PR #35) and platform tenant lifecycle administration (Web PR #36). All three still require authenticated local-stack acceptance. The remaining six are staff/provider UI; MRN policy/search UI; appointment availability/list/reschedule/cancel UI; inpatient ADT/bed occupancy/MAR/discharge; LIS/RIS/PACS/pharmacy; and notifications/patient portal/HR/payroll/ABDM/TPA. Deliver deferred capabilities in dependency order with approved product, security and operational requirements.
 
 ## 6. Hosted CI status and merge rule
 
@@ -88,6 +88,10 @@ Verified current-head runs include:
 - Web PR #27 and #28: browser/Docker CI 45734073286 and 45670894903 passed before merge.
 - Web PR #29–#33: CI/Docker runs 45738737945, 45738814930, 45738824899, 45738835427 and 45739127780 passed on the respective PR heads; all five PRs were merged in sequence.
 - Web PR #34 facility hierarchy: final CI/Docker runs 45744960504 and 45744951178 passed on head `b36c7115003384eee8f809511a0b6808b36e76f2`; 67 Vitest tests and all 14 Chromium E2E tests passed, followed by successful production build and Docker smoke. PR #34 merged as `c8a5a5ec9a31e85cab05d60d05e8852616319be3`.
+- Web PR #35 tenant membership administration: runs 45745881098 and 45746024118 passed 75 Vitest tests, 14 Chromium E2E tests, production build and Docker smoke; merged as `b8e4a4ec8864884f5e71dc070a319a5f4df07185`.
+- Web PR #36 platform tenant lifecycle workspace: runs 45747601458 and 45747606834 passed 85 Vitest tests, 14 Chromium E2E tests, production build and Docker smoke; merged as `54589758db04848d25e2e078f3619c1932cc645a`.
+- API PR #57 platform-operator self-status: runs 45746214399 and 45746214402 passed Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and Docker verification; merged as `916b75a9a8a81e37216d48562b65c23d07682fc1`.
+- API PR #58 initial-admin activation guard: runs 45747380466 and 45747380428 passed Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and Docker verification; merged as `2d74b412f6b26274381ebd0d0ed461eb1b75ead8`.
 
 Do not merge an implementation PR based on a green-looking local report alone or on a hosted job that never received a runner. Record the tested PR head SHA and the exact workflow run. No implementation merge gates remain in the current PR queue. Authenticated screenshots for the integrated UI are still required as product acceptance evidence. Local PR #6 is merged after Docker runtime pipeline smoke; a real CompileCare.Api-to-observability integration check on the developer Mac remains post-merge local acceptance. All 11 CompileCare repositories are now public and [CompileCare.Api issue #56](https://github.com/CompileCare/CompileCare.Api/issues/56) is closed as resolved.
  
@@ -113,6 +117,6 @@ The owner has made all 11 CompileCare repositories public. Hosted Actions runner
 
 Web PRs #29–#34 have all been merged into main in sequence. The final facility hierarchy PR #34 passed 67 Vitest tests, 14/14 Chromium E2E tests, production build and Docker build/container smoke on commit `b36c7115003384eee8f809511a0b6808b36e76f2` (runs 45744960504 and 45744951178) before merging as `c8a5a5ec9a31e85cab05d60d05e8852616319be3`.
 
-The Facility hierarchy scenario was Not Run in the original Antigravity-tested build. It is now implemented and merged; do not count it as locally accepted until the authenticated local Docker stack is exercised with synthetic hospitals, departments, wards, rooms and beds, including read-only and write-only membership boundaries.
+The Facility hierarchy, tenant membership administration and platform tenant lifecycle scenarios were Not Run in the original Antigravity-tested build. They are now implemented and merged; do not count them as locally accepted until the authenticated local Docker stack is exercised with synthetic hospitals, departments, wards, rooms, beds, memberships and platform tenants. Verify read-only/write membership boundaries, platform-operator visibility and the initial-admin activation prerequisite.
 
-The screenshot-evidence checklist is now a post-merge product acceptance item. Capture the integrated Web main build at desktop, tablet and mobile widths, with a keyboard-focus state and Facilities views for permitted roles. Do not use real patient data.
+The screenshot-evidence checklist is now a post-merge product acceptance item. Capture the integrated Web main build at desktop, tablet and mobile widths, with a keyboard-focus state, Facilities views, Memberships for a synthetic HospitalAdmin and Platform tenants for a synthetic persisted platform operator. Do not use real patient data or real identity subjects.
