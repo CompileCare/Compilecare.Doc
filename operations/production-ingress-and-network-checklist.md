@@ -6,7 +6,7 @@
 
 CompileCare consists of a browser workspace, ASP.NET Core API, PostgreSQL persistence, OIDC identity provider, and internal observability services. The browser-facing Web and API origins are separate trust boundaries unless deliberately deployed same-origin.
 
-The API currently maps `/metrics` through `MapPrometheusScrapingEndpoint()` without endpoint-level authorization metadata. Treat this as an internal monitoring endpoint: **do not expose `/metrics` through the public Internet ingress**. Permit access only from the approved monitoring network or an authenticated internal scrape path. The application currently does not provide an ingress-independent public/private network boundary for this endpoint; enforce and test the boundary in the selected deployment.
+The API maps `/metrics` through `MapPrometheusScrapingEndpoint()` without user-authentication metadata, but outside Development/Testing it now requires an explicit `Observability:Metrics:AllowedNetworks` CIDR allowlist. Requests outside those networks receive 404, and startup fails if the allowlist is missing, malformed or unrestricted (`/0`). Treat this as an internal monitoring endpoint: **do not expose `/metrics` through the public Internet ingress**. Permit access only from the approved monitoring network or an authenticated internal scrape path. The application CIDR guard is defense in depth; it does not replace the ingress/network boundary.
 
 The API also exposes liveness/readiness endpoints through the shared observability package. Decide which probes must be reachable by the platform load balancer and prevent unrelated public access. Do not expose Development-only OpenAPI in production.
 
@@ -23,7 +23,7 @@ Record these before production deployment:
 | Internal service network | API, database, identity, observability and worker network boundaries | Not selected |
 | Trusted proxy addresses | Exact proxy/load-balancer IPs observed by API | Not selected |
 | Public path routing | Explicit allowlist of Web/API paths; block internal routes | Not selected |
-| Metrics scrape source | Monitoring identity/network and credential strategy | Not selected |
+| Metrics scrape source | Monitoring identity/network and credential strategy; configure `Observability:Metrics:AllowedNetworks` | Not selected |
 | Health probe source | Load balancer/orchestrator source and permitted paths | Not selected |
 | Rate limiting | Edge and API thresholds, burst behavior and shared quota strategy | Requires deployment sizing |
 | Data residency | Region and any cross-region replication constraints | Requires hosting/legal decision |
@@ -92,7 +92,8 @@ Capture dated, sanitized evidence for each deployment:
 - [ ] The production Web CSP contains only the approved API/OIDC origins and blocks inline script/style execution, objects and framing.
 - [ ] API CORS accepts the approved Web origin and rejects an unapproved origin.
 - [ ] Real OIDC discovery, login, callback, token exchange, silent renewal and logout work through the deployed ingress.
-- [ ] `/metrics` is unreachable from a public client and reachable from the approved Prometheus scrape source.
+- [ ] Configure `Observability:Metrics:AllowedNetworks` to the actual Prometheus source CIDR(s); verify requests outside the allowlist return 404.
+- [ ] `/metrics` is unreachable from a public client at the ingress and reachable from the approved Prometheus scrape source.
 - [ ] Health endpoints are limited to approved probe/monitoring sources and disclose no dependency details beyond the intended status.
 - [ ] Development-only OpenAPI is unavailable in production.
 - [ ] PostgreSQL and observability services have no public listener.
