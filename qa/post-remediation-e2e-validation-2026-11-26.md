@@ -123,6 +123,7 @@ The 404 responses should be reviewed against intended API semantics and the UI's
 - [ ] Windows 10/11 Docker Desktop launcher acceptance on a real Windows host.
 - [x] Add automated public-shell accessibility regression checks for main landmark/heading, accessible control names, field labels, image alt attributes, keyboard focus/skip link, responsive overflow and reduced motion (Web PR #58; CI run `45844753971`, 19/19 Playwright specs passed).
 - [x] Extend accessibility label/name checks into the authenticated HospitalAdmin workspace (Web PR #59; CI run `45845404253`, 113/113 unit tests and 20/20 Playwright specs passed).
+- [x] Verify authenticated keyboard users can focus the skip link and move focus to the main landmark (Web PR #60; CI run `45846148079`, 113/113 unit tests and 20/20 Playwright specs passed).
 - [ ] Complete authenticated hospital-user visual review, keyboard-only and screen-reader workflows; independent accessibility assessment.
 - [ ] Independent penetration testing and qualified privacy/legal/compliance review for applicable Indian requirements.
 - [ ] Hospital pilot acceptance and clinical governance approval.
