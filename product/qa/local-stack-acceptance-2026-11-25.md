@@ -72,7 +72,7 @@ The report marks the following scenarios Not Run because the relevant UI capabil
 7. Laboratory/radiology/PACS and pharmacy dispensing.
 8. Notifications, patient portal, workforce HR/payroll and ABDM/TPA integrations.
 
-These eight scenarios were Not Run in the original tested build and must not be reclassified as failures. Three are now implemented and merged: facility hierarchy CRUD (Web PR #34), tenant membership administration (Web PR #35) and platform tenant lifecycle administration (Web PR #36). All three still require authenticated local-stack acceptance. The remaining five are staff/provider UI; MRN policy/search UI; appointment availability/list/reschedule/cancel UI; inpatient ADT/bed occupancy/MAR/discharge; LIS/RIS/PACS/pharmacy; and notifications/patient portal/HR/payroll/ABDM/TPA. Deliver deferred capabilities in dependency order with approved product, security and operational requirements.
+These eight scenarios were Not Run in the original tested build and must not be reclassified as failures. Three are now implemented and merged: facility hierarchy CRUD (Web PR #34), tenant membership administration (Web PR #35) and platform tenant lifecycle administration (Web PR #36). All three still require authenticated local-stack acceptance. The remaining six are staff/provider UI; MRN policy/search UI; appointment availability/list/reschedule/cancel UI; inpatient ADT/bed occupancy/MAR/discharge; LIS/RIS/PACS/pharmacy; and notifications/patient portal/HR/payroll/ABDM/TPA. Deliver deferred capabilities in dependency order with approved product, security and operational requirements.
 
 ## 6. Hosted CI status and merge rule
 
@@ -97,9 +97,9 @@ Do not merge an implementation PR based on a green-looking local report alone or
  
 ## 7. PR grouping and merge order
 
-- **Web design and facility stack:** PRs #29 → #30 → #31 → #32 → #33 → #34 were merged sequentially into `main`. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`. The screenshot evidence remains post-merge product acceptance.
+- **Web experience and administration stack:** PRs #29 → #30 → #31 → #32 → #33 → #34 → #35 → #36 are merged into `main`. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`; #35 `b8e4a4ec8864884f5e71dc070a319a5f4df07185`; #36 `54589758db04848d25e2e078f3619c1932cc645a`. The screenshot evidence remains post-merge product acceptance.
 - **Web test work:** PR #27 (cross-platform OPD browser interactions) and PR #28 (local Playwright HTML report) are merged.
-- **API security:** PR #54 membership audit coverage and PR #55 inaccessible-hospital collection contract fix are merged after PostgreSQL/Docker verification.
+- **API security and platform lifecycle:** PR #54 membership audit coverage and PR #55 inaccessible-hospital collection contract fix are merged after PostgreSQL/Docker verification. PR #57 platform-operator self-status and PR #58 initial-admin activation guard are also merged after Release build, model-drift, unit, PostgreSQL integration and Docker verification.
 - **Local environment:** PR #5 GSSAPI warning, PR #7 Keycloak silent-renewal reconciliation and PR #6 optional observability overlay are merged. PR #6 passed a Docker runtime smoke of the synthetic metrics, traces and logs pipeline; a real API instrumentation smoke remains local post-merge acceptance.
 - **Database and caching:** Database PR #2 backup/restore helpers and Caching PR #5 tenant isolation tests are merged after hosted Docker/test verification.
 - **Documentation:** PR #50 is merged, paired with Local PR #5. Keep future docs changes paired with implementation status.
