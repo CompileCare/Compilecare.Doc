@@ -121,7 +121,8 @@ The 404 responses should be reviewed against intended API semantics and the UI's
 - [ ] Elasticsearch/Kibana authentication and TLS for the target deployment.
 - [ ] Provider-native encrypted PITR backups, retention, defined RPO/RTO and automated restore drills.
 - [ ] Windows 10/11 Docker Desktop launcher acceptance on a real Windows host.
-- [ ] Authenticated hospital-user visual review, keyboard-only and screen-reader workflows; independent accessibility assessment.
+- [x] Add automated public-shell accessibility regression checks for main landmark/heading, accessible control names, field labels, image alt attributes, keyboard focus/skip link, responsive overflow and reduced motion (Web PR #58; CI run `45844753971`, 19/19 Playwright specs passed).
+- [ ] Complete authenticated hospital-user visual review, keyboard-only and screen-reader workflows; independent accessibility assessment.
 - [ ] Independent penetration testing and qualified privacy/legal/compliance review for applicable Indian requirements.
 - [ ] Hospital pilot acceptance and clinical governance approval.
 - [ ] Resolve ADR-012 patient contact verification decisions before OTP implementation.
