@@ -181,6 +181,16 @@ The workspace uses the reusable `AppointmentSlotGrid` component from [CompileCar
 
 The API remains responsible for validating active hospital registration, tenant/hospital/department context, provider assignment, slot availability and concurrent reservation in a transaction. A visible available slot is not a guarantee that a booking will succeed; a conflict must be shown as an actionable error and availability should be refreshed using the existing flow.
 
+### PostgreSQL concurrency and conflict contract — 2026-11-26
+
+The scheduling service maps PostgreSQL concurrency failures to the existing HTTP 409 Conflict contract instead of leaking an unhandled 500:
+- `23P01` exclusion-constraint violation and `23505` unique-constraint violation represent a slot/availability conflict.
+- `40P01` deadlock detected is treated as a concurrent scheduling conflict. The transaction is rolled back and the caller must refresh availability before retrying.
+- When two requests reserve the same available slot concurrently, exactly one booking succeeds; the competing request receives 409. The API does not silently move the appointment to another slot or automatically retry a potentially stale choice.
+- A client receiving 409 should preserve the user's context, reload the current availability/queue state and ask the user to choose again.
+
+This behavior is implemented in [CompileCare.Api PR #60](https://github.com/CompileCare/CompileCare.Api/pull/60), merged as `b31832ef8a416373532bcfe46b9e171dcc9890e7). Its integration suite exercises concurrent booking and verifies the loser receives a conflict response rather than an internal-server error.
+
 Verification for the UI increment includes keyboard and pointer selection, available/unavailable/selected states, 375px and desktop layouts, hospital timezone display, in-flight/confirmed disabling and booking-conflict recovery. CI and Docker checks must execute and pass before merge. Keep mocked UI tests separate from real Keycloak/API/PostgreSQL acceptance.
 
 
@@ -198,3 +208,10 @@ The follow-on [CompileCare.Web PR #32](https://github.com/CompileCare/CompileCar
 The row component receives only entries returned by the existing selected tenant/hospital/department queue query. It does not calculate or advance queue state, expose patient identifiers or create a new API. The API continues to validate the transition, role and scope for every action.
 
 Verification for the UI increment includes keyboard navigation through the action group, status announcement, responsive desktop/tablet/375px layout, reason gating and in-flight disabling. Server-side/API integration checks remain separate from the mocked Web UI suite.
+
+
+### Cross-hospital encounter denial and audit verification — 2026-11-26
+
+[CompileCare.Api PR #61](https://github.com/CompileCare/CompileCare.Api/pull/61), merged as `ac8ef92aa8063321bc07f838c4e512945f8f2182`, extends the cross-hospital clinical-scope integration test. A clinical user assigned to Hospital A cannot read a Hospital B encounter or queue-linked encounter, update its note, sign it or create it from a queue entry. Each attempt returns 404, records the requested tenant and validated actor issuer/subject with Rejected outcome and 404 status, and leaves the Hospital B owner's note unsigned and unchanged.
+
+Hosted verification runs 45749260863 and 45749260926 passed Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and isolated Docker verification.
