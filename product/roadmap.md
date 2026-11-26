@@ -478,3 +478,22 @@ Local PR #16 merged as `35880086060049bf3ebf49e48e7e5f205ec98b69`. Successful Lo
 - The same run retained the real API issuer/audience/subject checks, PostgreSQL-persisted membership roles, tenant data isolation, cross-tenant membership mutation denial, membership revocation/reactivation, and nine-service telemetry checks.
 
 This closes the **hosted reception patient registration/search and FacilityViewer patient-registration authorization** gates. It does not complete appointments, queue, OPD/clinical or billing browser workflows; it does not prove local Mac/browser session renewal, hospital-user visual/accessibility acceptance, or production configuration. All records used in CI are synthetic.
+
+### FacilityViewer patient-data authorization regression — 2026-11-26
+
+The subsequent authorization regression slice is merged and hosted-verified:
+
+- Web PR #51 merged as `cc63739d0bbc6094f98afaf2295bfb6937f714f9`. The real PKCE browser acceptance now verifies that FacilityViewer cannot see Reception navigation, Patient registration navigation, or the "Find a registered patient" workspace.
+- Local PR #16 merged as `35880086060049bf3ebf49e48e7e5f205ec98b69`. It proves a real Keycloak-issued FacilityViewer token receives HTTP 403 when directly attempting patient registration against the tenant-B hospital.
+- Local PR #17 merged as `8deec532fbe52327b373b5f386d4e72859b859a2`. Its real Keycloak/PostgreSQL acceptance script additionally requires HTTP 403 for patient registration, patient search, patient identity detail and duplicate-candidate review. All attempted patient-like values are synthetic; no patient record is created for the denied cases.
+- Local workflow run `45810119901` passed both jobs: full nine-service Docker startup, real Keycloak identity and persisted tenant checks, all FacilityViewer negative API assertions, real Authorization Code + PKCE browser acceptance, telemetry verification, tooling validation and isolated environment cleanup.
+
+These results close the **hosted FacilityViewer patient read/write/duplicate-review authorization regression** for the current patient API surface. They do not imply that every future patient endpoint is automatically covered: new routes must retain explicit positive and negative permission tests, tenant/organization scope tests and audit metadata.
+
+### Current continuation checkpoint — 2026-11-26
+
+The latest connected GitHub review found no remaining open PRs across Web, API, Database, Observability, ApiClient, Caching, OtpService, Mobile, Site and Documentation. Local PR #17 was merged after both hosted workflow jobs passed. The only open-PR listing briefly returned a stale snapshot for #17; the direct PR record confirms it is closed and merged.
+
+**Next engineering priority:** continue Phase 3 security/operational hardening without bypassing ADR-016. The existing audit query/export API remains provisional. Do not implement customer-facing Audit Review UI, broaden audit scope, add bulk export, or invent retention rules until the pilot hospital's named-reader, scope, retention, legal-hold and export approvals are recorded. Safe engineering work may continue on test coverage, documentation, threat-model traceability and deployment-readiness automation that does not activate unapproved customer access.
+
+Developer-Mac execution, local browser/session renewal, authenticated visual/accessibility review (owned by Antigravity/user), production CSP and trusted-proxy configuration, provider-native backup/PITR and restore drills, and pilot/security/privacy sign-off remain outstanding. The hosted evidence is strong progress, not a production-readiness declaration.
