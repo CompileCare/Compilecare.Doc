@@ -368,3 +368,17 @@ The following are retained product scope, not part of the first outpatient MVP. 
 11. Add validated interoperability and analytics capabilities.
 
 The sequence may be adjusted by pilot evidence, but dependencies and deferred decisions must remain visible in roadmap updates. Every delivered feature must update its workflow, module catalogue, API contract where applicable, tests and this blueprint. A merged PR or green CI is not, by itself, proof of complete workflow acceptance or production readiness.
+
+
+### 14.5 Stabilization implementation and acceptance evidence — 2026-11-26
+
+The post-regression remediation baseline is recorded separately from product-scope completion:
+
+- API PR #76 corrects malformed HTTP request status handling (4xx rather than a generic 500); API PR #77 serializes same-tenant/same-patient booking attempts with a transaction-scoped advisory lock while retaining the PostgreSQL exclusion constraint.
+- Observability PR #4 publishes corrected OTLP/gRPC exporters in package 1.0.1; API PR #78 consumes those packages and adds Npgsql tracing; Local PR #11 configures the gRPC receiver and adds real API-to-Jaeger/Npgsql and API-to-Collector/Prometheus checks to the local verifier.
+- Web PR #45 fixes the Reception landing priority, mobile-width overflow and cancellation-action contrast; Web PR #46 adds static-workspace response headers and retains `X-Frame-Options: DENY`.
+- Local PR #12 provisions the Kibana `CompileCare Logs` data view (`compilecare-logs-*`, timestamp `@timestamp`) during local stack verification.
+
+Hosted CI evidence for these PRs passed at merge. This does not replace the required developer-Mac execution of the full local stack, authenticated browser acceptance, visual review or security review. The remaining status is in [the stabilization evidence update](roadmap.md#stabilization-evidence-update--2026-11-26-post-full-platform-regression).
+
+**Still outstanding:** API PR #79 rate limiting/HSTS/trusted-proxy hardening (do not count until merged); CSP and npm lockfile/dependency audit; Audit Review UI; real local Jaeger/Npgsql spans and Collector-fed app metrics; authenticated responsive screenshots; operational and pilot acceptance. No claim of production readiness or complete security compliance is made.
