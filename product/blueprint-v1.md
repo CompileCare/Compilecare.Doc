@@ -381,7 +381,7 @@ The post-regression remediation baseline is recorded separately from product-sco
 
 Hosted CI evidence for these PRs passed at merge. This does not replace the required developer-Mac execution of the full local stack, authenticated browser acceptance, visual review or security review. The remaining status is in [the stabilization evidence update](roadmap.md#stabilization-evidence-update--2026-11-26-post-full-platform-regression).
 
-**Still outstanding:** run the merged nine-service launcher and verifier on the developer Mac; execute browser Authorization Code + PKCE sign-in/session and role-based Web workflows against the local Keycloak/API/PostgreSQL stack; configure the exact trusted ingress IPs for ReverseProxy:KnownProxies and validate forwarded headers/HSTS in the target deployment; tune per-instance rate limits and decide whether shared quotas are needed across replicas; production CSP and browser policy testing; Audit Review UI; responsive screenshots and keyboard/accessibility review; operational and pilot acceptance. Local PR #14 has verified real Keycloak-issued access tokens, two PostgreSQL-persisted tenant memberships with different roles, hospital data isolation and membership revocation/reactivation in hosted full-stack CI. This API-level acceptance does not replace browser/session acceptance or the developer-Mac run. The API rate-limit/HSTS/trusted-proxy code is merged in API PR #79, and the Web npm lockfile/npm ci/blocking audit is merged in Web PR #47. No claim of production readiness or complete security compliance is made.
+**Still outstanding:** run the merged nine-service launcher and verifier on the developer Mac and repeat browser/session renewal there; capture authenticated desktop/tablet/390px screenshots and perform keyboard/screen-reader accessibility review with hospital users; configure the exact trusted ingress IPs for ReverseProxy:KnownProxies and validate forwarded headers/HSTS in the target deployment; tune per-instance rate limits and decide whether shared quotas are needed across replicas; production CSP and browser policy testing; Audit Review UI; operational and pilot acceptance. Local PR #15 has verified hosted browser Authorization Code + PKCE sign-in/callback and role-based tenant switching against real Keycloak, Web and API services; Local PR #14 verifies the persisted two-tenant permissions and data isolation against PostgreSQL. Hosted CI does not replace the developer-Mac run or actual visual/accessibility acceptance. The API rate-limit/HSTS/trusted-proxy code is merged in API PR #79, and the Web npm lockfile/npm ci/blocking audit is merged in Web PR #47. No claim of production readiness or complete security compliance is made.
 
 
 ### 14.6 Full-stack hosted verification — 2026-11-26
@@ -398,3 +398,19 @@ Local PR #14 (`02888b4`) adds an isolated hosted Docker acceptance path that obt
 The test uses a temporary CI-only client and direct grant. It does not exercise the production-style Web Authorization Code + PKCE flow, browser redirect, silent renewal, refresh/session lifecycle or user-facing Web UI. Those checks still require browser-based acceptance against the developer-Mac local stack.
 
 The same PR fixes the checked-in local Keycloak realm: it adds the built-in `basic` scope to the `compilecare-web` default scopes and the reconciler ensures the `oidc-sub-mapper` emits access-token `sub`. This supplies the validated subject needed to look up persisted tenant memberships. Production IdP configuration must be checked separately and is not changed by the local realm file.
+
+
+### 14.8 Real browser PKCE and tenant-switch acceptance — 2026-11-26
+
+Local PR #15 (`d6e1362`) adds and passes a dedicated Playwright suite against the full hosted Docker stack. PR run `45795779615`, attempt 2, passed both Local jobs. The browser test uses the real public `compilecare-web` client and Authorization Code + PKCE (no direct grants on that client), follows the actual Keycloak login and Web callback, and uses the same synthetic identity whose two persisted tenant memberships were created by the API acceptance script.
+
+The browser assertions passed:
+- Sign-in through the real Keycloak login page and OIDC callback.
+- Tenant A selection displayed CI Hospital A and the HospitalAdmin patient-registration/facilities navigation.
+- Tenant B selection displayed CI Hospital B and FacilityViewer facility-only navigation.
+- Real API hospital-list requests carried a bearer authorization header and the selected `X-Tenant-ID`.
+- The test did not record or log tokens, authorization codes or passwords.
+
+The CI-only browser credentials were passed in a mode-0600 temporary file and removed by unconditional workflow cleanup; the isolated Docker project/volumes were also removed.
+
+**Still required:** execute the same stack and browser/session checks on the developer Mac; capture real authenticated desktop/tablet/390px screenshots; perform keyboard/screen-reader and role-based visual acceptance with hospital staff; verify production Keycloak's subject mapper, trusted ingress, CSP and rate-limit strategy; complete remaining operations and pilot gates. Hosted browser evidence does not establish production readiness or visual/accessibility conformance.
