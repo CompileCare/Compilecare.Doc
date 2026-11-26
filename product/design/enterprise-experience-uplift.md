@@ -188,3 +188,59 @@ Tenant-scoped membership administration is documented in [Tenant membership admi
 The complete Web experience, facility and tenant administration stack (#29–#36) is merged into `main`. Final facility-workspace verification on head `b36c7115003384eee8f809511a0b6808b36e76f2` passed 67 Vitest tests, all 14 Chromium E2E tests, production build and Docker smoke (runs 45744960504 and 45744951178). Tenant membership administration PR #35 passed 75 Vitest tests, all 14 Chromium E2E tests, production build and Docker smoke (runs 45745881098 and 45746024118). Platform tenant lifecycle PR #36 passed 85 Vitest tests, all 14 Chromium E2E tests, production build and Docker smoke (runs 45747601458 and 45747606834).
 
 No open implementation PRs remain in the CompileCare organization. All 11 repositories are public, and API issue #56 about Actions runner allocation is closed as resolved. Remaining acceptance work is to capture authenticated screenshots with synthetic data and exercise facility CRUD, tenant membership, platform tenant lifecycle, Keycloak renewal, SEC-002 and real API telemetry against the updated local Docker stack.
+
+
+## 11. Route-based module architecture — new product requirement (2026-11-26)
+
+The current Web workspace uses a single top-level workspace composition with hash-selected sections. This is an interim implementation and does not yet provide the independent route-level workspaces expected of a full hospital information platform. The reported “everything looks like one page” experience is therefore an information-architecture issue as well as a visual-design issue.
+
+### Target architecture
+- One shared authenticated shell owns global navigation, user/session controls, tenant/hospital context and the main content outlet.
+- Each module has an independent route-level page/workspace and feature-owned components, data loading and tests.
+- Use stable browser paths, browser history, refresh-safe deep links and clear page headings/breadcrumbs.
+- Keep platform administration in a separate platform-operator control plane.
+- Navigation is generated from effective permissions and selected organization context; route guards are UX controls only. Every API operation remains protected by server-side authorization.
+- Preserve existing workflow semantics and API contracts while extracting screens. Do not bundle domain changes into the route migration.
+- Avoid a large rewrite. Migrate in focused, testable slices and remove legacy hash behavior only after redirects and regression coverage exist.
+
+### Proposed route map
+| Module | Proposed route |
+|---|---|
+| Overview | `/app/overview` |
+| Reception | `/app/reception` |
+| Patient registration | `/app/patients/register` |
+| Patient record | `/app/patients/:patientId` |
+| Appointments | `/app/appointments` |
+| Queue | `/app/queue` |
+| Clinical/OPD | `/app/clinical` |
+| Billing | `/app/billing` |
+| Facilities | `/app/facilities` |
+| Staff | `/app/staff` |
+| Memberships | `/app/memberships` |
+| Patient identifier policy | `/app/settings/patient-identifiers` |
+| Platform tenant lifecycle | `/platform/tenants` |
+
+Final route names may be refined during implementation. Existing deep links should receive safe redirects where applicable.
+
+### Migration sequence
+1. Establish route layout, authenticated shell and permission-aware navigation.
+2. Extract overview and reception/patient registration.
+3. Extract appointment management and queue operations.
+4. Extract clinical/OPD, preserving identity confirmation and signed-record safeguards.
+5. Extract billing, facilities, staff, memberships and identifier policy.
+6. Keep platform tenant lifecycle separate.
+7. Add route-level states, responsive/browser/keyboard tests and authenticated evidence.
+8. Remove hash-based section navigation after migration and redirects are verified.
+
+### Acceptance criteria
+- A module URL renders its own page, not merely a different heading over the same long page.
+- Refresh, back/forward, bookmarks and deep links work predictably.
+- The active tenant/hospital and required department context remain visible.
+- Unauthorized routes show a safe access-denied/not-found experience without leaking data; APIs independently enforce authorization.
+- Each route has explicit loading, empty, validation, conflict and service-error states as relevant.
+- Keyboard navigation, visible focus, accessible names/headings, responsive desktop/tablet/mobile and WCAG 2.2 AA target checks are covered.
+- Playwright verifies navigation and critical workflows; Vitest verifies focused components.
+- Actual authenticated screenshots use synthetic data and record commit, browser, viewport and date. Mockups and mocked screenshots are not acceptance evidence.
+
+### UI scope guardrails
+This initiative restructures and improves the experience of existing capabilities. It does not add new KPIs, clinical functions, financial rules or unapproved data collection. Do not claim WCAG conformance or production readiness without evidence.
