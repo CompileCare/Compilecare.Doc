@@ -38,6 +38,10 @@ Qualified reviewers must assess applicable Indian data-protection and healthcare
 
 Software supports clinical workflows. AI or automated outputs must not be represented as clinical decisions without an approved clinical safety process; human review/responsibility must remain explicit.
 
+## Threat model
+
+See [CompileCare initial application threat model](threat-model.md) for the current trust boundaries, abuse cases, implemented controls and residual risks. It is an engineering baseline, not an independent assessment or compliance certification.
+
 ## Production security gate
 
 Threat model and data-flow review; complete authentication/authorization and cross-tenant tests; audit review; secrets/dependency scans; backup/restore verification; incident/breach procedures; suitable penetration testing; privacy/legal review; operational approvals; and formal production sign-off.
