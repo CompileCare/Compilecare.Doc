@@ -37,6 +37,8 @@ This document establishes the visual and interaction quality bar for the authent
 
 ## Definition of done for every UI slice
 
+- The skip link is the first keyboard stop; activating it with Enter moves focus to the main workspace landmark. Verify this in browser automation and repeat on the authenticated local stack.
+
 - Design reviewed at desktop, tablet and narrow viewport widths.
 - Keyboard-only completion verified for the primary and error-recovery paths.
 - Contrast, focus, labels, accessible names and async announcements reviewed.
