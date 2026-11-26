@@ -1,7 +1,8 @@
 # ADR-014: Appointment scheduling and queue boundaries
 
-- **Status:** Proposed for implementation
+- **Status:** Accepted for initial pilot implementation; hospital operational validation pending
 - **Date:** 2026-11-24
+- **Last reviewed:** 2026-11-26
 - **Decision owners:** Product and engineering; hospital operations, reception and clinical stakeholders must validate the workflow before production use
 
 ## Context
@@ -17,7 +18,7 @@ These are related but distinct workflows. An appointment reserves a future time 
 3. **Scope each appointment to one tenant, hospital and department.** The provider is required for the first scheduled-appointment increment and must be an active staff profile with a provider designation and an effective assignment to that hospital/department at the appointment time. This is an operational scheduling check only; designation does not establish verified credentials or clinical authority.
 4. **Start with explicit, date-specific provider availability sessions.** An authorized scheduler publishes a session with start/end, slot duration and provider. The system derives discrete bookable slots; a provider slot can have only one active appointment. Recurring schedule templates, leave integration, multi-provider/resource booking and external calendar sync are later capabilities.
 5. **Store instants in UTC and interpret schedules in the hospital's configured IANA time zone.** The API accepts offset-aware timestamps; display and queue-day boundaries use the hospital timezone. Reject ambiguous/nonexistent local times and require a configured timezone before enabling scheduling. Do not assume the server timezone.
-6. **Make booking concurrency-safe.** Reserve a slot transactionally with database-enforced uniqueness/locking so simultaneous requests cannot double-book a provider slot. Prevent overlapping active appointments for the same patient within the tenant by default; return a conflict that staff must resolve rather than silently moving either appointment.
+6. **Make booking concurrency-safe.** Reserve a slot transactionally with database-enforced uniqueness/locking so simultaneous requests cannot double-book a provider slot. Prevent overlapping active appointments for the same patient within the tenant by default; return a conflict that staff must resolve rather than silently moving either appointment. Map PostgreSQL exclusion/unique violations (23P01/23505) and deadlock detection (40P01) to HTTP 409 Conflict; do not leak a database exception as HTTP 500 or silently retry a stale slot.
 7. **Keep appointment lifecycle separate from arrival.** Appointment states are Booked, Cancelled, Completed and NoShow. Check-in is a timestamp/actor plus a link to one queue entry, not a new appointment state. Enforce at most one queue entry per appointment; repeated or concurrent check-in returns the existing entry and never creates another token. Rescheduling atomically reserves a new booking and cancels the old booking, preserving explicit RescheduledFrom/RescheduledTo links and audit history.
 8. **Support walk-ins without fabricating appointments.** A walk-in creates a queue entry directly for a patient with a valid hospital registration. It has no appointment reference. A checked-in appointment creates exactly one queue entry. Both paths converge on the same queue workflow.
 9. **Use a simple FIFO queue for the first increment.** Queue entries are scoped to tenant, hospital, department and hospital-local service date. Queue tokens are daily, department-scoped operational identifiers, separate from MRN. Initial ordering is check-in time; manual priority changes, clinical triage ranking, emergency routing and multi-queue orchestration require separate clinical/operational approval.
@@ -75,6 +76,15 @@ These are implementation defaults for the first slice, not final hospital policy
 - Audit actor, tenant, hospital/department, target identifier, action, outcome, timestamp, reason code where applicable and correlation ID. Avoid full request bodies and sensitive patient values.
 - Do not log appointment reason, patient identifiers, names, diagnoses, access tokens or raw request payloads in traces, metrics, exceptions or health details.
 - Retain cancelled/rescheduled appointments and queue history according to an approved retention policy; do not physically delete operational history through ordinary CRUD.
+
+## Implementation and verification — 2026-11-26
+
+The first scheduling, booking and queue workflows are implemented in the API and Web application. PostgreSQL constraints remain the final concurrency authority; service-level conflict handling maps SQLSTATE 23P01, 23505 and 40P01 to the existing 409 Conflict contract. The caller must refresh availability and make a new choice; the API does not silently rebook another slot.
+
+- [CompileCare.Api PR #60](https://github.com/CompileCare/CompileCare.Api/pull/60), merge commit `b31832ef8a416373532bcfe46b9e171dcc9890e7`, adds PostgreSQL deadlock conflict handling for availability publication and appointment booking. Hosted runs 45748869864 and 45748869951 passed Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and Docker verification.
+- [CompileCare.Api PR #61](https://github.com/CompileCare/CompileCare.Api/pull/61), merge commit `ac8ef92aa8063321bc07f838c4e512945f8f2182`, extends cross-hospital OPD encounter security tests. Five denied actions (encounter read, queue-linked encounter read, note update, sign and create-from-queue) return 404 and emit rejected audit metadata containing the requested tenant and validated actor issuer/subject. The Hospital B owner can still read the unchanged, unsigned note. Hosted runs 45749260863 and 45749260926 passed Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and Docker verification.
+
+These hosted tests do not replace authenticated local-stack acceptance against Keycloak/API/PostgreSQL with synthetic patients, staff, provider assignments and availability sessions. Hospital-specific scheduling windows, no-show policy, cancellation policy, retention and timezone configuration remain pilot validation items.
 
 ## Consequences
 

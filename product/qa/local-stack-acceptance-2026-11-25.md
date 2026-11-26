@@ -97,9 +97,10 @@ Do not merge an implementation PR based on a green-looking local report alone or
  
 ## 7. PR grouping and merge order
 
-- **Web design and facility stack:** PRs #29 → #30 → #31 → #32 → #33 → #34 were merged sequentially into `main`. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`. The screenshot evidence remains post-merge product acceptance.
+- **Web experience and administration stack:** PRs #29 → #30 → #31 → #32 → #33 → #34 → #35 → #36 are merged into `main`. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`; #35 `b8e4a4ec8864884f5e71dc070a319a5f4df07185`; #36 `54589758db04848d25e2e078f3619c1932cc645a`. The screenshot evidence remains post-merge product acceptance.
 - **Web test work:** PR #27 (cross-platform OPD browser interactions) and PR #28 (local Playwright HTML report) are merged.
-- **API security:** PR #54 membership audit coverage and PR #55 inaccessible-hospital collection contract fix are merged after PostgreSQL/Docker verification.
+- **API security and platform lifecycle:** PR #54 membership audit coverage, PR #55 inaccessible-hospital collection contract fix, PR #57 platform-operator self-status and PR #58 initial-admin activation guard are merged after PostgreSQL/Docker verification.
+- **API scheduling and audit:** PR #60 PostgreSQL deadlock-to-409 handling and PR #61 cross-hospital OPD denial/audit coverage are merged after Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and Docker verification.
 - **Local environment:** PR #5 GSSAPI warning, PR #7 Keycloak silent-renewal reconciliation and PR #6 optional observability overlay are merged. PR #6 passed a Docker runtime smoke of the synthetic metrics, traces and logs pipeline; a real API instrumentation smoke remains local post-merge acceptance.
 - **Database and caching:** Database PR #2 backup/restore helpers and Caching PR #5 tenant isolation tests are merged after hosted Docker/test verification.
 - **Documentation:** PR #50 is merged, paired with Local PR #5. Keep future docs changes paired with implementation status.
@@ -115,8 +116,15 @@ This record is based on the Antigravity local full-stack acceptance report, its 
 
 The owner has made all 11 CompileCare repositories public. Hosted Actions runner allocation is functioning, and API issue #56 was closed as resolved.
 
-Web PRs #29–#34 have all been merged into main in sequence. The final facility hierarchy PR #34 passed 67 Vitest tests, 14/14 Chromium E2E tests, production build and Docker build/container smoke on commit `b36c7115003384eee8f809511a0b6808b36e76f2` (runs 45744960504 and 45744951178) before merging as `c8a5a5ec9a31e85cab05d60d05e8852616319be3`.
+Web PRs #29–#36 have all been merged into main. Facility hierarchy PR #34 passed 67 Vitest tests, tenant membership PR #35 passed 75 Vitest tests, and platform tenant lifecycle PR #36 passed 85 Vitest tests; all three passed all 14 Chromium E2E tests, production build and Docker smoke. PR #36 merged as `54589758db04848d25e2e078f3619c1932cc645a` (runs 45747601458 and 45747606834).
 
 The Facility hierarchy, tenant membership administration and platform tenant lifecycle scenarios were Not Run in the original Antigravity-tested build. They are now implemented and merged; do not count them as locally accepted until the authenticated local Docker stack is exercised with synthetic hospitals, departments, wards, rooms, beds, memberships and platform tenants. Verify read-only/write membership boundaries, platform-operator visibility and the initial-admin activation prerequisite.
 
 The screenshot-evidence checklist is now a post-merge product acceptance item. Capture the integrated Web main build at desktop, tablet and mobile widths, with a keyboard-focus state, Facilities views, Memberships for a synthetic HospitalAdmin and Platform tenants for a synthetic persisted platform operator. Do not use real patient data or real identity subjects.
+
+
+## 10. Scheduling concurrency and cross-hospital audit — 2026-11-26
+
+- API PR #60 merged as `b31832ef8a416373532bcfe46b9e171dcc9890e7`. PostgreSQL exclusion/unique conflicts and deadlocks (23P01, 23505, 40P01) now return HTTP 409 Conflict rather than an unhandled 500. Hosted runs 45748869864 and 45748869951 passed 12 unit tests, 97 PostgreSQL integration tests and Docker verification.
+- API PR #61 merged as `ac8ef92aa8063321bc07f838c4e512945f8f2182`. Five cross-hospital OPD operations (encounter read, queue-linked encounter read, note update, signing and encounter creation) return 404, create rejected audit records with requested tenant and validated actor issuer/subject, and leave the owning hospital's clinical note unchanged. Hosted runs 45749260863 and 45749260926 passed 12 unit tests, 97 PostgreSQL integration tests and Docker verification.
+- No open implementation PRs remain across the 11 public CompileCare repositories. The remaining acceptance work is authenticated local Keycloak/API/PostgreSQL verification with synthetic data and screenshot evidence; hosted CI does not replace that local end-to-end acceptance.
