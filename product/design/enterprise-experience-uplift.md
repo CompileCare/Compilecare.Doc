@@ -103,6 +103,10 @@ The first shared foundation is under review in [CompileCare.Web PR #29](https://
 
 This is a foundation increment, not completion of the uplift. Build, test, Docker, real-browser visual review and desktop/tablet/mobile evidence are still required. The current hosted Web CI run failed before runner allocation (`runner_id=0`, no runner name and zero steps); it did not execute the build or tests. Do not merge until the required checks actually execute and pass.
 
+### Local acceptance findings — 2026-11-25
+
+The baseline build (`CompileCare.Web` `5a90b0a`, `CompileCare.Api` `5a6d882`) was exercised against the real local Docker stack: 48 of 50 executed acceptance cases passed; AUTH-005 and SEC-002 failed and are tracked in Local PR #7 and API PR #55. The mocked UI suite separately reports 35/35 Vitest tests passing and 11/14 Playwright tests passing on macOS arm64; the three native-select/Select-All portability failures are addressed in Web PR #27. The same run verified no horizontal overflow at 1440×900, 768×1024 and 375×812 and a visible 3px focus indicator with labelled inputs. Eight unimplemented UI/future-scope scenarios remain Not Run. See [the complete local acceptance record](../qa/local-stack-acceptance-2026-11-25.md). These local results do not replace hosted CI, Docker verification on the PR head commits, or real-app visual evidence.
+
 ## Reception search component refinement — 2026-11-25
 
 The follow-on [CompileCare.Web PR #30](https://github.com/CompileCare/CompileCare.Web/pull/30), stacked on the shell foundation in PR #29, extracts the patient result list into a focused feature component. Each patient result is a native button with an exposed pressed/selected state; Enter and Space work through standard button behavior, and in-flight operations disable selection. This replaces a focusable `article role="button"` with manually implemented keyboard handling.
