@@ -286,3 +286,8 @@ CompileCare.Web PR #38 merged as `23e84efaaa02ed61d18696fd8a9318db2df1862b`. The
 ## Logical backup and restore verification — 2026-11-26
 
 [CompileCare.Database PR #4](https://github.com/CompileCare/CompileCare.Database/pull/4) merged as `245c42fcc4e19a51a391b7203087de88a144cf3d`. The existing PostgreSQL 16 Docker backup/restore suite now additionally verifies the archive's SHA-256 sidecar, manifest format/source database metadata and mode `0600` on the archive and both sidecars. The test also exercises successful restore, source/target overwrite guards and corrupted-archive rejection. The Docker verification workflow passed. This validates provider-neutral logical backup helpers only; production physical backups/PITR, encryption/key ownership, off-site storage, retention, RPO/RTO and scheduled restore drills remain open.
+
+
+## Keyboard skip-link verification — 2026-11-26
+
+[CompileCare.Web PR #43](https://github.com/CompileCare/CompileCare.Web/pull/43) merged as `73764e1bb14ce5de6a84cced5e9072603b796e73`. The Chromium accessibility suite now verifies the skip link is the first keyboard stop, has a visible focus indicator, and activates with Enter to move focus to the main workspace landmark. Vitest, production build, Chromium E2E and Docker smoke passed (Web CI runs `45762291461` and `45762285239`). This is a targeted keyboard-navigation regression test, not a complete WCAG 2.2 AA audit; authenticated local-stack keyboard/screen-reader review and real responsive screenshots remain outstanding.

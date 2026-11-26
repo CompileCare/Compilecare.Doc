@@ -226,3 +226,11 @@ These hosted checks strengthen the security regression suite but do not replace 
 - Existing tests verify successful restore into a new database, reject source-database and existing-target restores, and reject a corrupted archive without creating the target database.
 - Hosted Docker backup/restore verification passed. Repeat with synthetic data in the local Docker environment.
 - **Still outstanding for production:** provider-native physical backup/PITR, encryption and key ownership, off-site storage, retention, defined RPO/RTO, scheduled restore drills and accountable operator sign-off. The logical helper test is not production recovery approval.
+
+
+## 23. Keyboard skip-link behavior — 2026-11-26
+
+- Web PR #43 merged as `73764e1bb14ce5de6a84cced5e9072603b796e73`.
+- In the Chromium browser suite, verify the skip link is the first keyboard stop, has a visible focus indicator, and pressing Enter moves focus to `main#workspace-main`.
+- Hosted Vitest, production build, Chromium E2E and Docker smoke passed (runs `45762291461` and `45762285239`).
+- Repeat with the real authenticated Docker/Keycloak/API workspace and keyboard-only navigation on desktop/tablet. Screen-reader review and complete WCAG 2.2 AA assessment remain outstanding; this test alone is not a conformance claim.
