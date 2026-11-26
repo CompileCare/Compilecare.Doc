@@ -244,3 +244,15 @@ Final route names may be refined during implementation. Existing deep links shou
 
 ### UI scope guardrails
 This initiative restructures and improves the experience of existing capabilities. It does not add new KPIs, clinical functions, financial rules or unapproved data collection. Do not claim WCAG conformance or production readiness without evidence.
+
+
+## Stabilization verification update — 2026-11-26
+
+The first responsive/landing/contrast corrections are merged in Web PR #45:
+- Reception now wins the default workspace selection when the effective membership grants patient-search access; Overview remains available as a secondary section.
+- The authenticated Overview has a 390×844 Playwright overflow regression and narrow-width layout rules.
+- Appointment cancellation uses an explicit high-contrast destructive style with a component assertion.
+
+Static workspace response hardening is merged in Web PR #46 and covered by a Docker header check: `nosniff`, strict-origin referrer policy, `X-Frame-Options: DENY`, permitted cross-domain policy, same-origin CORP and restrictive Permissions-Policy. CSP remains intentionally deferred until deployment-specific identity and API origins are known and tested.
+
+These are hosted-CI verified corrections, not final visual acceptance. The user-local authenticated experience still needs desktop/tablet/mobile screenshots, keyboard/screen-reader review and confirmation against the actual OIDC/API environment. The route-based module migration described above is still future work; the current single-workspace/hash-selected composition remains an interim architecture. See [the roadmap stabilization evidence](../roadmap.md#stabilization-evidence-update--2026-11-26-post-full-platform-regression).
