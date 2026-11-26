@@ -91,11 +91,11 @@ The list is paginated at 50 entries per page. The service applies scope containm
 - The create form clearly states that the target user must already exist in the configured identity provider and that the OIDC subject, not email, is required.
 - Scope editing preserves the full scope set in the update request; changing a role does not silently discard existing scopes.
 
-## Platform tenant lifecycle is separate
+## Platform tenant lifecycle is a separate control plane
 
-Global tenant registry operations are not part of this tenant-scoped workspace. The existing API exposes platform-only tenant create/list/get and Provisioning → Active/Suspended/Closed lifecycle transitions, protected by the persisted PlatformOperator identity and a separate authorization policy. Tenant HospitalAdmin roles never grant platform-operator access.
+Global tenant registry operations are not part of this tenant-scoped workspace. The dedicated platform workspace is implemented in [Platform tenant lifecycle](platform-tenant-lifecycle.md) and merged in [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36). It appears only when the API self-status endpoint confirms the caller's persisted PlatformOperator identity. Tenant HospitalAdmin roles never grant platform-operator access.
 
-A dedicated platform-operator workspace and its self-status discovery path are a separate implementation increment. Do not expose global tenant list or lifecycle actions to ordinary tenant administrators.
+The platform workspace can create tenants in Provisioning, provision the initial tenant-wide HospitalAdmin and activate the tenant, suspend active tenants, reactivate suspended tenants and permanently close tenants. The API enforces the state-transition matrix and rejects activation until an active tenant-wide HospitalAdmin exists. Global operations remain protected by the PlatformOperator policy on every request.
 
 ## Verification status
 
@@ -109,4 +109,4 @@ Hosted Web CI runs 45745881098 and 45746024118 passed on final head `2d3ce430142
 
 The component tests cover membership listing, department-scope creation, role/scope updates, explicit lifecycle confirmation and self-management controls. API client tests verify tenant headers, no-store reads, request methods and payloads.
 
-A real authenticated local-stack acceptance walkthrough remains required. Use synthetic OIDC identities and synthetic tenant/hospital/department records; verify tenant-wide, hospital-scoped and department-scoped administrators, self-management rejection and last-active-tenant-wide-HospitalAdmin protection.
+A real authenticated local-stack acceptance walkthrough remains required. Use synthetic OIDC identities and synthetic tenant/hospital/department records; verify tenant-wide, hospital-scoped and department-scoped administrators, self-management rejection and last-active-tenant-wide-HospitalAdmin protection. Also verify the platform operator control plane is hidden for ordinary tenant users and that activation is rejected until initial-admin provisioning completes.
