@@ -385,8 +385,8 @@ This is an evidence update to the original Antigravity report. It records code/C
 ### Security and operations — current state
 
 - Web PR #46 adds response headers (`nosniff`, Referrer-Policy, `X-Frame-Options: DENY`, CORP and Permissions-Policy); Docker smoke asserts them. This is defence-in-depth, not a complete browser security policy.
-- SEC-001 (API rate limiting, HSTS and trusted proxy processing) is tracked in API PR #79. It is **not merged** until the latest head's build/test, Docker and migration-rehearsal workflows all pass. Configure `ReverseProxy:KnownProxies` with the actual trusted ingress proxy addresses before deployment. The built-in rate limiter is per API process/instance; it is not a fleet-global quota.
-- SEC-002 is only partially addressed: CSP remains deferred pending exact production Keycloak/API origins and policy testing. The Web repository still needs a reproducible npm lockfile and a successful dependency audit; do not report supply-chain auditability as complete.
+- SEC-001 code-level hardening is merged in API PR #79: per-subject/per-IP rate limiting, RFC 9457 429 responses with Retry-After, HSTS outside Development, trusted forwarded-header processing and the Kestrel banner disabled. Configure ReverseProxy:KnownProxies with the exact trusted ingress proxy IP addresses before deployment. The built-in limiter is per API process/instance, not a fleet-global quota; a multi-replica deployment needs gateway/shared quota enforcement for strict global limits. Tune the defaults against measured hospital traffic.
+- SEC-002 is partially addressed: Web PR #47 commits npm's generated lockfile, switches CI and Docker to npm ci, and makes npm audit blocking. The final PR CI passed and the dependency audit reported zero vulnerabilities for that lockfile. CSP remains deferred until exact production Keycloak/API origins are known and the enforced policy is browser-tested. Do not claim complete browser security or supply-chain compliance from the dependency audit alone.
 - The previous NU1902 on the OTLP exporter version 1.12.0 was addressed by the Observability 1.0.1 update to exporter 1.15.3.
 - GAP-001 (Audit Review UI) remains outstanding. API audit search/export capability does not equal a usable, permission-controlled Audit Review workspace.
 
@@ -398,9 +398,19 @@ This is an evidence update to the original Antigravity report. It records code/C
 - [ ] Re-run the eight-way concurrent appointment booking scenario repeatedly against PostgreSQL.
 - [ ] Capture authenticated desktop/tablet/390px screenshots, console/network output and keyboard/accessibility evidence.
 - [ ] Complete Audit Review UI requirements, permission model, search/export UX and workflow acceptance before implementing it.
-- [ ] Resolve CSP origins/policy and npm lockfile/dependency audit; complete secret rotation, backup/PITR/restore, audit retention and production ingress configuration.
+- [ ] Resolve production CSP origins/policy and test the enforced policy; complete secret rotation, backup/PITR/restore, audit retention and production ingress configuration.
+- [ ] Configure exact ReverseProxy:KnownProxies ingress addresses and validate forwarded scheme/client-IP behavior in the target deployment; load-test and tune per-instance rate limits, and add gateway/shared quotas if multi-replica global limits are required.
 - [ ] Complete hospital pilot acceptance, security/privacy review and applicable legal/regulatory assessment.
 
 ### Release decision
 
 The code-level remediation above reduces the original defect set, but the platform remains **CONDITIONAL FAIL / HOLD NEW FEATURE WORK** until the remaining local authenticated acceptance and security/operational gates are evidenced. Do not declare OBS-001 closed based solely on the hosted synthetic Collector pipeline test. Keep new hospital modules deferred while these gates remain open.
+
+
+### Security and reproducible-build follow-up — 2026-11-26
+
+The subsequent remediation is now merged:
+- API PR #79 (merge commit 403b633) adds the rate limiter (600/minute per authenticated subject, 120/minute per anonymous IP by default), 429 ProblemDetails/Retry-After, trusted forwarded-header processing with a one-hop/symmetric-header policy, HSTS outside Development and disables the Kestrel server banner. Its final hosted checks passed 12 unit tests, 117 PostgreSQL integration tests, Docker verification and migration rehearsal.
+- Web PR #47 (merge commit 0732352) commits the npm-generated v3 lockfile and uses npm ci in both Web CI and the Docker build. The PR's blocking npm audit, Vitest, TypeScript/production build, Chromium E2E and Docker/header smoke all passed. The generating CI audit reported zero vulnerabilities.
+
+These changes close the original API rate-limit code gap and the Web lockfile/ENOLOCK auditability gap at repository/CI level. They do not close deployment acceptance: operators must set the exact trusted proxy IPs, calibrate per-instance rate limits, define a shared quota strategy if strict multi-replica limits are required, and complete CSP policy testing for the actual production OIDC/API origins.
