@@ -102,7 +102,7 @@ These controls are present in the current code or verified hosted workflows; the
 - API PR #73 — PostgreSQL migration rehearsal and integration-test isolation.
 - Web PR #43 — skip-link keyboard focus regression; hosted browser coverage is not a full WCAG or real-identity acceptance.
 - Database PR #4/#5 — logical backup/restore integrity and weekly synthetic CI regression.
-- Local PR #9 — local infrastructure smoke script (pending merge at the time of this document).
+- Local PR #9 — local infrastructure smoke script merged as d9e52044051b3fadb15e8ed3f679f0346ad31952; shell syntax, Keycloak Docker import/reconciliation, Compose validation and observability Docker smoke passed. The script itself still needs to be run on the developer Mac.
 
 ## 7. Review cadence
 
