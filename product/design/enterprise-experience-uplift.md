@@ -166,6 +166,7 @@ The public-repository GitHub Actions workflows are now allocating hosted runners
 | [#33](https://github.com/CompileCare/CompileCare.Web/pull/33) | Clinical queue-row accessibility | Run 45739127780 passed, including the OPD journey E2E and Docker smoke |
 | [#34](https://github.com/CompileCare/CompileCare.Web/pull/34) | Facility hierarchy CRUD workspace | Runs 45744960504 and 45744951178 passed 67 Vitest tests, 14 Chromium E2E tests, build and Docker smoke |
 | [#35](https://github.com/CompileCare/CompileCare.Web/pull/35) | Tenant membership administration | Runs 45745881098 and 45746024118 passed 75 Vitest tests, 14 Chromium E2E tests, build and Docker smoke |
+| [#36](https://github.com/CompileCare/CompileCare.Web/pull/36) | Platform tenant lifecycle workspace | Runs 45747601458 and 45747606834 passed 85 Vitest tests, 14 Chromium E2E tests, build and Docker smoke |
 
 PRs #29–#36 have been merged into Web main. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`; #35 `b8e4a4ec8864884f5e71dc070a319a5f4df07185`; #36 `54589758db04848d25e2e078f3619c1932cc645a`. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
 
