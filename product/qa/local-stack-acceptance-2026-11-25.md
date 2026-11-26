@@ -243,3 +243,12 @@ These hosted checks strengthen the security regression suite but do not replace 
 - The workflow uses disposable PostgreSQL and synthetic rows only. It validates archive checksum/manifest, successful isolated restore, no-overwrite guards and corrupted-archive rejection.
 - Hosted Docker verification passed on PR #5 (run `45762631339`).
 - This scheduled check does not touch production or prove provider-native physical backup/PITR, off-site storage, retention, RPO/RTO or production recovery. Those remain separate release gates.
+
+
+## 25. Local infrastructure smoke helper — 2026-11-26
+
+- Local PR #9 merged as `d9e52044051b3fadb15e8ed3f679f0346ad31952`.
+- On the developer Mac, with the local Compose stack started and local/.env populated, run `bash local/scripts/verify-stack.sh` from the CompileCare.Local repository root.
+- Expected checks: postgres, keycloak, api and web containers running; PostgreSQL readiness; Web and API root responses; Development OpenAPI document; Keycloak OIDC discovery issuer and endpoints.
+- Hosted Local CI passed shell syntax validation, Keycloak Docker import/reconciliation, Compose validation and Docker observability smoke. It does not prove that the script passed on the developer Mac.
+- Follow with the authenticated acceptance steps in this document using synthetic records only. The smoke helper does not validate user login, tenant membership/RBAC, patient workflows, real API persistence, or production readiness.
