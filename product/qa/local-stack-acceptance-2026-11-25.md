@@ -180,3 +180,13 @@ These hosted checks strengthen the security regression suite but do not replace 
 - Web PR #42 merged as `3243b658067b94f3a462d35527c58bff64653648`. Added selected-date appointment and queue totals scoped to the chosen department, plus hospital-wide daily collection metrics in the configured hospital time zone. Overview quick links are permission-gated; no patient identifiers or names are shown. Stale responses are ignored after scope/date changes.
 - Hosted `build-test` run 45756983905 passed Vitest, TypeScript/production build, Chromium E2E and Docker build/smoke.
 - **Local acceptance still required:** use synthetic data to reconcile appointment and queue totals against their module lists for selected department/date; reconcile daily collection total/payment count against billing reports for the hospital business date/time zone; switch tenant, hospital, department and date while requests are in flight and verify stale metrics do not overwrite the new scope; verify users without each permission do not receive the corresponding metric or shortcut. Capture desktop/tablet/mobile screenshots and confirm keyboard access to filters, refresh and shortcuts.
+
+
+## 18. Controlled audit query and export — 2026-11-26
+
+- API PR #71 merged as `da0880979b25cc12a2ccfd18419a6368baa1d2de`.
+- Verify tenant-wide HospitalAdmin can list audit metadata and export CSV; verify hospital-scoped HospitalAdmin receives 403; verify one tenant cannot see another tenant's events.
+- Verify listing rejects ranges over 90 days, CSV export rejects ranges over 31 days, and exports over 5,000 rows are rejected. Verify page size is capped at 100.
+- Verify CSV values beginning with spreadsheet formula characters are neutralized. Inspect exported columns to ensure no request/response body, patient clinical note, or other clinical payload is present.
+- Hosted Release CI and Docker integration verification passed for the merged commit. This is hosted verification, not a substitute for local Docker acceptance on the developer workstation.
+- **Production follow-up still open:** define and implement retention enforcement, monitor/review audit exports, establish access review and retention policy, and complete privacy/legal review. Do not treat this feature as production sign-off.
