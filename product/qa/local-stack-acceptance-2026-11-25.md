@@ -64,7 +64,7 @@ These are scoped observations from the executed cases, not a full WCAG 2.2 AA co
 The report marks the following scenarios Not Run because the relevant UI capability is not implemented in the tested build or the capability is deferred by the MVP blueprint:
 
 1. Ongoing tenant lifecycle and membership administration screens.
-2. Facility hierarchy CRUD screens for hospitals, departments, wards, rooms and beds.
+2. Facility hierarchy CRUD screens for hospitals, departments, wards, rooms and beds — now in implementation in Web PR #34; not complete in the original Antigravity-tested build.
 3. Staff directory and provider assignment screens.
 4. MRN policy configuration and search-by-MRN screens.
 5. Publishing appointment availability and appointment list/reschedule/cancel screens.
@@ -72,7 +72,7 @@ The report marks the following scenarios Not Run because the relevant UI capabil
 7. Laboratory/radiology/PACS and pharmacy dispensing.
 8. Notifications, patient portal, workforce HR/payroll and ABDM/TPA integrations.
 
-These items remain roadmap scope decisions. Do not mark them as failed tests, and do not create implementation PRs solely to make the Not Run count disappear. Deliver them in dependency order with approved product, security and operational requirements.
+These items were Not Run in the tested build and remain roadmap scope decisions. Facility hierarchy CRUD is now being delivered as a dependency-aligned core hospital workflow in Web PR #34; it must not be counted complete until merged and validated against the local authenticated stack. Do not mark the original Not Run scenarios as failed tests or create implementation PRs solely to make the count disappear. Deliver remaining items in dependency order with approved product, security and operational requirements.
 
 ## 6. Hosted CI status and merge rule
 
@@ -84,21 +84,23 @@ Verified current-head runs include:
 - Database PR #2 backup/restore: PostgreSQL Docker verification 45738452765 passed before merge.
 - Caching PR #5 tenant isolation: workflow passed before merge.
 - Local PR #5 and #7: Local validation 45658651667 and 45738522025 passed before merge.
+- Local PR #6 observability overlay: Docker runtime smoke runs 45740981547 and 45740976578 passed before merge; the test verifies synthetic OTLP metrics in Prometheus, traces through Jaeger v3, logs in Elasticsearch and Kibana readiness.
 - Web PR #27 and #28: browser/Docker CI 45734073286 and 45670894903 passed before merge.
 - Web PR #29–#33: CI/Docker runs 45738737945, 45738814930, 45738824899, 45738835427 and 45739127780 passed on the respective PR heads.
+- Web PR #34 facility hierarchy: CI/Docker runs 45741273030 and 45741268665 passed on head `6a307da8c0466ab6de89512ecdf8e3f651230743`.
 
-Do not merge an implementation PR based on a green-looking local report alone or on a hosted job that never received a runner. Record the tested PR head SHA and the exact workflow run. The current remaining merge gates are authenticated screenshot evidence for Web PR #29 and full developer-Mac observability-overlay startup/telemetry smoke for Local PR #6. The runner/billing distinction is tracked in [CompileCare.Api issue #56](https://github.com/CompileCare/CompileCare.Api/issues/56); `CompileCare.Site`, `CompileCare.Mobile` and `CompileCare.OtpService` still appear private in the organization inventory and remain subject to the Free organization's included Actions allowance.
+Do not merge an implementation PR based on a green-looking local report alone or on a hosted job that never received a runner. Record the tested PR head SHA and the exact workflow run. The current remaining merge gate is authenticated screenshot evidence for Web PR #29. Local PR #6 is merged after the Docker runtime pipeline smoke; a real CompileCare.Api-to-observability integration check on the developer Mac remains post-merge local acceptance, not a hosted-CI merge gate. The runner/billing distinction is tracked in [CompileCare.Api issue #56](https://github.com/CompileCare/CompileCare.Api/issues/56); `CompileCare.Site`, `CompileCare.Mobile` and `CompileCare.OtpService` still appear private in the organization inventory and remain subject to the Free organization's included Actions allowance.
  
 ## 7. PR grouping and merge order
 
-- **Web design stack:** PR #29 → #30 → #31 → #32 → #33. These remain intentionally stacked. All five PR heads have passed hosted CI and Docker smoke checks, but merge remains blocked on the real authenticated screenshot evidence required for PR #29. Merge sequentially after that evidence is recorded.
+- **Web design and facility stack:** PR #29 → #30 → #31 → #32 → #33 → #34. These remain intentionally stacked. All six PR heads have passed hosted CI and Docker smoke checks, but merge remains blocked on the real authenticated screenshot evidence required for PR #29. PR #34 adds the Hospital → Department → Ward → Room → Bed administration workspace. Merge sequentially after screenshot evidence is recorded.
 - **Web test work:** PR #27 (cross-platform OPD browser interactions) and PR #28 (local Playwright HTML report) are merged.
 - **API security:** PR #54 membership audit coverage and PR #55 inaccessible-hospital collection contract fix are merged after PostgreSQL/Docker verification.
-- **Local environment:** PR #5 GSSAPI warning and PR #7 Keycloak silent-renewal reconciliation are merged. PR #6 optional observability stack remains open pending full Docker runtime/telemetry smoke.
+- **Local environment:** PR #5 GSSAPI warning, PR #7 Keycloak silent-renewal reconciliation and PR #6 optional observability overlay are merged. PR #6 passed a Docker runtime smoke of the synthetic metrics, traces and logs pipeline; a real API instrumentation smoke remains local post-merge acceptance.
 - **Database and caching:** Database PR #2 backup/restore helpers and Caching PR #5 tenant isolation tests are merged after hosted Docker/test verification.
 - **Documentation:** PR #50 is merged, paired with Local PR #5. Keep future docs changes paired with implementation status.
 
-Six implementation PRs remain open: five deliberately stacked Web experience slices (#29–#33) and one independent Local observability overlay (#6). This QA/roadmap update is a separate documentation-only PR #70. The API, Database, Caching, Web test and Local Keycloak/GSSAPI workstreams listed above have been merged; they are not duplicates or abandoned PRs.
+Six implementation PRs remain open: six deliberately stacked Web experience/facility slices (#29–#34). This documentation update is a separate docs-only PR #71. The API, Database, Caching, Web test and Local Keycloak/GSSAPI workstreams listed above have been merged; they are not duplicates or abandoned PRs.
  
 ## 8. Evidence and source artifacts
 
