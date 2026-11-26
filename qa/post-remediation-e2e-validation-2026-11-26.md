@@ -116,7 +116,8 @@ The 404 responses should be reviewed against intended API semantics and the UI's
 - [ ] Configure the selected provider's trusted CA and verify an actual production-network PostgreSQL TLS connection with hostname validation.
 - [ ] Set the exact production Web/API origins and verify CORS preflight plus authenticated browser requests through the selected ingress.
 - [x] Verify CompileCare.Local emits the expected CSP through the full nine-service stack and real Keycloak Authorization Code + PKCE browser acceptance (Local PR #20 merged as `792196a2d19afeb128e8bf40205977d6b05e607a`; latest workflow run `45839528532` passed both jobs).
-- [ ] Define exact production Keycloak/API origins and browser-test CSP through real production-style OIDC login, callback, silent renewal and API requests; configure TLS/HSTS and trusted reverse-proxy addresses.
+- [x] Set API HSTS to a one-year max-age for trusted HTTPS requests, restrict forwarded headers to configured proxy IPs/one hop, and test that untrusted forwarded schemes cannot enable HSTS (API PR #83; CI `45846891145`, Docker `45846891086`, migration rehearsal `45846891178`).
+- [ ] Configure ingress TLS certificates, HTTP-to-HTTPS redirects, edge HSTS and exact trusted proxy IPs; verify production-style OIDC login, callback, silent renewal and API requests.
 - [ ] Production KMS/secret ownership, rotation, encryption and operational access controls.
 - [ ] Elasticsearch/Kibana authentication and TLS for the target deployment.
 - [ ] Provider-native encrypted PITR backups, retention, defined RPO/RTO and automated restore drills.
