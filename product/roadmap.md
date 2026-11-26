@@ -572,3 +572,9 @@ CompileCare.Api PR #83 is merged as `afcafdce72ca6aff0e904a1a343911930040cb1d`. 
 All three hosted workflows passed: CI `45846891145`, Docker Integration Verification `45846891086`, and PostgreSQL Migration Rehearsal `45846891178`. Integration tests assert the exact one-year HSTS duration, absence of subdomain/preload directives, and that an untrusted forwarded scheme cannot enable HSTS.
 
 **Still open:** the API does not terminate TLS. The selected ingress must install valid certificates, redirect HTTP to HTTPS, set edge HSTS, and provide the exact trusted proxy IPs. Do not enable HSTS preload or includeSubDomains until every affected hostname is confirmed HTTPS-only.
+
+### Backup, restore and disaster-recovery operational baseline — 2026-11-26
+
+Added `operations/backup-restore-disaster-recovery.md` as the required deployment-independent operational baseline. It inventories PostgreSQL, identity, object/document storage, key custody, configuration/secrets, audit logs and rebuildable indexes; defines the decisions required for RPO/RTO, backup frequency, retention, geographic resilience and restore-drill cadence; and sets minimum encryption, access, isolation, validation and approval controls. It explicitly distinguishes local migration rehearsal from provider-native backup/PITR and a successful disaster-recovery exercise.
+
+**Still open and release-blocking:** select the hosting provider and database/storage topology; approve per-deployment RPO/RTO and retention; configure provider-native encrypted backups and WAL/PITR where required; establish KMS/HSM custody and break-glass recovery; and complete a successful isolated restore drill. Tenant-level recovery is not implemented or evidenced and must not be promised. The starting recommendation is a monthly restore drill, subject to formal owner approval.
