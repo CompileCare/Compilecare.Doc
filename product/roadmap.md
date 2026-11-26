@@ -610,3 +610,9 @@ This closes the Development CORS validation bypass at code/CI level. Production 
 Web PR #63 is merged as `b2e0916b38ed5fe8e031bbf7c5b754b133a6b538`. The Nginx server configuration sets `server_tokens off`, and Docker CI fails if the response exposes `Server: nginx/<version>`. CI run `45854681476` passed dependency audit, unit tests, production build, all browser E2E tests, real-OIDC suite discoverability and Docker smoke, including the strict-CSP browser suite and version-header assertion.
 
 This reduces version disclosure only; it does not replace timely Nginx base-image patching or production ingress hardening.
+
+### Production ingress and network-security baseline — 2026-11-26
+
+Added `operations/production-ingress-and-network-checklist.md` to translate the existing API/Web controls into deployment acceptance requirements. It covers exact hostnames, TLS/HTTPS/HSTS, trusted proxies, CORS/CSP alignment, route exposure, private database/identity/observability networks, egress, edge rate limiting and evidence/sign-off.
+
+**New explicit deployment gate:** `/metrics` is mapped without endpoint-level authorization metadata and is intended for Prometheus only. The selected ingress/network must prevent public access and permit only the approved monitoring source or an authenticated internal scrape path. Health endpoints must be restricted to approved orchestrator/monitoring sources. No production ingress or network policy has yet been selected or validated.
