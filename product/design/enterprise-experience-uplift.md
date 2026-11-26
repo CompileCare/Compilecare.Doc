@@ -1,6 +1,6 @@
 # CompileCare — Enterprise Experience Uplift
 
-**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice. As of 2026-11-26, PRs #27–#28 are merged, PRs #29–#33 have passed hosted Vitest/build/Chromium/Docker checks, and the stacked UI chain remains gated on real authenticated screenshot evidence for PR #29.  
+**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice. As of 2026-11-26, PRs #27–#28 are merged, and PRs #29–#34 have passed hosted Vitest/build/Chromium/Docker checks. The stack now includes the Facility hierarchy workspace in PR #34 and remains gated on real authenticated screenshot evidence for PR #29 plus local facility-workflow acceptance.  
 **Scope:** Authenticated CompileCare hospital workspace in `CompileCare.Web`. The public-facing site is outside this initiative.
 
 ## 1. Intent
@@ -153,6 +153,7 @@ The public-repository GitHub Actions workflows are now allocating hosted runners
 - [CompileCare.Web PR #28](https://github.com/CompileCare/CompileCare.Web/pull/28) — local Playwright HTML report configuration. Hosted CI passed before merge.
 - [CompileCare.Local PR #7](https://github.com/CompileCare/CompileCare.Local/pull/7) — silent-renewal redirect registration plus idempotent reconciliation for an existing Keycloak client. Local CI passed the Docker Keycloak realm-import smoke test and exercises removal/restoration of the silent callback without resetting the realm.
 - [CompileCare.Api PR #55](https://github.com/CompileCare/CompileCare.Api/pull/55) — consistent 404 behavior for inaccessible hospital-scoped patient search and department collection listing. .NET CI and Docker/PostgreSQL integration verification passed before merge.
+- [CompileCare.Local PR #6](https://github.com/CompileCare/CompileCare.Local/pull/6) — optional observability overlay. Docker runtime smoke runs 45740981547 and 45740976578 passed for Collector, Prometheus, Jaeger v3, Elasticsearch and Kibana using synthetic telemetry before merge.
 
 ### UI stack verification
 
@@ -163,11 +164,15 @@ The public-repository GitHub Actions workflows are now allocating hosted runners
 | [#31](https://github.com/CompileCare/CompileCare.Web/pull/31) | Appointment slot selection | Run 45738824899 passed |
 | [#32](https://github.com/CompileCare/CompileCare.Web/pull/32) | Queue-row accessibility | Run 45738835427 passed |
 | [#33](https://github.com/CompileCare/CompileCare.Web/pull/33) | Clinical queue-row accessibility | Run 45739127780 passed, including the OPD journey E2E and Docker smoke |
+| [#34](https://github.com/CompileCare/CompileCare.Web/pull/34) | Facility hierarchy CRUD workspace | Runs 45741273030 and 45741268665 passed Vitest, build, Chromium E2E and Docker smoke |
 
-PRs #30–#33 are intentionally stacked behind PR #29 and must merge in sequence. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
+PRs #30–#34 are intentionally stacked behind PR #29 and must merge in sequence. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
 
 ### Remaining acceptance gate
 
-PR #29 has passed hosted CI, but the screenshot evidence described in [UI screenshot evidence](ui-screenshot-evidence.md) is still pending. Capture the actual authenticated application with synthetic tenant/hospital/department/staff/patient data at desktop, tablet and narrow viewports, and include a representative keyboard-focus state. Record the exact Web commit SHA, viewport and capture date. Do not substitute mocked Playwright screenshots or design mockups for this evidence.
+PR #29 has passed hosted CI, but the screenshot evidence described in [UI screenshot evidence](ui-screenshot-evidence.md) is still pending. Capture the actual authenticated application with synthetic tenant/hospital/department/staff/patient data at desktop, tablet and narrow viewports, and include a representative keyboard-focus state. Include the Facilities hierarchy view from PR #34 and both a read-only and a permitted write role where available. Record the exact Web commit SHA, viewport and capture date. Do not substitute mocked Playwright screenshots or design mockups for this evidence.
 
-The optional local observability overlay remains in [CompileCare.Local PR #6](https://github.com/CompileCare/CompileCare.Local/pull/6). Its collector and Compose configuration checks passed; the full developer-Mac Docker startup and log/metric/trace end-to-end smoke is still required before merge.
+[CompileCare.Local PR #6](https://github.com/CompileCare/CompileCare.Local/pull/6) is merged after the Docker runtime smoke verified synthetic metrics, traces and logs through the observability backends. A real CompileCare.Api request-to-log/metric/trace check on the developer Mac remains post-merge local acceptance, not a merge gate.
+
+
+The Facility workspace implementation is documented in [Facility hierarchy management](../workflows/facility-management.md). It uses existing tenant-scoped facility APIs, applies membership-scope-aware controls and keeps server authorization authoritative. The first UI slice is in Web PR #34; the original Antigravity scenario remains Not Run until the merged UI is exercised against the authenticated local stack with synthetic facility records.
