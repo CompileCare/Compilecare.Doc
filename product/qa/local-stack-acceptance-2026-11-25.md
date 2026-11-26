@@ -37,7 +37,7 @@ The 96% figure is 48/50 executed tests. The eight Not Run cases are not included
 - **Observed:** Patient search for a hospital ID belonging to another tenant returned HTTP 200 with an empty page. The report also observed the same response-contract issue on department collection listing for an out-of-scope hospital.
 - **Data exposure:** The report found zero patient/department rows returned; tenant query filters and department scoping prevented data leakage in the tested case.
 - **Expected contract:** Return 404 when the hospital is not visible in the caller's tenant and organization scope, consistent with single-resource anti-enumeration behavior.
-- **Correction:** API PR #55 is merged as `07fb9cea2dc6f70616c5a1fff67850f585b79d9`? No — see merge SHA below; it checks hospital visibility before patient search and returns a typed not-found result for inaccessible department collections. PostgreSQL cases cover tenant-wide foreign-tenant patient search and same-tenant out-of-scope/foreign-tenant department listing.
+- **Correction:** API PR #55 is merged as `07fb9cea2dc6f706fc5c1a6fff67850f585b79d9`? No — see merge SHA below; it checks hospital visibility before patient search and returns a typed not-found result for inaccessible department collections. PostgreSQL cases cover tenant-wide foreign-tenant patient search and same-tenant out-of-scope/foreign-tenant department listing.
 - **Hosted verification:** CI run 45739052864 passed restore, Release build, EF model-drift validation and all unit/integration tests; Docker Integration Verification run 45739052930 passed.
 - **Remaining local acceptance:** Repeat both real-stack cases on the updated local stack and confirm authorized hospital requests still return 200.
 
