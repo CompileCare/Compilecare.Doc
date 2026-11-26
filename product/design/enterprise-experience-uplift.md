@@ -1,6 +1,6 @@
 # CompileCare — Enterprise Experience Uplift
 
-**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice. As of 2026-11-26, PRs #27–#28 are merged, and PRs #29–#34 have passed hosted Vitest/build/Chromium/Docker checks. The stack now includes the Facility hierarchy workspace in PR #34 and remains gated on real authenticated screenshot evidence for PR #29 plus local facility-workflow acceptance.  
+**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice. As of 2026-11-26, PRs #27–#34 are merged into Web main. The shared visual foundation, Reception, appointment slot, queue, clinical queue and Facility hierarchy slices all passed hosted Vitest/build/Chromium/Docker verification. Real authenticated screenshots and local facility-workflow acceptance remain post-merge product acceptance items, not open-PR merge blockers.  
 **Scope:** Authenticated CompileCare hospital workspace in `CompileCare.Web`. The public-facing site is outside this initiative.
 
 ## 1. Intent
@@ -124,7 +124,7 @@ The follow-on [CompileCare.Web PR #31](https://github.com/CompileCare/CompileCar
 
 The component consumes only the existing slot list returned by the selected hospital/department/provider-session availability API. It does not decide availability, publish slots, reserve a slot, alter scheduling rules or change the booking API. The API remains the authority for concurrency, registration, authorization and reservation.
 
-Focused tests cover accessible names, availability/disabled state, selected-state semantics, selection callback, in-flight disabling and empty slots. Test fixtures use UTC explicitly for deterministic formatting. Build, browser and Docker verification remain required before merge.
+Focused tests cover accessible names, availability/disabled state, selected-state semantics, selection callback, in-flight disabling and empty slots. Test fixtures use UTC explicitly for deterministic formatting. Hosted build, browser and Docker verification passed before merge.
 
 
 ## Queue row accessibility refinement — 2026-11-25
@@ -166,13 +166,20 @@ The public-repository GitHub Actions workflows are now allocating hosted runners
 | [#33](https://github.com/CompileCare/CompileCare.Web/pull/33) | Clinical queue-row accessibility | Run 45739127780 passed, including the OPD journey E2E and Docker smoke |
 | [#34](https://github.com/CompileCare/CompileCare.Web/pull/34) | Facility hierarchy CRUD workspace | Runs 45741273030 and 45741268665 passed Vitest, build, Chromium E2E and Docker smoke |
 
-PRs #30–#34 are intentionally stacked behind PR #29 and must merge in sequence. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
+PRs #29–#34 have been merged in sequence into Web main. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
 
 ### Remaining acceptance gate
 
-PR #29 has passed hosted CI, but the screenshot evidence described in [UI screenshot evidence](ui-screenshot-evidence.md) is still pending. Capture the actual authenticated application with synthetic tenant/hospital/department/staff/patient data at desktop, tablet and narrow viewports, and include a representative keyboard-focus state. Include the Facilities hierarchy view from PR #34 and both a read-only and a permitted write role where available. Record the exact Web commit SHA, viewport and capture date. Do not substitute mocked Playwright screenshots or design mockups for this evidence.
+The UI stack has been merged, but the screenshot evidence described in [UI screenshot evidence](ui-screenshot-evidence.md) remains outstanding as a product acceptance item. Capture the actual authenticated application with synthetic tenant/hospital/department/staff/patient data at desktop, tablet and narrow viewports, and include a representative keyboard-focus state. Include the Facilities hierarchy view and both a read-only and a permitted write role where available. Record the exact Web main commit SHA, viewport and capture date. Do not substitute mocked Playwright screenshots or design mockups for this evidence.
 
 [CompileCare.Local PR #6](https://github.com/CompileCare/CompileCare.Local/pull/6) is merged after the Docker runtime smoke verified synthetic metrics, traces and logs through the observability backends. A real CompileCare.Api request-to-log/metric/trace check on the developer Mac remains post-merge local acceptance, not a merge gate.
 
 
-The Facility workspace implementation is documented in [Facility hierarchy management](../workflows/facility-management.md). It uses existing tenant-scoped facility APIs, applies membership-scope-aware controls and keeps server authorization authoritative. The first UI slice is in Web PR #34; the original Antigravity scenario remains Not Run until the merged UI is exercised against the authenticated local stack with synthetic facility records.
+The Facility workspace implementation is documented in [Facility hierarchy management](../workflows/facility-management.md). It uses existing tenant-scoped facility APIs, applies membership-scope-aware controls and keeps server authorization authoritative. Web PR #34 is merged as `c8a5a5ec9a31e85cab05d60d05e8852616319be3`. The original Antigravity scenario was Not Run in the earlier tested build; it is now implemented but remains pending authenticated local-stack acceptance with synthetic facility records.
+
+
+## Merge completion — 2026-11-26
+
+The complete Web experience stack (#29–#34) is merged into `main`. Final facility-workspace verification on head `b36c7115003384eee8f809511a0b6808b36e76f2` passed 67 Vitest tests, all 14 Chromium E2E tests, production build and Docker smoke (runs 45744960504 and 45744951178). A small post-review correction also clears stale loading indicators when a hierarchy selection is cleared and gives the inline delete confirmation non-modal group semantics.
+
+No open PRs remain in the CompileCare organization. All 11 repositories are public, and API issue #56 about Actions runner allocation is closed as resolved. Remaining acceptance work is to capture authenticated screenshots with synthetic data and exercise facility CRUD, Keycloak renewal, SEC-002 and real API telemetry against the updated local Docker stack.
