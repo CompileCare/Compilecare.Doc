@@ -76,7 +76,7 @@ These items remain roadmap scope decisions. Do not mark them as failed tests, an
 
 On 2026-11-26, the latest retried GitHub Actions jobs across API, Web, Caching, Local and Database repositories completed in approximately two seconds with `runner_id=0`, an empty runner name and zero steps. The workflow job logs were unavailable because no runner log blob was produced. These results do not establish a source-code build/test failure: the jobs did not execute.
 
-Do not merge an implementation PR based on a green-looking local report alone or on a hosted job that never received a runner. Restore GitHub Actions runner allocation, then rerun each PR's required build, tests, Docker checks and relevant browser/acceptance tests. Record the tested PR head SHA, not just the main-branch baseline SHA.
+Do not merge an implementation PR based on a green-looking local report alone or on a hosted job that never received a runner. Restore GitHub Actions runner allocation, then rerun each PR's required build, tests, Docker checks and relevant browser/acceptance tests. Record the tested PR head SHA, not just the main-branch baseline SHA. The cross-repository runner-allocation blocker is tracked in [CompileCare.Api issue #56](https://github.com/CompileCare/CompileCare.Api/issues/56).
 
 ## 7. PR grouping and merge order
 
