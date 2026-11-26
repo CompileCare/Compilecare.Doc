@@ -208,3 +208,12 @@ These hosted checks strengthen the security regression suite but do not replace 
 - Integration tests are serialized because multiple test fixtures drop and recreate the shared `compilecare_test` database; this prevents concurrent test requests from observing a database during reset.
 - Hosted Release CI, Docker integration verification and the migration-rehearsal workflow passed. Local authenticated Docker acceptance remains outstanding.
 - This CI check does not replace migration review against representative data, production approval, backup verification or a physical/PITR recovery drill.
+
+
+## 21. Local development credential bootstrap — 2026-11-26
+
+- Local PR #8 merged as `6784962a9120546952329e9f63d92aeee9c6bd4c`.
+- On a fresh macOS and Windows setup, verify that independent random 256-bit Keycloak and PostgreSQL passwords are generated and stored only in ignored `local/.env`; on macOS verify mode `0600`.
+- Verify Compose fails when `POSTGRES_PASSWORD` is absent and no weak password fallback is used.
+- Verify existing `.env` credentials are preserved when persistent volumes may exist. Do not rotate only the `.env` value: update the PostgreSQL role or Keycloak admin password in the running service first, then update `.env` and restart dependent services.
+- Hosted Local CI passed shell/PowerShell syntax, Keycloak Docker import/reconciliation, Compose configuration and Docker observability smoke checks. This does not validate the user's existing local volumes or replace local acceptance.
