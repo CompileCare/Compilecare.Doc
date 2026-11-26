@@ -1,6 +1,6 @@
 # CompileCare — Enterprise Experience Uplift
 
-**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice. As of 2026-11-26, PRs #27–#34 are merged into Web main. The shared visual foundation, Reception, appointment slot, queue, clinical queue and Facility hierarchy slices all passed hosted Vitest/build/Chromium/Docker verification. Real authenticated screenshots and local facility-workflow acceptance remain post-merge product acceptance items, not open-PR merge blockers.  
+**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice. As of 2026-11-26, PRs #27–#35 are merged into Web main. The shared visual foundation, Reception, appointment slot, queue, clinical queue, Facility hierarchy and tenant membership administration slices all passed hosted Vitest/build/Chromium/Docker verification. Real authenticated screenshots and local facility/membership acceptance remain post-merge product acceptance items, not open-PR merge blockers.  
 **Scope:** Authenticated CompileCare hospital workspace in `CompileCare.Web`. The public-facing site is outside this initiative.
 
 ## 1. Intent
@@ -164,9 +164,10 @@ The public-repository GitHub Actions workflows are now allocating hosted runners
 | [#31](https://github.com/CompileCare/CompileCare.Web/pull/31) | Appointment slot selection | Run 45738824899 passed |
 | [#32](https://github.com/CompileCare/CompileCare.Web/pull/32) | Queue-row accessibility | Run 45738835427 passed |
 | [#33](https://github.com/CompileCare/CompileCare.Web/pull/33) | Clinical queue-row accessibility | Run 45739127780 passed, including the OPD journey E2E and Docker smoke |
-| [#34](https://github.com/CompileCare/CompileCare.Web/pull/34) | Facility hierarchy CRUD workspace | Runs 45741273030 and 45741268665 passed Vitest, build, Chromium E2E and Docker smoke |
+| [#34](https://github.com/CompileCare/CompileCare.Web/pull/34) | Facility hierarchy CRUD workspace | Runs 45744960504 and 45744951178 passed 67 Vitest tests, 14 Chromium E2E tests, build and Docker smoke |
+| [#35](https://github.com/CompileCare/CompileCare.Web/pull/35) | Tenant membership administration | Runs 45745881098 and 45746024118 passed 75 Vitest tests, 14 Chromium E2E tests, build and Docker smoke |
 
-PRs #29–#34 have been merged in sequence into Web main. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
+PRs #29–#34 have been merged in sequence into Web main, followed by membership administration PR #35. Merge commits: #29 `37f30508a23add4a8af0918307a524dd9f9f4bdb`; #30 `f0e548737ac05a1886640be742ed64a32f892e38`; #31 `0c10cafacb43183b47bc2f18ea0deadf8a90a95e`; #32 `68a8c9798a29df34031e2e13d7857550f887546b`; #33 `23cf6dcf503fc4e781e9b343d244ea9665566e29`; #34 `c8a5a5ec9a31e85cab05d60d05e8852616319be3`. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
 
 ### Remaining acceptance gate
 
@@ -176,6 +177,8 @@ The UI stack has been merged, but the screenshot evidence described in [UI scree
 
 
 The Facility workspace implementation is documented in [Facility hierarchy management](../workflows/facility-management.md). It uses existing tenant-scoped facility APIs, applies membership-scope-aware controls and keeps server authorization authoritative. Web PR #34 is merged as `c8a5a5ec9a31e85cab05d60d05e8852616319be3`. The original Antigravity scenario was Not Run in the earlier tested build; it is now implemented but remains pending authenticated local-stack acceptance with synthetic facility records.
+
+Tenant-scoped membership administration is documented in [Tenant membership administration](../workflows/tenant-membership-administration.md) and merged in Web PR #35 as `b8e4a4ec8864884f5e71dc070a319a5f4df07185`. It is shown only to memberships with `membership.manage`, supports exact OIDC subject-based provisioning, role/scope editing and confirmed membership lifecycle operations. The global platform tenant lifecycle workspace is merged in Web PR #36 (`54589758db04848d25e2e078f3619c1932cc645a`) after hosted Vitest, production build, all 14 Chromium E2E tests and Docker smoke passed. It remains a separate platform-operator-only control plane, not part of the tenant HospitalAdmin workspace.
 
 
 ## Merge completion — 2026-11-26
