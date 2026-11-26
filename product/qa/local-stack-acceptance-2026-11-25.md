@@ -130,6 +130,8 @@ The screenshot-evidence checklist is now a post-merge product acceptance item. C
 - No open implementation PRs remain across the 11 public CompileCare repositories. The remaining acceptance work is authenticated local Keycloak/API/PostgreSQL verification with synthetic data and screenshot evidence; hosted CI does not replace that local end-to-end acceptance.
 
 ## 11. Audit transaction and endpoint coverage — 2026-11-26
+- API PR #69 merged as `bb97d951c8d8eb042e7d381501a9f3f29862fb4e`. The authenticated-route audit guard now also asserts that at least one route is discovered, preventing a false-positive empty-source test. Hosted Release CI run 45751984878 and Docker Integration Verification run 45751984843 passed.
+
 
 - API PR #66 merged as `a88a105624dd717c49aca83a7e6fb69e85dd75d0`. A Department B PatientRegistrar is denied ten availability, appointment and queue operations targeting Department A in the same hospital; each denial returns 404 and is audited with validated actor/tenant and exact resource attribution. Hosted CI runs 45751436654 and 45751402961 passed Release build, EF model-drift, 12 unit tests and 99 PostgreSQL integration tests; Docker run 45751436573 passed.
 - API PR #67 merged as `29ccf37cc75273ea98d99e39ccf456a429434210`. A PostgreSQL trigger injects an audit-event persistence failure during patient registration. The regression verifies HTTP 503 and confirms both patient and hospital-registration writes are rolled back. Hosted CI runs 45751563380 and 45751571863 passed; Docker run 45751571879 passed.
