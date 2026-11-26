@@ -37,7 +37,7 @@ The post-remediation execution summary records 41 total, 41 passed, zero failed 
 
 DEF-006 is not represented as a completed defect. It is a grouped release backlog item with distinct governance and deployment dependencies:
 
-- **CSP:** no Content-Security-Policy header was observed at the local Web endpoint. The enforced policy must be based on the exact production Keycloak/API origins and tested in the target deployment; do not add a broad or guessed policy.
+- **CSP:** no Content-Security-Policy header was observed during this Antigravity run (before the subsequent Web hardening PR). Web PR #56 was subsequently merged and adds an enforced Nginx CSP rendered from validated runtime API/OIDC origins; CI run `45838673174` passed the header-generation and invalid-wildcard startup checks. CompileCare.Local PR #20 supplies local API/Keycloak origins and adds full-stack CSP assertions; its hosted run started before Web PR #56 merged, so it must be rerun against Web main before merge. Production CSP acceptance remains open until exact HTTPS production origins and real OIDC/API flows are tested.
 - **Audit Log Viewer UI:** the API `/api/v1/audit/events` and CSV export are reported implemented, but the customer-facing Web screen is not. Keep UI, export workflow and permissions gated by ADR-016 and hospital/compliance approval.
 - **OtpService:** runtime integration is not implemented; the OtpService main branch remains a skeleton. Patient contact verification is separately deferred under ADR-012.
 
@@ -110,7 +110,9 @@ The 404 responses should be reviewed against intended API semantics and the UI's
 
 ## Remaining release gates
 
-- [ ] Resolve production deployment origins, implement and test a restrictive CSP, TLS/HSTS and trusted-proxy configuration.
+- [x] Implement an enforced, configurable Web CSP with startup validation and CI header/invalid-origin checks (Web PR #56; CI run `45838673174`).
+- [ ] Verify CompileCare.Local emits the expected CSP through the full nine-service stack after Local PR #20 is rerun against Web main.
+- [ ] Define exact production Keycloak/API origins and browser-test CSP through real production-style OIDC login, callback, silent renewal and API requests; configure TLS/HSTS and trusted reverse-proxy addresses.
 - [ ] Production KMS/secret ownership, rotation, encryption and operational access controls.
 - [ ] Elasticsearch/Kibana authentication and TLS for the target deployment.
 - [ ] Provider-native encrypted PITR backups, retention, defined RPO/RTO and automated restore drills.
