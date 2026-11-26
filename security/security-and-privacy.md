@@ -26,7 +26,7 @@ The implementation is the first authenticated tenant boundary for the facility A
 - TLS in transit, encryption at rest, key and secret rotation, and secure key storage.
 - Input validation, output encoding, CSRF protections where applicable, rate limiting, abuse protection and secure session/token handling.
 - Dependency/container scanning, software supply-chain controls, least-privilege CI and release credentials.
-- Backups, restore tests, incident response, disaster recovery and tested operational runbooks.
+- Backups, restore tests, incident response, disaster recovery and tested operational runbooks. See the [Backup, Restore and Disaster-Recovery Operational Baseline](../operations/backup-restore-disaster-recovery.md) for the protected-data inventory, recovery-objective decisions, isolated restore procedure and drill acceptance evidence.
 - Data minimization, purpose limitation, retention, controlled export and verified deletion processes.
 - No patient-identifiable information in logs, telemetry, test fixtures or screenshots unless specifically approved and protected.
 
