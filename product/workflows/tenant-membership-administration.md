@@ -40,7 +40,7 @@ The create form:
 - Uses the issuer from the currently validated sign-in; it is not editable.
 - Requires the target user's exact OIDC subject.
 - Does not accept email as an identity key.
-- Requires the user to exist in the configured identity provider before membership creation.
+- Requires the operator to create the user in the configured identity provider before membership creation. This is an operational precondition: CompileCare stores the membership but does not create or verify identity-provider accounts.
 
 The UI displays the subject because administrators need to distinguish identity records. Access to this identifier is restricted to the membership-management permission.
 
@@ -88,7 +88,7 @@ The list is paginated at 50 entries per page. The service applies scope containm
 - Self-management controls are disabled in the UI; the API independently rejects self-update and self-deactivation.
 - A 409 response may indicate a concurrent change, last-administrator protection or another protected lifecycle rule. The UI asks the administrator to refresh and review the current assignments.
 - A 403/404 response is surfaced without substituting a broader list or bypassing scope checks.
-- The create form clearly states that the target user must already exist in the configured identity provider and that the OIDC subject, not email, is required.
+- The create form clearly states that the target user must already exist in the configured identity provider, that CompileCare does not create IdP accounts, and that the OIDC subject (not email) is required.
 - Scope editing preserves the full scope set in the update request; changing a role does not silently discard existing scopes.
 
 ## Platform tenant lifecycle is a separate control plane
