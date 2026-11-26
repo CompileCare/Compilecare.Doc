@@ -22,6 +22,7 @@ Keep product documentation aligned with the real authenticated hospital workspac
 7. Draft clinical note with the approved five sections, signed read-only note, and append-only amendment history.
 8. Facility hierarchy administration showing the active hospital, department/ward/room/bed navigation, and permission-appropriate controls. Capture both a read-only view and a permitted write view where the staging roles allow it.
 9. Tenant membership administration for a synthetic HospitalAdmin identity, showing the membership list, role/scope editor and explicit deactivate/reactivate confirmation. Do not expose real identity subjects or use production user data in screenshots.
+10. Global Platform tenants workspace signed in as a synthetic persisted PlatformOperator, showing Provisioning, Active and Suspended tenant states, the initial-administrator flow and explicit suspension/terminal-closure confirmations. Also capture a tenant HospitalAdmin session proving the platform navigation and workspace are absent.
 
 Capture each view at a desktop viewport (1440×900), tablet viewport (1024×768) and narrow viewport (390×844), where the workflow remains meaningful. Include keyboard focus in at least one representative capture and keep labels/statuses legible.
 
