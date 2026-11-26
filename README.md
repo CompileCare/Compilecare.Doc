@@ -11,6 +11,7 @@ CompileCare is an India-focused hospital information and management platform for
 - [Glossary](product/glossary.md)
 - [Hospital module catalogue](product/module-catalogue.md)
 - [Delivery roadmap and current implementation status](product/roadmap.md)
+- [Full-platform E2E validation — 2026-11-26](qa/e2e-validation-2026-11-26.md)
 - [Requirements lifecycle](product/requirements-lifecycle.md)
 - [Patient registration workflow](product/workflows/patient-registration.md)
 - [Staff and provider management workflow](product/workflows/staff-and-provider-management.md)
