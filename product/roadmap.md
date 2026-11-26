@@ -517,3 +517,20 @@ The following Web remediation is merged:
 DEF-006 is reclassified rather than treated as one code defect: CSP remains a deployment-specific gate until exact production Keycloak/API origins are known; Audit Review UI remains deferred under ADR-016; and OtpService runtime integration remains deferred/not implemented. Do not broaden audit permissions or implement customer-facing audit browsing/export UX before hospital/compliance approval.
 
 **Next:** rerun Antigravity's full local E2E and visual evidence collection against the combined current Web main; review restored context with multiple/revoked memberships; complete hospital-user keyboard/screen-reader review; validate the Windows 10/11 launcher on a real host; and close production CSP/trusted-proxy, provider-native backup/PITR, RPO/RTO, restore-drill and pilot/security/privacy gates. The original local report remains the historical baseline; new validation must use a new dated evidence directory.
+
+### Post-remediation local acceptance — 2026-11-26 (supersedes the prior rerun gate)
+
+**Status: VALIDATION PASS FOR IMPLEMENTED OPD MVP SCOPE. Not hospital-pilot or production approval.**
+
+The post-remediation Antigravity run was completed against the combined current Web main after PRs #53–#55. The detailed evidence is recorded in [Post-remediation E2E validation](../qa/post-remediation-e2e-validation-2026-11-26.md).
+
+- Live browser E2E improved from 34/35 to **41/41**; security/RBAC/tenant isolation remained **24/24**; combined live checks improved from **58/59 to 65/65**, with zero failures and zero blocked checks.
+- DEF-001 through DEF-005 and DEF-007 are verified fixed. DEF-005 includes separate Overview refresh and persisted/validated tenant+hospital context checks.
+- Web CI evidence: 113/113 unit tests and 16/16 Playwright specs using five workers.
+- All nine local containers were running. Prometheus had two scrape jobs up and 140 HTTP metric series; Collector exposed 1,037 HTTP metric lines with zero Collector error-log lines; Jaeger contained 50 API traces/101 spans including PostgreSQL spans; sampled Elasticsearch secret-leak search returned zero hits.
+- Local performance sample: 167 API requests, p50 13 ms, p95 51 ms, max 111 ms; this is not production capacity certification.
+- Execution summary: 41/41 browser checks passed, zero failed/blocked, seven not-implemented areas. Six console errors and 12 network entries were recorded and classified in the QA report; these are not described as zero console/network errors.
+
+**DEF-006 remains open as a grouped release backlog item:** production CSP must be designed for exact deployed Keycloak/API origins; customer-facing Audit Log Viewer UI remains deferred under ADR-016 despite the reported API/CSV export implementation; OtpService runtime integration remains a skeleton and patient contact verification remains gated by ADR-012.
+
+The previous checklist item requiring a fresh combined-main local E2E rerun is now complete. Remaining gates are authenticated hospital-user keyboard/screen-reader and accessibility review, Windows 10/11 launcher acceptance, production TLS/HSTS/CSP/trusted-proxy/KMS configuration, Elasticsearch/Kibana authentication and TLS, provider-native encrypted PITR and restore drills with defined RPO/RTO, independent penetration/privacy/legal review, and hospital pilot approval. Do not implement Audit Review UI or OTP/contact verification before their respective governance decisions.
