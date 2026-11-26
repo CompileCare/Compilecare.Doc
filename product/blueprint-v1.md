@@ -395,7 +395,7 @@ This is hosted Linux Docker evidence. The developer-Mac one-click startup and au
 
 Local PR #14 (`02888b4`) adds an isolated hosted Docker acceptance path that obtains signed user access tokens from Keycloak, then exercises the actual PostgreSQL-backed API. The successful PR run `45792658639` verified issuer/audience/subject validation, platform bootstrap, two tenant provisioning, distinct HospitalAdmin/FacilityViewer memberships for the same user, tenant-specific hospital isolation, cross-tenant membership mutation denial, and immediate effect of membership deactivation/reactivation.
 
-The test uses a temporary CI-only client and direct grant. It does not exercise the production-style Web Authorization Code + PKCE flow, browser redirect, silent renewal, refresh/session lifecycle or user-facing Web UI. Those checks still require browser-based acceptance against the developer-Mac local stack.
+The API-level test uses a temporary CI-only client and direct grant; by itself it does not exercise the production-style Web Authorization Code + PKCE flow, browser redirect, silent renewal or refresh/session lifecycle. The separate Local PR #15 browser suite now verifies the real PKCE sign-in/callback and tenant switch in hosted Docker CI. Developer-Mac session renewal and local browser workflow acceptance remain outstanding.
 
 The same PR fixes the checked-in local Keycloak realm: it adds the built-in `basic` scope to the `compilecare-web` default scopes and the reconciler ensures the `oidc-sub-mapper` emits access-token `sub`. This supplies the validated subject needed to look up persisted tenant memberships. Production IdP configuration must be checked separately and is not changed by the local realm file.
 
