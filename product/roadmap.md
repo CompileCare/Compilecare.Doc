@@ -271,3 +271,8 @@ CompileCare.Web PR #38 merged as `23e84efaaa02ed61d18696fd8a9318db2df1862b`. The
 ## Audit export hardening — 2026-11-26
 
 [CompileCare.Api PR #72](https://github.com/CompileCare/CompileCare.Api/pull/72) merged as `0fc8cfee33290986c798bf0285dc6cf6861a9422`. CSV export now neutralizes formula values even when preceded by whitespace and prefixes leading tab/CR/LF control characters. PostgreSQL integration coverage confirms a control-character-prefixed actor subject is neutralized and that the export endpoint itself is recorded as an `ExportAuditEvents` audit event. Release CI and Docker integration verification passed. This supplements the bounded tenant-wide audit query/export delivered in PR #71; retention policy, access review and production governance remain outstanding.
+
+
+## PostgreSQL migration rehearsal and integration-test isolation — 2026-11-26
+
+[CompileCare.Api PR #73](https://github.com/CompileCare/CompileCare.Api/pull/73) merged as `e95e23dee5a08fe6805ae64da1c8cdefda759597`. Added a PostgreSQL 16 CI rehearsal that applies the base revision to an isolated upgrade database, then applies the PR revision's idempotent migration script to both the upgraded database and a fresh database. The script is applied twice to verify idempotency, and the complete EF migration histories must match. The rehearsal caught and corrected a missing SQL statement terminator in the audit-trigger migration; the trigger behavior is unchanged. Integration tests now run serially because several fixtures reset the same shared test database. Release CI, Docker integration verification and migration rehearsal passed. This is a disposable CI check, not a production-data migration rehearsal or release approval.

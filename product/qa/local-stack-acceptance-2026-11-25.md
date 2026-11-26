@@ -198,3 +198,13 @@ These hosted checks strengthen the security regression suite but do not replace 
 - PostgreSQL integration tests verify leading tab/control-character spreadsheet formula protection in exported actor metadata and verify that the export request itself is captured as `ExportAuditEvents` and visible in a subsequent audit query.
 - Hosted Release CI and Docker integration verification passed. Repeat on local Docker with synthetic test identities; do not use real patient data for export tests.
 - Retention enforcement, export monitoring/access review and privacy/legal policy remain separate production readiness gates.
+
+
+## 20. PostgreSQL migration rehearsal and test isolation — 2026-11-26
+
+- API PR #73 merged as `e95e23dee5a08fe6805ae64da1c8cdefda759597`.
+- CI migration rehearsal applies base migrations to a disposable PostgreSQL 16 upgrade database, then applies the current idempotent script to both the upgrade database and a fresh database. The script is run twice on each target, and exact migration-history IDs are compared.
+- The rehearsal found a missing statement terminator after the audit trigger function definition. The migration SQL was corrected without changing the function body or schema semantics.
+- Integration tests are serialized because multiple test fixtures drop and recreate the shared `compilecare_test` database; this prevents concurrent test requests from observing a database during reset.
+- Hosted Release CI, Docker integration verification and the migration-rehearsal workflow passed. Local authenticated Docker acceptance remains outstanding.
+- This CI check does not replace migration review against representative data, production approval, backup verification or a physical/PITR recovery drill.
