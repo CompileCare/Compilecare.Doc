@@ -558,3 +558,9 @@ CompileCare.Api PR #82 is merged as `dc07866a064855dce72880bc24c1cc13c393be40`. 
 All three final hosted workflows passed: CI `45843760937` (Release build, EF model-drift and full test suite), Docker Integration Verification `45843760927`, and PostgreSQL Migration Rehearsal `45843760942`. The Docker suite also exercises the production HSTS/forwarded-header middleware using the non-Development Testing environment and a synthetic, non-connected database configuration.
 
 **Still open for deployment:** select the hosting provider, securely mount its trusted CA if required, configure the real PostgreSQL hostname and `VerifyFull` connection string, and prove a successful TLS connection with hostname validation from the deployed API network. Encryption-at-rest, KMS ownership/rotation, encrypted backups/PITR and restore drills remain separate gates.
+
+### Automated Web accessibility regression baseline — 2026-11-26
+
+Web PR #58 is merged as `a480b0eea462afcf955b44da278a3817ef3ca6bf`; CI run `45844753971` passed 113 unit tests and all 19 Chromium Playwright specs. The existing keyboard skip-link/focus and responsive overflow checks are retained. The accessibility suite now also asserts one main landmark and one level-one heading, accessible names for public-shell links/buttons, associated labels for form fields, alternative text attributes on images, and reduced-motion transition durations.
+
+This is an automated public-shell baseline only. It does not constitute WCAG 2.2 AA conformance or validate authenticated role-specific clinical workflows with screen readers. Keep the manual hospital-user keyboard, screen-reader, zoom/contrast and assistive-technology review as an explicit pilot gate; extend automated coverage as authenticated fixtures become available.
