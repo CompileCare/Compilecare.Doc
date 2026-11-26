@@ -154,3 +154,7 @@ This is hosted local-stack integration evidence, not proof of the production CSP
 API PR #86 merged as `1a5a722a3342cf5fbaf439418717570189e808ea`. Outside Development/Testing, the API now requires explicit `Observability:Metrics:AllowedNetworks` CIDRs and returns 404 to sources outside the allowlist. Missing, malformed and unrestricted `/0` CIDRs are rejected. CI run `45856072221` passed 12 unit and 162 integration tests; Docker Integration Verification `45856072556` and PostgreSQL Migration Rehearsal `45856072217` also passed.
 
 The monitoring CIDR must be supplied for the actual production topology, and the public ingress must independently block `/metrics`. The middleware does not claim that production ingress/network configuration has been deployed or tested.
+
+### Metrics source-address compatibility follow-up
+
+API PR #88 merged as `d67b2d77ae6d4f1db56de3150b77d0284a388984`. The middleware normalizes IPv4-mapped IPv6 peers before checking IPv4 CIDRs and returns 404 when the remote address is absent. CI run `45856806161` passed 12 unit and 164 integration tests; Docker Integration Verification `45856806071` and PostgreSQL Migration Rehearsal `45856806255` also passed.
