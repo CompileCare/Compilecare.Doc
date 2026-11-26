@@ -1,6 +1,6 @@
 # CompileCare — Enterprise Experience Uplift
 
-**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice.  
+**Status:** Phase 5 product and engineering priority; implementation is incremental and must be verified per slice. As of 2026-11-26, PRs #27–#28 are merged, PRs #29–#33 have passed hosted Vitest/build/Chromium/Docker checks, and the stacked UI chain remains gated on real authenticated screenshot evidence for PR #29.  
 **Scope:** Authenticated CompileCare hospital workspace in `CompileCare.Web`. The public-facing site is outside this initiative.
 
 ## 1. Intent
@@ -141,3 +141,33 @@ The follow-on [CompileCare.Web PR #33](https://github.com/CompileCare/CompileCar
 This increment is deliberately limited to the clinical queue list. The identity confirmation required before viewing an encounter, department patient lookup, draft editing, signing, closing, cancellation, append-only amendment handling, and all API authorization flows remain in the existing clinical workflow and are not changed. The queue row continues to display operational tokens only; patient identity and clinical content are not added to queue lists.
 
 Tests cover row/status/action names, passing the selected API-returned QueueEntry to the existing open handler, completed-visit resume label and disabled states. Build, browser and Docker verification remain required before merge.
+
+
+## Verification update — 2026-11-26
+
+The public-repository GitHub Actions workflows are now allocating hosted runners and executing their steps. The previous zero-runner condition is no longer blocking the active Web UI work.
+
+### Completed and merged
+
+- [CompileCare.Web PR #27](https://github.com/CompileCare/CompileCare.Web/pull/27) — cross-platform Playwright interactions for native selects and macOS/Linux Select All behavior. Hosted browser and Docker smoke checks passed before merge.
+- [CompileCare.Web PR #28](https://github.com/CompileCare/CompileCare.Web/pull/28) — local Playwright HTML report configuration. Hosted CI passed before merge.
+- [CompileCare.Local PR #7](https://github.com/CompileCare/CompileCare.Local/pull/7) — silent-renewal redirect registration plus idempotent reconciliation for an existing Keycloak client. Local CI passed the Docker Keycloak realm-import smoke test and exercises removal/restoration of the silent callback without resetting the realm.
+- [CompileCare.Api PR #55](https://github.com/CompileCare/CompileCare.Api/pull/55) — consistent 404 behavior for inaccessible hospital-scoped patient search and department collection listing. .NET CI and Docker/PostgreSQL integration verification passed before merge.
+
+### UI stack verification
+
+| PR | Slice | Hosted verification |
+|---|---|---|
+| [#29](https://github.com/CompileCare/CompileCare.Web/pull/29) | Shared visual foundation and shell | Run 45738737945 passed Vitest, build, Chromium E2E and Docker smoke |
+| [#30](https://github.com/CompileCare/CompileCare.Web/pull/30) | Reception patient selection | Run 45738814930 passed |
+| [#31](https://github.com/CompileCare/CompileCare.Web/pull/31) | Appointment slot selection | Run 45738824899 passed |
+| [#32](https://github.com/CompileCare/CompileCare.Web/pull/32) | Queue-row accessibility | Run 45738835427 passed |
+| [#33](https://github.com/CompileCare/CompileCare.Web/pull/33) | Clinical queue-row accessibility | Run 45739127780 passed, including the OPD journey E2E and Docker smoke |
+
+PRs #30–#33 are intentionally stacked behind PR #29 and must merge in sequence. The PR #29 CSS/test corrections ensure the skip-to-content link is the first keyboard stop and the narrow-screen navigation remains within the viewport; PR #33's OPD journey selector now matches the queue-token-specific accessible name.
+
+### Remaining acceptance gate
+
+PR #29 has passed hosted CI, but the screenshot evidence described in [UI screenshot evidence](ui-screenshot-evidence.md) is still pending. Capture the actual authenticated application with synthetic tenant/hospital/department/staff/patient data at desktop, tablet and narrow viewports, and include a representative keyboard-focus state. Record the exact Web commit SHA, viewport and capture date. Do not substitute mocked Playwright screenshots or design mockups for this evidence.
+
+The optional local observability overlay remains in [CompileCare.Local PR #6](https://github.com/CompileCare/CompileCare.Local/pull/6). Its collector and Compose configuration checks passed; the full developer-Mac Docker startup and log/metric/trace end-to-end smoke is still required before merge.
