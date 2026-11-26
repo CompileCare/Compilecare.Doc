@@ -200,3 +200,13 @@ Tenant-scoped membership administration is implemented and merged in [CompileCar
 The workflow is documented in [Tenant membership administration](workflows/tenant-membership-administration.md). ADR-0004 now records the implemented tenant registry, separate persisted platform-operator authorization and membership lifecycle rules.
 
 **Completed:** [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36) merged as `54589758db04848d25e2e078f3619c1932cc645a`. The global platform tenant lifecycle workspace uses the merged self-status endpoint from API PR #57 and the activation guard from PR #58. It is visible only to persisted platform operators; all global operations remain protected by the PlatformOperator API policy. **Next:** authenticated local Keycloak/API/PostgreSQL acceptance for tenant creation, initial administrator provisioning, activation, suspension, reactivation and terminal closure.
+
+
+### Scheduling concurrency and cross-hospital audit — 2026-11-26
+
+Appointment scheduling now maps PostgreSQL exclusion/unique conflicts and deadlocks (SQLSTATE 23P01, 23505 and 40P01) to HTTP 409 rather than leaking an internal-server error. Concurrent booking keeps exactly one successful reservation; the competing caller must refresh availability and choose again.
+
+- [CompileCare.Api PR #60](https://github.com/CompileCare/CompileCare.Api/pull/60) merged as `b31832ef8a416373532bcfe46b9e171dcc9890e7`. Hosted runs 45748869864 and 45748869951 passed Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and Docker verification.
+- [CompileCare.Api PR #61](https://github.com/CompileCare/CompileCare.Api/pull/61) merged as `ac8ef92aa8063321bc07f838c4e512945f8f2182`. The cross-hospital OPD denial test verifies five unauthorized operations return 404, emit rejected audit metadata with validated actor/tenant attribution, and leave the owner's clinical note unchanged. Hosted runs 45749260863 and 45749260926 passed the same Release/model-drift/unit/integration/Docker gates.
+
+The appointment and cross-hospital security workflows are documented in [Appointments and queue](workflows/appointments-and-queue.md) and [ADR-014](../architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md). Authenticated local Keycloak/API/PostgreSQL acceptance remains required before pilot sign-off.
