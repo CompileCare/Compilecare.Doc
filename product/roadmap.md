@@ -107,7 +107,7 @@ The initial OPD vertical slice now includes reception and patient registration/M
 
 ## Active release-readiness work — status 2026-11-26
 
-The local acceptance findings and the follow-up PRs have been rechecked on their current heads. The GitHub Actions runner-allocation issue that previously produced `runner_id=0` and zero-step jobs is no longer blocking the active public-repository workflows. Hosted jobs now receive runners and execute actual tests and Docker verification. Issue [CompileCare.Api #56](https://github.com/CompileCare/CompileCare.Api/issues/56) remains open to record the visibility/billing distinction because `CompileCare.Site`, `CompileCare.Mobile` and `CompileCare.OtpService` still appear private in the organization inventory; Actions for those repositories remain subject to the Free organization compute allowance and budget.
+The local acceptance findings and follow-up PRs have been rechecked. The GitHub Actions runner-allocation issue that previously produced `runner_id=0` and zero-step jobs is resolved. All 11 CompileCare repositories are now public, hosted jobs receive runners and execute actual tests and Docker verification, and issue [CompileCare.Api #56](https://github.com/CompileCare/CompileCare.Api/issues/56) is closed as completed.
 
 ### Merged after executed verification
 
