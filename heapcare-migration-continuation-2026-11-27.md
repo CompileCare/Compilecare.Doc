@@ -81,3 +81,18 @@ Do not declare the migration complete until repository slug cleanup, production 
 - Existing Keycloak realm/client/audience, PostgreSQL database/role, connection-string fallback and persistent Docker volume identifiers remain compatibility contracts. No domain, DNS, mail, certificate or production origin is assumed configured.
 
 This checkpoint records engineering evidence only; it is not a production approval or a declaration that the brand/identity migration is fully closed.
+
+
+## Engineering continuation — 2026-11-27 (follow-up checkpoint)
+
+### Platform-operator authorization regression
+- `HeapCare.Api#104` — merged commit `3f58326b3168035bde036a082766080409ad9c91`. Added a PostgreSQL-backed integration regression proving that a tenant HospitalAdmin cannot obtain platform tenant-administration access by supplying forged `role`, `platform_operator` or permission claims in the bearer token. Authorization continues to depend on the validated identity and active persisted PlatformOperator record.
+- All three reported PR checks passed for head `983ab483d33b6a8bf32c0945d20ce1eed8465199`: two build-and-test checks and Docker integration verification. See [PR #104](https://github.com/HeapCare/HeapCare.Api/pull/104).
+- Post-merge API main-branch CI run [#46005866195](https://github.com/HeapCare/HeapCare.Api/actions/runs/46005866195) was observed initializing its PostgreSQL test containers at this checkpoint; its final outcome is intentionally not inferred here.
+
+### Repository metadata cleanup
+- A read-only inventory found legacy/placeholder descriptions still present on several renamed repositories (including `CompileCare.Api` and `CompileCare Web Site`). This is repository metadata, separate from source code and runtime compatibility identifiers. No metadata mutation has been made in this checkpoint; the available connected GitHub write actions do not expose repository-description updates.
+
+### Current release boundaries
+- The authorization regression is automated evidence for this platform-operator escalation path only; it is not a complete endpoint-by-endpoint authorization certification.
+- OTP remains on security hold, and production identity, data-volume, DNS/domain and release-governance gates above remain open.
