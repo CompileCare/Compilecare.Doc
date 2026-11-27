@@ -726,3 +726,10 @@ HeapCare is the accepted product-facing brand. The migration is now in implement
 **Preserved intentionally:** GitHub organization/repository slugs, support email/domain, production Keycloak realm/issuer/client/audience, PostgreSQL database/role/schema, EF migration history and persistent Docker volumes. These are external or persisted contracts, not safe global-replacement targets. The API now prefers `ConnectionStrings:HeapCare` with a legacy `ConnectionStrings:CompileCare` fallback. Local session-storage keys are migrated without losing tenant/hospital selection.
 
 **Administrative blockers:** GitHub organization/repository renames are not exposed by the connected GitHub actions in this session. HeapCare domain/DNS/email/certificates have not been purchased/configured. New private HeapCare NuGet packages need package read grants for production consumer repositories. Final completion requires those administrative tasks plus green latest-head and post-merge verification.
+
+
+### Merge completion — 2026-11-27
+
+The API technical migration (PR #101) and Web frontend identifier migration (PR #69) are now merged, alongside the previously merged Site, Local, Database documentation, Observability, API Client, Caching, Mobile/OTP scaffold and central documentation changes. The API final PR-head checks passed: .NET restore/build/test, EF pending-model-change detection, Docker integration verification, and legacy-to-HeapCare PostgreSQL migration rehearsal. The Web final PR-head checks passed: npm audit, unit tests, production build, browser E2E, Docker build and CSP smoke test. Post-merge main-branch checks and the newest Local full-stack verification are running.
+
+The source/project migration is therefore merged across all 11 repositories. Remaining work is limited to external/admin identity changes and final post-merge verification: GitHub organization/repository slugs, domain/email/DNS/certificates, production Keycloak realm/client/audience, private package read grants, and data-safe database/persistent-volume renaming where genuinely required.
