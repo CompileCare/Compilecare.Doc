@@ -903,3 +903,23 @@ The existing Playwright accessibility suite currently verifies the public shell 
 ### Parallel execution constraints
 
 Independent API authorization, Local integration, Web UX and documentation work may proceed concurrently when they do not modify shared files or depend on unmerged changes. CI is monitored per PR and merges require green required checks on the exact PR head. Provider selection, production identity/key custody, retention/legal-hold policy, pilot role approval and hospital-group/branch semantics remain owner-dependent gates; no production or clinical policy is inferred.
+
+
+## Phase execution update — 2026-11-27 (API #119–#120, Local #30 and Web #76)
+
+### Phase 3 — duplicate-review authorization, scope and audit evidence
+
+- **HeapCare.Api PR #119** merged as `bb3ab9868b58de247033b7a2695878c10e218902`. PostgreSQL-backed coverage proves a persisted HospitalAdmin can review duplicate candidates and receives the matching hospital-local candidate. Hosted API CI and Docker/PostgreSQL integration verification passed.
+- **HeapCare.Api PR #120** merged as `25f4b300ce1bd85bb99a4db57f16affeee45f617`. A hospital-scoped HospitalAdmin can review candidates in the assigned hospital; a same-tenant request for another hospital receives a non-disclosing 404. Both the successful and rejected requests are asserted in the audit store with tenant, issuer, subject, action, resource, outcome and status attribution. API CI and Docker integration verification passed.
+- These changes add test evidence only. They do not change role grants or approve which roles should have duplicate-review responsibility. The current persisted implementation continues to grant that capability to HospitalAdmin and PatientRegistrar; role approval remains a product/clinical-owner gate.
+
+### Phase 4 — authenticated duplicate-review acceptance
+
+- **HeapCare.Local PR #30** merged as `981a63809db69861ec316d8bcb82a8d8ae5fee7d`. The isolated nine-service acceptance workflow now obtains real Keycloak-issued tokens for the persisted tenant roles and exercises duplicate review through the API: HospitalAdmin and PatientRegistrar can retrieve the synthetic hospital-local candidate; FacilityManager, FacilityViewer and ClinicalUser are denied without patient-name disclosure.
+- The full Local run [#46031858710](https://github.com/HeapCare/HeapCare.Local/actions/runs/46031858710) passed Local tooling validation and full nine-service Docker/API telemetry verification, including the real Authorization Code + PKCE browser journey.
+- This closes a specific API workflow acceptance slice; it does not complete the OPD/appointment/billing end-to-end acceptance or constitute live clinical/patient data validation.
+
+### Phase 5 — authenticated role UI regression
+
+- **HeapCare.Web PR #76** merged as `8dcb5417bf9b690d7bcdff97ae96e929ef9beafa`. Playwright now verifies the authenticated workspace's main landmark, keyboard skip-link focus, accessible control names and labelled form fields for all five persisted tenant-role contexts.
+- The role contexts in PR #76 are intentionally UI-mocked. Real OIDC browser acceptance remains a separate lane, and manual six-role accessibility, real screen-reader, zoom/reflow, contrast and qualified WCAG 2.2 AA evaluation remain outstanding.
