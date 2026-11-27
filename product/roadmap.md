@@ -775,3 +775,27 @@ This administrative rename does not change persisted or external identity contra
 The first post-rename CI inspection found stale organization references in the API workflow's shared Observability checkout and in the API Client/Caching NuGet publish endpoints. The two package repositories' Release build, test and pack stages passed, but their publish jobs failed with HTTP 403 because they still pushed to `nuget.pkg.github.com/CompileCare`. Updated the API and Docker Integration Verification workflows to checkout `HeapCare/HeapCare.Observability`, and updated API Client and Caching publish feeds to `https://nuget.pkg.github.com/HeapCare/index.json`. The affected push-triggered workflows were started by those commits and were still running at the time of this note; package publication is not considered restored until those new runs pass and package consumption is verified from a clean restore.
 
 The Local CI launcher checks still exercise the legacy `compilecare` Keycloak realm, OIDC client/audience, database names and persistent volume names. These remain deliberately preserved until a coordinated identity/data migration has a tested rollback and user-preserving cutover. The Local workflow is currently running after the README/launcher documentation update. The Web CI run for the current HeapCare README commit passed. The Observability workflow was triggered by its migration-status README update and is pending verification.
+
+## HeapCare migration verification addendum — 2026-11-27
+
+This addendum supersedes earlier execution notes above where they describe the GitHub organization/repository rename or package publication as still pending.
+
+### Administrative rename and CI remediation
+- The GitHub organization is now **HeapCare**, and all 11 repository slugs use the HeapCare name. Repository history and IDs were preserved.
+- Post-rename CI references were corrected in `HeapCare.Api/.github/workflows/ci.yml`, `HeapCare.Api/.github/workflows/docker-test.yml`, `HeapCare.ApiClient/.github/workflows/ci.yml` and `HeapCare.Caching/.github/workflows/ci.yml`.
+- Verified successful main-branch runs: API #45984268087, API Client #45984273706, Caching #45984278571 and Observability #45984332659.
+- API Client run #45984273706 passed both build/test and the **Publish to GitHub Packages** job. Caching run #45984278571 passed build/test/pack and the **Publish to GitHub Packages** job. These runs verify publication from CI; package-read access for every production consumer/deployment identity still requires consumer-side validation.
+- Additional successful checks include Web #45983835225, Local tooling #45983816999 and Database PostgreSQL backup/restore verification #45970305638. The public Site latest recorded run #45972538371 passed.
+- The organisation-wide open-PR search returned no open PRs at this checkpoint.
+
+### OTP service security hold
+- `HeapCare.OtpService` main currently contains only a scaffold README and `.gitignore`; the earlier OTP implementation PR #1 was closed **without merge**. Its feature branch remains separate from main.
+- PR #1 explicitly recorded unresolved security/architecture blockers: OTP hashing at rest, verification attempt limits, recipient/IP abuse controls, atomic distributed cooldown/rate limiting, request DTO and recipient validation, endpoint authorization/error review, concurrency coverage and expiry/resend/delivery-failure tests.
+- PR #1 also recorded that an SMTP credential had previously been committed to Git history and must be revoked/rotated. Removing it from the current configuration is insufficient; confirm rotation with the credential owner and follow the repository's secret-incident process before any OTP implementation is reused.
+- OTP delivery is therefore **deferred and not production-ready**. Do not merge or revive the old feature branch without a fresh security review and passing tests.
+
+### Remaining release gates
+- Validate package restore from each actual consuming repository and deployment identity using least-privilege package access.
+- Complete the full post-rename local Docker/OIDC/tenant acceptance against the current main branches, not only individual repository CI.
+- Preserve Keycloak realm/client/audience IDs, PostgreSQL identifiers, EF migration history and persistent Docker volumes until a separately tested identity/data migration is approved.
+- Do not claim production readiness from green CI alone; privacy/legal review, production secrets and key management, provider-native backups/PITR, restore drills, deployment configuration and hospital pilot acceptance remain separate gates.
