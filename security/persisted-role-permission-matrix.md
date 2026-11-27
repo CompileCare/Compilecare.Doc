@@ -71,3 +71,10 @@ These are focused regression slices, not exhaustive proof of every permission, e
 6. Reconcile this document whenever `TenantRolePermissions`, authorization policies, endpoint assignments or role provisioning changes.
 
 This snapshot does not lift the production/pilot HOLD. Authenticated Keycloak acceptance, full authorization regression, operational controls and independent security/privacy review remain release gates.
+
+
+### Organization-scope regression coverage — patient identifiers (2026-11-27)
+
+- API PR #96 merged as `41533bf7dfe34cc16fdd3f90aa99c1b3726ecc7f`. PostgreSQL-backed tests verify hospital-scoped HospitalAdmin access within its assigned hospital and denial of cross-hospital policy/identifier operations. Department-scoped HospitalAdmin is denied hospital-wide MRN policy, identifier listing, lookup and assignment operations.
+- Denials use non-disclosing 404 responses, expose no patient/MRN data, are attributed as rejected audit events, and leave policy/identifier state unchanged. Hosted PR CI, push CI and Docker Integration Verification passed.
+- This is focused coverage for the patient-identifier boundary; continue validating tenant, hospital and department scopes across each remaining domain and operation.
