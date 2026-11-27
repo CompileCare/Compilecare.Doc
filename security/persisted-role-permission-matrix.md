@@ -136,3 +136,13 @@ The source paths above were verified against the renamed HeapCare.Api main tree.
 - API PR #122 also adds an audit CSV tenant-isolation regression: requesting-tenant actor metadata is included while another tenant's actor metadata is excluded. This is test evidence for tenant-bound export filtering, not approval of export purpose, retention or legal-hold policy.
 
 The tests above are API/PostgreSQL regressions. The companion real Keycloak/Local acceptance remains a separate integration gate and must not be inferred from these component tests.
+
+### Additional tenant/resource security and concurrency regressions — 2026-11-27
+
+- API #122: PostgreSQL-backed audit CSV tenant isolation. Requesting-tenant actor metadata is included; another tenant's actor metadata is excluded.
+- API #123: Department-scoped PatientRegistrar can transition an in-scope queue entry but cannot mutate a peer department's queue entry in the same hospital. The denial is non-disclosing (404), audited and leaves state unchanged.
+- API #124: Eight simultaneous check-in requests for one booked appointment all return the same durable queue entry/token; PostgreSQL confirms a single appointment-linked row after the race. This tests the service's transaction-scoped advisory lock and recheck behavior.
+- Local #33: real Keycloak tokens prove ClinicalUser cannot read cashier invoices or record payments and FacilityViewer cannot read invoices.
+- Local #35: real Keycloak tokens prove availability publication is restricted to HospitalAdmin and availability read to PatientRegistrar; ClinicalUser cannot read availability and PatientRegistrar cannot create provider profiles.
+
+These are synthetic isolated CI tests. They verify current implementation behavior, not product-owner approval of the role model, clinical privileges or minimum-necessary access. Production role sign-off, privacy/legal review and deployment-specific recovery remain separate gates.
