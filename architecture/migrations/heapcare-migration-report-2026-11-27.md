@@ -96,3 +96,25 @@ Do not declare the brand migration fully closed until the GitHub administrative 
 Web run [#45979824743](https://github.com/CompileCare/CompileCare.Web/actions/runs/45979824743) passed after the real-OIDC browser test adopted `HEAPCARE_BROWSER_TEST_USER_FILE`. The Local acceptance script and workflow now use `HEAPCARE_CI_ACCEPTANCE` and `HEAPCARE_BROWSER_TEST_USER_FILE`; synthetic CI user/client IDs, ephemeral OIDC artifacts and temporary Compose resource names use HeapCare. Existing Keycloak realm/client/audience IDs and persistent data identifiers remain untouched.
 
 Local workflow concurrency now cancels superseded main-branch revisions. The latest run [#45980070858](https://github.com/CompileCare/CompileCare.Local/actions/runs/45980070858) is the authoritative final verification for the merged API main branch and HeapCare checkout paths. Shell/PowerShell, secret-placeholder and Keycloak JSON validation have passed; Docker realm-import smoke and the Docker observability/full-stack jobs are still running at the time of this report update.
+
+## Post-rename verification addendum — 2026-11-27
+
+The GitHub organization and all 11 repository slugs have now been renamed to HeapCare. The prior sections that say the organization/repository names remain CompileCare or that the rename is awaiting GitHub administration are historical notes and are superseded by this addendum.
+
+The following post-fix main-branch workflows completed successfully:
+- [HeapCare.Api #45984268087](https://github.com/HeapCare/HeapCare.Api/actions/runs/45984268087)
+- [HeapCare.ApiClient #45984273706](https://github.com/HeapCare/HeapCare.ApiClient/actions/runs/45984273706) — build/test and GitHub Packages publish jobs passed
+- [HeapCare.Caching #45984278571](https://github.com/HeapCare/HeapCare.Caching/actions/runs/45984278571) — build/test/pack and GitHub Packages publish jobs passed
+- [HeapCare.Observability #45984332659](https://github.com/HeapCare/HeapCare.Observability/actions/runs/45984332659)
+- [HeapCare.Web #45983835225](https://github.com/HeapCare/HeapCare.Web/actions/runs/45983835225)
+- [HeapCare.Local tooling #45983816999](https://github.com/HeapCare/HeapCare.Local/actions/runs/45983816999)
+- [HeapCare.Database backup/restore #45970305638](https://github.com/HeapCare/HeapCare.Database/actions/runs/45970305638)
+- [HeapCare.Site #45972538371](https://github.com/HeapCare/HeapCare.Site/actions/runs/45972538371)
+
+The CI regression was caused by stale `CompileCare` organization coordinates in API shared-project checkout references and API Client/Caching NuGet feed URLs. These were updated to HeapCare and the corresponding main-branch workflows passed. Package publication is verified; package-read authorization for each real deployment/consumer identity is still a release check.
+
+### OTP service is explicitly on security hold
+
+The current `HeapCare.OtpService` main branch is a scaffold only. The earlier implementation PR #1 was closed without merge and must not be treated as delivered code. Its review notes list unresolved OTP hashing, attempt limits, distributed atomic rate limiting/cooldown, recipient validation, endpoint abuse/authorization controls and missing expiry/resend/concurrency/delivery-failure tests. The PR also records that an SMTP credential was previously committed to Git history and must be revoked/rotated. Confirm rotation with the credential owner before considering any implementation from that branch; deleting the feature branch or removing the current file value alone does not invalidate historical exposure.
+
+At this checkpoint the organization-wide open-PR search returned no open PRs. No production readiness claim is made by this migration report. Preserve existing identity/database/volume identifiers until a separately tested migration is approved.
