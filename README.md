@@ -13,6 +13,7 @@ CompileCare is an India-focused hospital information and management platform for
 - [Glossary](product/glossary.md)
 - [Hospital module catalogue](product/module-catalogue.md)
 - [Delivery roadmap and current implementation status](product/roadmap.md)
+- [ADR-017: HeapCare brand migration](architecture/decisions/ADR-017-heapcare-brand-migration.md) — staged identity migration, technical contracts, dependencies and verification gates.
 - [Full-platform E2E validation — 2026-11-26](qa/e2e-validation-2026-11-26.md)
 - [Requirements lifecycle](product/requirements-lifecycle.md)
 - [Patient registration workflow](product/workflows/patient-registration.md)
