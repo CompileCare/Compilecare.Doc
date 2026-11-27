@@ -849,3 +849,32 @@ HeapCare.Local run [#45993951443](https://github.com/HeapCare/HeapCare.Local/act
 - No separate coding-agent/background-worker facility is exposed in this session. GitHub API operations and independent repository updates can be orchestrated concurrently, but this does not imply persistent workers.
 - Owner/provider/legal/pilot decisions remain blockers and will not be invented. Preserve existing Keycloak, database, migration-history and persistent-volume identifiers until a rehearsed reversible migration is approved.
 - OTP remains on security hold pending confirmation that the historical SMTP credential is revoked/rotated and a fresh security review. No production-readiness or WCAG 2.2 AA conformance claim is made from CI alone.
+
+
+## Additional verified phase evidence — 2026-11-27
+
+### Phase 3 — API security and audit regression coverage
+The following test-only API changes were merged after both the API CI and Docker integration verification jobs passed on their respective PR heads:
+
+- **PR #111:** PostgreSQL-backed stable audit pagination ordering when events share the same timestamp.
+- **PR #112:** malformed, empty-GUID and repeated `X-Tenant-ID` values are rejected with HTTP 400 Problem Details.
+- **PR #113:** CSV export neutralizes all spreadsheet formula prefixes (`=`, `+`, `-`, `@`) including a formula preceded by whitespace.
+- **PR #114:** audit queries reject non-UTC offsets and future end times.
+- **PR #115:** department-scoped HospitalAdmin cannot discover, read or mutate staff profiles assigned outside the department; permitted in-scope reads remain available and denied attempts are audited.
+
+These are focused regression tests over existing implementation behavior. They do not approve audit governance, retention/legal hold, export purpose, production key custody or hosting-provider backup policy.
+
+**Next API validation:** PR #116 adds CSV quoting/escaping coverage for commas, embedded double quotes and newlines. Its CI is running; it is not merged or counted as completed.
+
+### Phase 5 — authenticated workspace regression coverage
+- **Web PR #71 and #73** are merged with CI green: membership error announcements and named lifecycle confirmation grouping.
+- **Web PR #74 and #75** are merged with CI green: mocked appointment, billing, OPD and session-renewal fixtures now use HeapCare demo names; the legacy `compilecare-web` OIDC client identifier remains intentionally unchanged in test session storage.
+
+These automated checks do not replace the manual six-role authenticated accessibility matrix, real screen-reader pass, contrast/zoom/reflow checks or WCAG 2.2 AA evaluation.
+
+### Product-facing identity cleanup
+- **Site PR #14 and #15** are merged with Site CI green. The retired CompileCare support address is no longer published; the public site accurately states that the official HeapCare support contact is not yet published.
+- **Docs PR #168–#174** are merged, including current tenant/hospital hierarchy documentation, ADR owner terminology, migration execution status and Phase 5 membership accessibility evidence.
+
+### Execution rule
+CI is treated as a parallel validation lane. Independent API, Web and documentation changes were started while other workflows were running. Merge decisions were made only after each PR's own required checks passed and the exact PR head was verified.
