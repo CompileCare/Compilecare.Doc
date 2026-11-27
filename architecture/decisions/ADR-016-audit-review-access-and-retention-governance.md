@@ -1,12 +1,12 @@
 # ADR-016: Audit review access, export and retention governance
 
 - **Status:** Partially implemented — bounded tenant-wide query/export exists as a provisional baseline; production governance and any scope expansion remain unapproved
-- **Date:** 2026-11-26
+- **Date:** 2026-11-27
 - **Decision owners:** Product, security and engineering; pilot hospital operations, privacy/compliance and qualified legal stakeholders must validate before implementation is enabled for customer tenants
 
 ## Context
 
-CompileCare persists metadata-only audit events for tenant-scoped, user-scoped and platform-operator API requests. The records are append-only and support accountability and incident investigation. They intentionally exclude request/response bodies, clinical note text, patient payloads, credentials and query strings.
+HeapCare persists metadata-only audit events for tenant-scoped, user-scoped and platform-operator API requests. The records are append-only and support accountability and incident investigation. They intentionally exclude request/response bodies, clinical note text, patient payloads, credentials and query strings.
 
 The current audit record stores a validated tenant ID, the separately untrusted requested tenant ID, validated actor issuer/subject, action, resource type, target resource ID, HTTP method, route template, outcome, status, correlation ID and UTC occurrence time. It does **not** store validated hospital or department scope metadata. The audit middleware can identify route parameters, but route values are caller-controlled input and must not be treated as proof that an actor is authorized for a hospital or department.
 
@@ -40,7 +40,7 @@ The following safeguards are already implemented and merged:
 - Dedicated server-generated `audit.read` permission currently mapped to HospitalAdmin, with a further tenant-wide organization-scope requirement. This role mapping remains provisional pending named-reader approval; it is not a production compliance decision.
 - CSV formula/control-character neutralization and an audit event for the export request itself, visible in subsequent queries (API PR #72).
 
-The API implementation details are maintained in [Audit events and traceability](https://github.com/CompileCare/CompileCare.Api/blob/main/docs/security/audit-events.md).
+The API implementation details are maintained in [Audit events and traceability](https://github.com/HeapCare/HeapCare.Api/blob/main/docs/security/audit-events.md).
 
 ## Implementation gates
 
@@ -67,7 +67,7 @@ Do not broaden the current provisional query/export implementation or enable pro
 
 ## Consequences
 
-- CompileCare does not expose sensitive audit metadata before a defensible reader/scope model exists.
+- HeapCare does not expose sensitive audit metadata before a defensible reader/scope model exists.
 - Tenant/hospital/department audit access will be enforced as a data boundary, not merely a UI navigation rule.
 - Export and retention remain governed operational capabilities, not incidental API features.
 - The existing append-only, metadata-only audit pipeline remains useful for accountability while customer-facing audit review is designed and validated.
@@ -75,4 +75,4 @@ Do not broaden the current provisional query/export implementation or enable pro
 
 ## Current status and non-approval
 
-The current code has a bounded tenant-wide API, but policy approval is not inferred from the existence of the code or from a successful test. Before customer production use, the pilot hospital and qualified security/privacy/legal stakeholders must confirm the named reader roster, retention and legal-hold rules, export purpose/review, incident escalation and access-review cadence. Until then, keep the capability limited to the existing tenant-wide membership boundary and do not expand it to hospital/department scopes or bulk export. The API implementation notes are in [Audit events and traceability](https://github.com/CompileCare/CompileCare.Api/blob/main/docs/security/audit-events.md).
+The current code has a bounded tenant-wide API, but policy approval is not inferred from the existence of the code or from a successful test. Before customer production use, the pilot hospital and qualified security/privacy/legal stakeholders must confirm the named reader roster, retention and legal-hold rules, export purpose/review, incident escalation and access-review cadence. Until then, keep the capability limited to the existing tenant-wide membership boundary and do not expand it to hospital/department scopes or bulk export. The API implementation notes are in [Audit events and traceability](https://github.com/HeapCare/HeapCare.Api/blob/main/docs/security/audit-events.md).
