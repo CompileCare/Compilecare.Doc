@@ -84,8 +84,15 @@ HeapCare Observability, API Client and Caching package publishing workflows have
 - [ ] Post-merge API CI/EF checks, Web audit/unit/build/browser E2E/Docker checks and Local full-stack verification passed. Continue monitoring normal release CI after future changes.
 - [ ] Run a final residual-reference audit and classify each remaining CompileCare reference as GitHub slug/owner, legacy fallback, identity/database/persisted-data compatibility or defect.
 - [x] Complete the post-fix Local full-stack run after restoring the Keycloak import filename to match the preserved `compilecare` realm (run #45978681883 passed).
-- [ ] Complete the follow-up Local run against the merged API `main` branch and `HeapCare.Local` checkout path (run #45979293490 is in progress).
+- [ ] Complete the latest Local run against the merged API `main` branch, `HeapCare.Local` checkout path and HeapCare-named CI-only OIDC artifacts (run #45980070858 is in progress).
 
 ## Closure rule
 
 Do not declare the brand migration fully closed until the GitHub administrative rename and any chosen domain/identity changes are completed, private package access is verified for production consumers, and all post-merge checks pass. The source/project migration is merged; the external identity and administrative migration is not yet complete.
+
+
+## Latest CI contract alignment — 2026-11-27 15:45 IST
+
+Web run [#45979824743](https://github.com/CompileCare/CompileCare.Web/actions/runs/45979824743) passed after the real-OIDC browser test adopted `HEAPCARE_BROWSER_TEST_USER_FILE`. The Local acceptance script and workflow now use `HEAPCARE_CI_ACCEPTANCE` and `HEAPCARE_BROWSER_TEST_USER_FILE`; synthetic CI user/client IDs, ephemeral OIDC artifacts and temporary Compose resource names use HeapCare. Existing Keycloak realm/client/audience IDs and persistent data identifiers remain untouched.
+
+Local workflow concurrency now cancels superseded main-branch revisions. The latest run [#45980070858](https://github.com/CompileCare/CompileCare.Local/actions/runs/45980070858) is the authoritative final verification for the merged API main branch and HeapCare checkout paths. Shell/PowerShell, secret-placeholder and Keycloak JSON validation have passed; Docker realm-import smoke and the Docker observability/full-stack jobs are still running at the time of this report update.
