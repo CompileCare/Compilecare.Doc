@@ -107,3 +107,10 @@ The source paths above were verified against the renamed HeapCare.Api main tree.
 
 - API PR #117 merged as `0407dcfeefdd16d63299e74ba8cc27a9e3ef5e86`. PostgreSQL-backed tests verify FacilityManager and FacilityViewer receive HTTP 403 when invoking patient duplicate-candidate review. Responses do not disclose the submitted patient names; denied audit events retain tenant, validated issuer/subject, hospital resource, outcome and HTTP status attribution.
 - PatientRegistrar and HospitalAdmin remain the currently implemented roles with duplicate-review permission. This test-only regression does not change role grants or establish product-owner approval of duplicate review responsibilities.
+
+
+### Patient duplicate-review negative authorization — ClinicalUser (2026-11-27)
+
+- API PR #118 merged as `56bfd4018b596834686eb00fb72d425dae10842d` after hosted API CI and Docker/PostgreSQL integration verification passed on head `42135b92862d4f537ef68aa5404f4b36d3ca66bd`.
+- The PostgreSQL-backed regression verifies ClinicalUser receives HTTP 403 for duplicate-candidate review, the response does not expose submitted patient names, and the denied audit event retains tenant, validated issuer/subject and hospital resource attribution.
+- Together with PR #117, FacilityManager and FacilityViewer denial coverage now exists for this operation. HospitalAdmin and PatientRegistrar remain the currently implemented grants. This does not approve those grants or complete the role/capability/scope matrix.
