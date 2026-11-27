@@ -1,6 +1,6 @@
 # HeapCare Delivery Roadmap
 
-**Status:** Working product-first delivery plan, updated 2026-11-26. Phase 5 includes a formal enterprise experience uplift, tracked separately from feature delivery. The 2026-11-25 local full-stack acceptance run is recorded in [Local stack acceptance](qa/local-stack-acceptance-2026-11-25.md). This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
+**Status:** Working product-first delivery plan, updated 2026-11-27. Phase 5 includes a formal enterprise experience uplift, tracked separately from feature delivery. The 2026-11-25 local full-stack acceptance run is recorded in [Local stack acceptance](qa/local-stack-acceptance-2026-11-25.md). This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
 
 HeapCare is a hospital and healthcare information/management platform. This roadmap contains only hospital-system capabilities. The [Product Blueprint v1](blueprint-v1.md) is the source for product scope and patient workflows.
 
@@ -953,3 +953,31 @@ Independent API authorization, Local integration, Web UX and documentation work 
 - Phase-specific merged evidence in this increment: API PRs #122 and #123; Web PRs #79, #80 and #81. Local PR #31 remains open pending real nine-service/OIDC verification. The duplicate Web PR #82 was closed as superseded by merged PR #81.
 - Continue API security, Local integration, Web experience and documentation work in parallel when repository/file dependencies allow. Merge only after required checks pass on the exact current head. Never infer cross-repository acceptance from a component-only CI pass.
 - Preserve database, migration-history, Keycloak realm/client, OIDC issuer/audience and persistent-volume identifiers. Production backup/PITR, encryption-key custody, provider/region selection, isolated restore drill, retention/legal-hold policy, pilot role approval and hospital-group/branch semantics remain explicit owner-dependent gates.
+
+
+---
+
+## Phase execution update — 2026-11-27 (Local PRs #33–#35; Web PR #85)
+
+This update supersedes the earlier Phase 4 note that Local PR #31 was still open. The accepted baseline is now the merged Local main head exercised by run [#46041076667](https://github.com/HeapCare/HeapCare.Local/actions/runs/46041076667).
+
+### Phase 3 — authorization and database recovery evidence
+
+- **HeapCare.Local PR #33** merged after the exact-head Local run passed. Its real-Keycloak API acceptance verifies that ClinicalUser cannot read a synthetic cashier invoice or record a payment, and FacilityViewer cannot read the invoice. These are negative authorization checks against runner-local synthetic records; no runtime grants were broadened.
+- **HeapCare.Local PR #34** merged the disposable PostgreSQL logical backup/restore smoke step. CI creates a custom-format `pg_dump` archive, restores it into a separate empty database using `pg_restore`, and compares every application table's row count. The current-main Local run passed this step.
+- This proves the local CI dump/restore path only. It does not prove provider-native backups, WAL archiving/PITR, key recovery, encrypted off-site custody, cross-region recovery, tenant-level restore or production RPO/RTO. Those remain release gates.
+
+### Phase 4 — provider, availability and OPD workflow validation
+
+- **HeapCare.Local PR #35** merged after Local tooling validation and the complete nine-service real-Keycloak run passed. The synthetic API setup creates a provider staff profile and effective department assignment, publishes a future Asia/Kolkata availability session, and verifies PatientRegistrar can discover the session and read slots. FacilityManager cannot publish availability, ClinicalUser cannot read it, and PatientRegistrar cannot create staff profiles.
+- The same Local run also passed persisted-role API acceptance, the existing synthetic OPD/billing workflows, and the real Authorization Code + PKCE browser suite against HeapCare.Web main.
+- **HeapCare.Web PR #86** adds the paired browser journey that searches/selects a synthetic PatientRegistrar patient, loads the published slot, books an appointment and checks the patient in. At this documentation revision, its corrected CI run is still in progress; do not count browser booking/check-in as accepted until that exact-head run passes. Appointment scheduling remains staff-assisted and production activation remains subject to hospital policy validation.
+
+### Phase 5 — authenticated accessibility and quality
+
+- **HeapCare.Web PR #85** merged the six-role real-Keycloak accessible-name and form-label checks. The current Local full-stack run passed the authenticated browser suite against the resulting Web main.
+- Automated checks establish a useful regression baseline, not WCAG 2.2 AA conformance. Manual keyboard review, screen-reader testing, contrast, zoom/reflow and qualified accessibility evaluation remain outstanding.
+
+### Current release boundary
+
+Phases 3–5 have stronger merged implementation and CI acceptance evidence, but none is declared production-ready solely from these tests. Product/clinical role approval, privacy/legal review, operational backup/PITR, secrets and key custody, retention/legal hold, hosting/region selection, hospital scheduling policy and a production-like recovery drill remain explicit gates.
