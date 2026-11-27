@@ -112,3 +112,10 @@ This checkpoint records engineering evidence only; it is not a production approv
 - OTP remains on security hold pending confirmation that the historical SMTP credential is revoked/rotated and a fresh security review.
 - Production identity, persisted-volume migration/rollback, backup/PITR restore, privileged-access, incident-response, monitoring and privacy/legal gates remain open.
 - Repository descriptions still contain legacy/placeholder text; metadata changes require a supported GitHub repository-settings action and have not been made.
+
+
+## Engineering continuation — 2026-11-27 (membership scope validation)
+
+- `HeapCare.Api#106` merged as `1fd3cbaa9aea42e12149ff9d0d8a6d4aab964264`. PostgreSQL-backed integration coverage now proves an inactive persisted PlatformOperator cannot list platform tenants; all three required checks passed for the exact PR head.
+- `HeapCare.Api#107` adds regression coverage for department membership scope integrity: a department cannot be paired with a different hospital, and department-only input must be normalized to the department's actual persisted parent hospital. All three CI workflows are queued/running; do not merge until they pass on the exact head.
+- This is test-only coverage of existing service validation and canonicalization; no runtime authorization policy was changed.
