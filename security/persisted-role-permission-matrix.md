@@ -114,3 +114,15 @@ The source paths above were verified against the renamed HeapCare.Api main tree.
 - API PR #118 merged as `56bfd4018b596834686eb00fb72d425dae10842d` after hosted API CI and Docker/PostgreSQL integration verification passed on head `42135b92862d4f537ef68aa5404f4b36d3ca66bd`.
 - The PostgreSQL-backed regression verifies ClinicalUser receives HTTP 403 for duplicate-candidate review, the response does not expose submitted patient names, and the denied audit event retains tenant, validated issuer/subject and hospital resource attribution.
 - Together with PR #117, FacilityManager and FacilityViewer denial coverage now exists for this operation. HospitalAdmin and PatientRegistrar remain the currently implemented grants. This does not approve those grants or complete the role/capability/scope matrix.
+
+
+### Duplicate-review positive and hospital-scope regression — 2026-11-27
+
+- API PR #119 merged as `bb3ab9868b58de247033b7a2695878c10e218902`: a PostgreSQL-backed test confirms HospitalAdmin can review duplicate candidates and receives the expected hospital-local patient candidate.
+- API PR #120 merged as `25f4b300ce1bd85bb99a4db57f16affeee45f617`: a hospital-scoped HospitalAdmin receives the candidate within its assigned hospital but cannot query another hospital in the same tenant. The cross-hospital response is non-disclosing (404). The test verifies both the allowed and rejected audit events, including tenant, validated issuer/subject, action, resource ID/type, outcome and HTTP status.
+- Both PRs are test-only and do not modify role grants. They prove implementation behavior, not product or clinical approval of duplicate-review responsibilities.
+
+### Real Keycloak/API acceptance — duplicate review (2026-11-27)
+
+- HeapCare.Local PR #30 merged as `981a63809db69861ec316d8bcb82a8d8ae5fee7`. The real-Keycloak acceptance script provisions synthetic data and verifies HospitalAdmin and PatientRegistrar can review duplicate candidates; FacilityManager, FacilityViewer and ClinicalUser are denied without submitted patient-name disclosure.
+- The successful full-stack verification used isolated synthetic users and test data. It does not authorize production clinical use or replace the full endpoint/scope acceptance matrix.
