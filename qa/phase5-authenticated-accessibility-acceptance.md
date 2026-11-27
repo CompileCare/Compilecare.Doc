@@ -88,3 +88,10 @@ The Web CI workflow runs Vitest, TypeScript/production build, Chromium E2E, a pr
 5. The full Web test/build/Chromium E2E/Docker/CSP workflow passes for each code change.
 6. Local authenticated Keycloak/API/PostgreSQL acceptance is rerun after fixes.
 7. No WCAG 2.2 AA or production/pilot approval claim is made without the required complete review and separate security/operational sign-off.
+
+
+### Route-level workspace navigation — 2026-11-27
+
+Web PR #64 merged as `1a73684e7ac3c4660cf343855499a594792401c3`. Module URLs now display a single active workspace under the shared authenticated shell while retaining mounted component state. The hosted Web pipeline passed Vitest, TypeScript/production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke after the browser journeys were updated to navigate between reception, patient registration, appointments, queue and billing routes.
+
+**Acceptance boundary:** this is automated hosted browser coverage. It does not complete the manual authenticated local Keycloak/API/PostgreSQL role matrix, keyboard-only review for all routes, assistive-technology testing, contrast/zoom evaluation or WCAG 2.2 AA conformance review. Those remain Not Run until executed on the target local environment with synthetic identities and data.

@@ -327,7 +327,7 @@ This section complements the milestone checklist above. It distinguishes current
 ### Web experience architecture milestone
 **Goal:** move from the interim single Workspace/hash-section composition to independent route-level module workspaces under a shared authenticated shell.
 
-- [ ] Introduce route-based module layouts and stable URLs; retain safe redirects/deep links from existing hash URLs during migration.
+- [x] Introduce route-based module layouts and stable URLs; retain safe redirects/deep links from existing hash URLs during migration (Web PR #64).
 - [ ] Extract overview, reception and patient registration into independent route workspaces.
 - [ ] Extract appointments and queue workspaces without changing their API lifecycle semantics.
 - [ ] Extract clinical/OPD, retaining patient identity confirmation, signing, closing and append-only amendment safeguards.
@@ -646,3 +646,26 @@ This closes a focused patient-identifier organization-scope regression gap; it d
 API PR #97 merged as `ac99bd91602e03d3e6cd483a8bdba0971395eca7`. PostgreSQL-backed integration coverage verifies that FacilityManager, FacilityViewer and PatientRegistrar memberships cannot read or mutate OPD encounters. The regression exercises direct and queue-linked reads, encounter creation, note updates, signing, amendments, closure and cancellation. Each denied operation must return 403, disclose no clinical note content, leave the encounter unchanged, and create a denied audit event attributed to the validated tenant, issuer and subject. Hosted Release build/test, push build/test and Docker Integration Verification all passed on head `19e9781bbe0a15c5a27fea4355de73def42c6844`.
 
 This closes the identified non-clinical role-denial slice for the OPD encounter endpoints. It does not replace clinical workflow acceptance, clinical governance review, or exhaustive scope validation for every future clinical capability.
+
+
+## Platform stabilization and public website update — 2026-11-27
+
+### Authorization regression coverage
+
+- [CompileCare.Api PR #98](https://github.com/CompileCare/CompileCare.Api/pull/98) merged as `71fb901eafdde5e557c7b3257070317cf8c9c390`. FacilityManager was added to the negative appointment/availability and billing matrices; FacilityManager and FacilityViewer are both denied patient registration and hospital patient search. Release CI, push CI and Docker Integration Verification passed.
+- [CompileCare.Api PR #99](https://github.com/CompileCare/CompileCare.Api/pull/99) merged as `45dfdcb726a85df04a1daf9e76d96dfdd25a2014`. HospitalAdmin is explicitly verified to have no implicit clinical encounter access. The PostgreSQL-backed test exercises encounter read by ID and queue, creation, note update, sign, amendment, close and cancel; it verifies no clinical note disclosure, no state mutation and denied audit attribution. Release CI, push CI and Docker Integration Verification passed.
+- [CompileCare.Api PR #100](https://github.com/CompileCare/CompileCare.Api/pull/100) merged as `0a8f326cea2be23984a68e90e100188b311b7a4b`. Hospital- and department-scoped HospitalAdmin memberships are denied tenant-wide audit query and CSV export; the tests retain the persisted audit-read grant and verify the service-level tenant-wide scope boundary. Release CI, push CI and Docker Integration Verification passed.
+
+### Route-level authenticated Web workspaces
+
+[CompileCare.Web PR #64](https://github.com/CompileCare/CompileCare.Web/pull/64) merged as `1a73684e7ac3c4660cf343855499a594792401c3`. Existing permission-aware URLs now render one module workspace at a time under the shared authenticated shell. The change covers overview, reception, patient registration, appointments, queue/walk-ins, clinical, billing, facilities, staff, MRN policy, memberships and platform tenant lifecycle. Module components remain mounted while inactive routes are hidden so local form state survives navigation. Legacy hash links and non-module accessibility anchors are preserved. Vitest, TypeScript/production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke passed after updating end-to-end journeys to navigate between routes.
+
+**Remaining Web architecture work:** extract the inline reception and patient-registration markup into independent page components, continue component ownership extraction for each module, and execute authenticated local accessibility acceptance. The route conversion is an incremental architecture milestone, not completion of the full Web refactor.
+
+### Public CompileCare website
+
+- [CompileCare.Site PR #3](https://github.com/CompileCare/CompileCare.Site/pull/3) merged as `74094e98012f5356cb3b03ff5bd040157ffdc87d`: redesigned public homepage/navigation, full module catalogue with implementation/planned status labels, technology page, About/Contact, metadata and responsive design.
+- [CompileCare.Site PR #4](https://github.com/CompileCare/CompileCare.Site/pull/4) merged as `d43021891268af376aa1cd3349bbb4ca0ce018d9`: direct dependency/version inventory, additional tooling and explicit distinction between current technologies and planned ABDM/ABHA, FHIR, HL7 and DICOM integrations.
+- [CompileCare.Site PR #5](https://github.com/CompileCare/CompileCare.Site/pull/5) merged as `6e293ace962e7633e120c44ec9c887157370175b`: provider-neutral .NET 8 container, non-root runtime, port 8080, /health endpoint and container build CI.
+
+The repository build and container build pass. The custom domain's live deployment is **not verified**: the repository has no provider-specific deployment workflow and no hosting-provider deployment connection has been confirmed. Do not report the new build as live until the chosen provider deploy and domain health checks are completed.
