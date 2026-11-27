@@ -3,7 +3,7 @@
 **Status:** Accepted — implementation merged; operational acceptance remains in progress  
 **Decision date:** 2026-11-23  
 **Last reviewed:** 2026-11-26  
-**Scope:** CompileCare.Api and CompileCare.Web — hospital-management platform
+**Scope:** HeapCare.Api and HeapCare.Web — hospital-management platform
 
 ## Context
 
@@ -85,13 +85,13 @@ The following API implementation is merged:
 - Authenticated platform-operator self-status endpoint (API PR #57, merge commit `916b75a9a8a81e37216d48562b65c23d07682fc1`).
 - Platform-only tenant create/list/get and lifecycle routes.
 - Server-enforced initial tenant-wide HospitalAdmin prerequisite before activation (API PR #58, merge commit `2d74b412f6b26274381ebd0d0ed461eb1b75ead8`).
-- Platform tenant lifecycle workspace in [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36), merge commit `54589758db04848d25e2e078f3619c1932cc645a`.
+- Platform tenant lifecycle workspace in [HeapCare.Web PR #36](https://github.com/HeapCare/HeapCare.Web/pull/36), merge commit `54589758db04848d25e2e078f3619c1932cc645a`.
 - Tenant-scoped membership administration with role/scope validation, self-management rejection, last-admin protection and metadata audit.
 - PostgreSQL integration coverage for platform-only access, lifecycle transitions, terminal closure, invalid/duplicate slugs, initial-admin concurrency, scoped membership operations and audit behavior.
 
-The tenant membership administration UI is merged in [CompileCare.Web PR #35](https://github.com/CompileCare/CompileCare.Web/pull/35), merge commit `b8e4a4ec8864884f5e71dc070a319a5f4df07185`. It supports tenant-scoped membership list/create/update/deactivate/reactivate for authorized HospitalAdmins. Its workflow is documented in [Tenant membership administration](../../product/workflows/tenant-membership-administration.md).
+The tenant membership administration UI is merged in [HeapCare.Web PR #35](https://github.com/HeapCare/HeapCare.Web/pull/35), merge commit `b8e4a4ec8864884f5e71dc070a319a5f4df07185`. It supports tenant-scoped membership list/create/update/deactivate/reactivate for authorized HospitalAdmins. Its workflow is documented in [Tenant membership administration](../../product/workflows/tenant-membership-administration.md).
 
-The trusted platform-operator self-status API is merged in CompileCare.Api PR #57. The global platform tenant lifecycle UI is merged in [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36), merge commit `54589758db04848d25e2e078f3619c1932cc645a`. It shows the global workspace only after the API confirms the caller's persisted platform-operator identity. Hosted Vitest, production build, all 14 Chromium E2E tests and Docker smoke passed. Every global operation remains protected by the PlatformOperator API policy; the UI is not an authorization boundary.
+The trusted platform-operator self-status API is merged in HeapCare.Api PR #57. The global platform tenant lifecycle UI is merged in [HeapCare.Web PR #36](https://github.com/HeapCare/HeapCare.Web/pull/36), merge commit `54589758db04848d25e2e078f3619c1932cc645a`. It shows the global workspace only after the API confirms the caller's persisted platform-operator identity. Hosted Vitest, production build, all 14 Chromium E2E tests and Docker smoke passed. Every global operation remains protected by the PlatformOperator API policy; the UI is not an authorization boundary.
 
 ## Remaining operational acceptance
 

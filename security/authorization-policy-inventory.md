@@ -60,15 +60,15 @@ For every capability above, maintain positive and negative integration coverage 
 
 ## Verification references
 
-- API `src/CompileCare.Api/Security/AuthorizationPolicies.cs` — policy constants and membership-identity permission evaluation.
-- API `src/CompileCare.Api/Endpoints/FacilityEndpoints.cs` — facility read/write/delete operation policy assignments.
-- API `src/CompileCare.Api/Endpoints/PatientEndpoints.cs` — patient registration, duplicate review and read/identity-read assignments.
-- API `src/CompileCare.Api/Endpoints/StaffEndpoints.cs` — staff read/manage assignments.
-- API `src/CompileCare.Api/Endpoints/AppointmentEndpoints.cs` — availability, appointment and queue assignments.
-- API `src/CompileCare.Api/Endpoints/OpdEncounterEndpoints.cs` — encounter read/manage/sign/amend assignments.
-- API `src/CompileCare.Api/Endpoints/BillingEndpoints.cs` — catalogue, invoice, payment and report assignments.
-- API `src/CompileCare.Api/Endpoints/AuditEndpoints.cs` — audit read assignments.
-- API `src/CompileCare.Api/Endpoints/TenantMembershipEndpoints.cs` — membership and platform-operator boundary.
+- API `src/HeapCare.Api/Security/AuthorizationPolicies.cs` — policy constants and membership-identity permission evaluation.
+- API `src/HeapCare.Api/Endpoints/FacilityEndpoints.cs` — facility read/write/delete operation policy assignments.
+- API `src/HeapCare.Api/Endpoints/PatientEndpoints.cs` — patient registration, duplicate review and read/identity-read assignments.
+- API `src/HeapCare.Api/Endpoints/StaffEndpoints.cs` — staff read/manage assignments.
+- API `src/HeapCare.Api/Endpoints/AppointmentEndpoints.cs` — availability, appointment and queue assignments.
+- API `src/HeapCare.Api/Endpoints/OpdEncounterEndpoints.cs` — encounter read/manage/sign/amend assignments.
+- API `src/HeapCare.Api/Endpoints/BillingEndpoints.cs` — catalogue, invoice, payment and report assignments.
+- API `src/HeapCare.Api/Endpoints/AuditEndpoints.cs` — audit read assignments.
+- API `src/HeapCare.Api/Endpoints/TenantMembershipEndpoints.cs` — membership and platform-operator boundary.
 - API `README.md` — documented OIDC, tenant membership, facility and staff security behavior.
 
 ## Release gate
