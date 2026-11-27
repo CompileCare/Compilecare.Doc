@@ -193,3 +193,8 @@ The domain `heapcare.in` remains unpurchased/unconfigured. Existing Keycloak rea
 - OTP remains on security hold pending confirmation that the historical SMTP credential has been revoked/rotated and a fresh security review is complete.
 
 This refresh supersedes earlier status sentences in this ADR where they conflict with the verified merges and checks listed above. Historical migration evidence and old PR links are retained intentionally.
+
+
+## Latest API verification — 2026-11-27
+
+API PR #116 is now merged after both API CI and Docker integration verification passed. Its PostgreSQL-backed regression test verifies CSV quoting for commas, embedded double quotes and embedded newlines in actor-subject fields. This completes the focused audit CSV serialization test batch #111–#116; it does not replace the outstanding audit governance and production release gates.
