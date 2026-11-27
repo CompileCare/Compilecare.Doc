@@ -2,7 +2,7 @@
 
 ## Purpose and boundary
 
-The Platform tenants workspace is the global CompileCare control plane for customer tenant registration and lifecycle. It is separate from the hospital/tenant workspace and must never be shown to ordinary tenant HospitalAdmins.
+The Platform tenants workspace is the global HeapCare control plane for customer tenant registration and lifecycle. It is separate from the hospital/tenant workspace and must never be shown to ordinary tenant HospitalAdmins.
 
 The workspace is visible only when the API confirms that the currently authenticated, validated OIDC issuer/subject has an active persisted `PlatformOperator` record. The browser does not infer platform privileges from token roles, tenant roles or client-side configuration.
 
@@ -25,7 +25,7 @@ This is a presentation signal only. Every global tenant operation independently 
 
 1. The platform operator creates a tenant with a unique URL-safe slug and display name.
 2. The tenant is persisted in `Provisioning` state. It cannot yet be used for ordinary tenant-scoped API access.
-3. The platform operator first creates the intended user in the configured OIDC identity provider, then enters that user's exact OIDC subject. CompileCare creates the tenant membership; it does not create identity-provider users.
+3. The platform operator first creates the intended user in the configured OIDC identity provider, then enters that user's exact OIDC subject. HeapCare creates the tenant membership; it does not create identity-provider users.
 4. The platform operator provisions the initial tenant-wide HospitalAdmin through the platform-only initial-administrator endpoint.
 5. The platform operator activates the tenant. The API independently verifies that an active tenant-wide HospitalAdmin exists and returns 409 if it does not.
 6. The new HospitalAdmin signs in and creates the first hospital and department through tenant-scoped facility APIs.
@@ -77,7 +77,7 @@ The self-status endpoint is authenticated and self-only; it does not reveal othe
 
 ## Verification status
 
-The platform workspace is merged in [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36), merge commit `54589758db04848d25e2e078f3619c1932cc645a`.
+The platform workspace is merged in [HeapCare.Web PR #36](https://github.com/HeapCare/HeapCare.Web/pull/36), merge commit `54589758db04848d25e2e078f3619c1932cc645a`.
 
 Hosted Web CI runs 45747601458 and 45747606834 passed on final head `426c8dcbc39da1ea6c0d9d1ecf8c4ff07cb416bf`:
 - 85 Vitest tests across 9 files.
@@ -85,6 +85,6 @@ Hosted Web CI runs 45747601458 and 45747606834 passed on final head `426c8dcbc39
 - TypeScript/Vite production build.
 - Docker build and container smoke.
 
-The platform self-status API is merged in [CompileCare.Api PR #57](https://github.com/CompileCare/CompileCare.Api/pull/57), merge commit `916b75a9a8a81e37216d48562b65c23d07682fc1`. Server-side initial-administrator activation enforcement is merged in [CompileCare.Api PR #58](https://github.com/CompileCare/CompileCare.Api/pull/58), merge commit `2d74b412f6b26274381ebd0d0ed461eb1b75ead8`.
+The platform self-status API is merged in [HeapCare.Api PR #57](https://github.com/HeapCare/HeapCare.Api/pull/57), merge commit `916b75a9a8a81e37216d48562b65c23d07682fc1`. Server-side initial-administrator activation enforcement is merged in [HeapCare.Api PR #58](https://github.com/HeapCare/HeapCare.Api/pull/58), merge commit `2d74b412f6b26274381ebd0d0ed461eb1b75ead8`.
 
 A real authenticated local-stack acceptance walkthrough remains required. Use a synthetic persisted platform operator, synthetic OIDC users and synthetic tenants. Verify that ordinary tenant users cannot see the platform workspace or invoke global routes; that provisioning without an initial admin cannot activate; and that Active, Suspended and Closed transitions behave as documented.
