@@ -1019,3 +1019,12 @@ This section supersedes earlier pending notes in this roadmap and records only c
 ### Final Local replay after Web #88 — 2026-11-27
 
 Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run #46047530266 passed Local validation and the full nine-service Docker/observability workflow. Exact cross-repository heads were API 745085912684d54a2c2f6ca830ade712d76d9e63, Web 554012ff0cafdab86381addd8c77985fe897dccd, and Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52. The real Keycloak Authorization Code + PKCE suite completed 11 passing tests, including six persisted-role accessibility checks and the PatientRegistrar booking/check-in workflow. This replay includes Web #88's provider-session and available-slot status announcements.
+
+### Clinical note lifecycle — real Keycloak acceptance — 2026-11-27
+
+- **Local PR #38 merged** as `fae841e12223e82ff6e7a8c0dfdf571222f744d6`. Full-stack run [#46050151054](https://github.com/HeapCare/HeapCare.Local/actions/runs/46050151054) passed both tooling validation and the full nine-service Docker/observability job.
+- The real Keycloak-issued ClinicalUser workflow registered a separate synthetic patient, created an in-progress queue visit and encounter, saved a draft, signed it with signer attribution, rejected a post-sign overwrite with HTTP 409, closed the encounter, and appended an attributed amendment. It re-read the encounter and proved the original signed assessment stayed unchanged. PatientRegistrar was denied encounter read access.
+- The browser manifest exposed the second synthetic encounter. The real-OIDC ClinicalUser workspace reopened it and verified patient identity, read-only signed note fields, absence of the Review and sign action, and visible append-only amendment history. The original empty-note encounter remained separate and continued to prove signing is disabled until the required fields exist.
+- The integrated run completed 11 real-OIDC browser tests, including the six persisted-role workspace checks and the clinical, registration, appointment and billing journeys.
+- Exact cross-repository heads for run #46050151054: API `745085912684d54a2c2f6ca830ade712d76d9e63`, Web `baab2966baeafd8f07e94bf45ab02f8ef3ecc1e9`, Observability `1a06382e4eeed3e0070a0def2b89b8d11512dd52`.
+- All clinical note values in this added test were explicitly synthetic CI placeholders in an ephemeral database. No real patient history, examination findings, diagnosis, treatment or care plan was used; this does not authorize production clinical use.
