@@ -632,3 +632,10 @@ All hosted checks passed on the merged change: CI `45856072221` (Release build, 
 API PR #88 is merged as `d67b2d77ae6d4f1db56de3150b77d0284a388984`. The metrics guard now normalizes IPv4-mapped IPv6 remote addresses before comparing against configured IPv4 CIDRs and explicitly denies requests with no remote address. Regression tests cover both cases; the configured CIDR allowlist is unchanged.
 
 All hosted checks passed: CI `45856806161` (12 unit and 164 integration tests), Docker Integration Verification `45856806071`, and PostgreSQL Migration Rehearsal `45856806255`.
+
+
+### Patient identifier organization-scope regression — 2026-11-27
+
+CompileCare.Api PR #96 is merged as `41533bf7dfe34cc16fdd3f90aa99c1b3726ecc7f`. PostgreSQL-backed integration coverage verifies that a hospital-scoped HospitalAdmin can operate only within its assigned hospital, while cross-hospital policy/identifier access and department-scoped access to hospital-wide MRN operations are denied with non-disclosing 404 responses. The tests assert rejected audit attribution, no patient/MRN data in denied responses, and unchanged policy/identifier state after denied writes. Hosted PR CI, push CI and Docker Integration Verification all passed on head `853a24c5377b3ba94bfa14281b439f50f5508fb8`.
+
+This closes a focused patient-identifier organization-scope regression gap; it does not establish exhaustive organization-scope coverage for every domain or production acceptance.
