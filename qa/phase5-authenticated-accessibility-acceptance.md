@@ -95,3 +95,25 @@ The Web CI workflow runs Vitest, TypeScript/production build, Chromium E2E, a pr
 Web PR #64 merged as `1a73684e7ac3c4660cf343855499a594792401c3`. Module URLs now display a single active workspace under the shared authenticated shell while retaining mounted component state. The hosted Web pipeline passed Vitest, TypeScript/production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke after the browser journeys were updated to navigate between reception, patient registration, appointments, queue and billing routes.
 
 **Acceptance boundary:** this is automated hosted browser coverage. It does not complete the manual authenticated local Keycloak/API/PostgreSQL role matrix, keyboard-only review for all routes, assistive-technology testing, contrast/zoom evaluation or WCAG 2.2 AA conformance review. Those remain Not Run until executed on the target local environment with synthetic identities and data.
+
+
+## Automated route-component and real-identity acceptance — 2026-11-27
+
+### Web route workspaces merged
+
+- Web PR #65: patient registration workspace extracted; duplicate candidate review and explicit acknowledgement preserved.
+- Web PR #66: reception workspace extracted; MRN lookup remains gated by patient-identifier read permission.
+- Web PR #67: appointment booking and queue/walk-in workspaces extracted; appointment slot selection, check-in, queue actions and cancellation/no-show reason behavior preserved.
+- All three changes passed the complete hosted Web validation pipeline: Vitest, TypeScript/production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke.
+
+### Full-stack local CI after Web PR #67
+
+[CompileCare.Local run #45946047300](https://github.com/CompileCare/CompileCare.Local/actions/runs/45946047300) passed the nine-service Docker/observability stack and real Keycloak/OIDC acceptance.
+
+- API, Npgsql traces and Collector-fed API metrics were verified through Jaeger/Prometheus; Kibana data view was provisioned over Elasticsearch logs.
+- Real Keycloak-issued tokens passed issuer/audience checks.
+- Two PostgreSQL-persisted tenant memberships with different roles were verified; hospital data isolation, cross-tenant membership mutation denial and membership revocation/reactivation passed.
+- Real OIDC Authorization Code + PKCE browser sign-in passed (1 E2E test).
+- Exact API/Web/Observability commit SHAs are recorded in the roadmap entry for this run.
+
+**This does not complete the manual checklist below.** Authenticated role-by-role clinical workflows, manual visual acceptance, keyboard-only review, assistive technology, contrast, zoom/reflow, reduced motion and WCAG 2.2 AA assessment remain Not Run until performed on the target local environment with synthetic data. No accessibility certification or production/pilot approval is claimed.

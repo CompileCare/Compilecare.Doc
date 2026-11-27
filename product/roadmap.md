@@ -669,3 +669,35 @@ This closes the identified non-clinical role-denial slice for the OPD encounter 
 - [CompileCare.Site PR #5](https://github.com/CompileCare/CompileCare.Site/pull/5) merged as `6e293ace962e7633e120c44ec9c887157370175b`: provider-neutral .NET 8 container, non-root runtime, port 8080, /health endpoint and container build CI.
 
 The repository build and container build pass. The custom domain's live deployment is **not verified**: the repository has no provider-specific deployment workflow and no hosting-provider deployment connection has been confirmed. Do not report the new build as live until the chosen provider deploy and domain health checks are completed.
+
+
+### Route workspace extraction and full-stack integration — 2026-11-27
+
+**Web route-component extraction is complete for the current implemented hospital workspaces:**
+
+- [Web PR #65](https://github.com/CompileCare/CompileCare.Web/pull/65) — patient registration extracted into a dedicated workspace with duplicate-review and acknowledgement behavior retained.
+- [Web PR #66](https://github.com/CompileCare/CompileCare.Web/pull/66) — reception patient search extracted with permission-gated MRN lookup.
+- [Web PR #67](https://github.com/CompileCare/CompileCare.Web/pull/67) — appointment booking and queue/walk-in flows extracted into dedicated workspaces.
+- All three PRs passed Vitest, TypeScript/production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP checks before merge. API orchestration and workflow state remain in the authenticated workspace controller; route components own presentation and delegate actions.
+
+**Public-site technology and runtime verification:**
+
+- [Site PR #6](https://github.com/CompileCare/CompileCare.Site/pull/6) — exact internal package versions, OpenTelemetry instrumentation, container image tags and scripting tools.
+- [Site PR #7](https://github.com/CompileCare/CompileCare.Site/pull/7) — browser standards, npm/Git/Chromium, Google Fonts, jsDelivr and Simple Icons inventory; technology cards have logo images with alternative text.
+- [Site PR #8](https://github.com/CompileCare/CompileCare.Site/pull/8) — CI starts the .NET 8 Docker container, probes /health and smoke-tests the homepage, features, technology, About and Contact routes; container cleanup is verified.
+- [Site PR #10](https://github.com/CompileCare/CompileCare.Site/pull/10) — final direct .NET package inventory, including the ASP.NET Core observability companion, dotnet-ef and cryptography/XML dependencies.
+
+**Cross-repository full-stack evidence:**
+
+[CompileCare.Local run #45946047300](https://github.com/CompileCare/CompileCare.Local/actions/runs/45946047300) passed after Web PR #67. The full nine-service stack, OIDC discovery, Prometheus/Jaeger/Elasticsearch/Collector readiness, Kibana data-view provisioning, API/Npgsql traces, Collector-fed API metrics, real Keycloak-issued tokens, PostgreSQL-persisted tenant memberships, tenant isolation, cross-tenant membership mutation denial, membership revocation/reactivation and real Authorization Code + PKCE browser sign-in all passed. The browser suite reported 1 passed test.
+
+Exact checked-out commits recorded by the run:
+
+- CompileCare.Local: `13e815acbeb9a195ba749bb50814f97876e7e70a`
+- CompileCare.Api: `0a8f326cea2be23984a68e90e100188b311b7a4b`
+- CompileCare.Web: `1b7da7aa8e4d5e3ebae79f17986e44560d68edd9`
+- CompileCare.Observability: `935f6629d5abb92296385ec2e0c1ec04060b3fb7`
+
+**Remaining acceptance gates:** manual authenticated role/workflow execution, UI visual review, keyboard-only and screen-reader review, contrast/zoom/reflow, Mac/Windows launcher acceptance, production ingress/TLS, provider-native PostgreSQL PITR/restore, signing-key rotation, clinical governance and pilot sign-off remain open. Hosted Linux CI is not a substitute for those activities.
+
+**Backlog reconciliation:** API issue #4 (obsolete roadmap tracker) and Site issue #2 (fake demo login on the informational site) are closed with rationale. Mobile issues #2/#3 remain blocked pending OTP service security/provider decisions and a consuming mobile application. Site issue #9 tracks live `compilecare.site` deployment and is blocked until the hosting provider/service and DNS authority are confirmed. The public-site repository is updated, but the live custom domain is not verified.
