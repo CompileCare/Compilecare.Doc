@@ -85,3 +85,12 @@ This snapshot does not lift the production/pilot HOLD. Authenticated Keycloak ac
 - API PR #97 merged as `ac99bd91602e03d3e6cd483a8bdba0971395eca7`. PostgreSQL-backed tests cover FacilityManager, FacilityViewer and PatientRegistrar denial for encounter read (by encounter and queue), create, note update, sign, amend, close and cancel.
 - Denials return 403 without disclosing clinical note content; persisted encounter state remains unchanged; denied audit records include tenant, validated issuer/subject and HTTP status attribution.
 - Hosted Release build/test, push build/test and Docker Integration Verification passed. ClinicalUser access remains separately granted and organization-scoped; the test is not a clinical acceptance or regulatory-compliance claim.
+
+
+### Additional persisted-role regression coverage — 2026-11-27
+
+- API PR #98 merged as `71fb901eafdde5e557c7b3257070317cf8c9c390`: FacilityManager is included in negative scheduling/availability and billing matrices; FacilityManager and FacilityViewer are denied patient registration and patient search. No unauthorized billing state change is permitted; the full Release, push and Docker checks passed.
+- API PR #99 merged as `45dfdcb726a85df04a1daf9e76d96dfdd25a2014`: HospitalAdmin is explicitly denied OPD encounter read, creation, note update, signing, amendment, closure and cancellation. The test checks no clinical note disclosure, unchanged encounter state and denied audit attribution. Release, push and Docker checks passed.
+- API PR #100 merged as `0a8f326cea2be23984a68e90e100188b311b7a4b`: hospital- and department-scoped HospitalAdmin memberships cannot query or export tenant-wide audit events despite having the persisted audit-read permission. The service-level tenant-wide scope guard returns 403. Release, push and Docker checks passed.
+
+These additions close specific gaps in the five-role matrix. They do not replace the full authenticated Keycloak/API/PostgreSQL acceptance matrix or product/clinical approval of role responsibilities.
