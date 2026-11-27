@@ -706,3 +706,15 @@ Exact checked-out commits recorded by the run:
 ## HeapCare brand migration — 2026-11-27
 
 The proposed product brand is now **HeapCare**. The migration is tracked in [ADR-017: HeapCare brand migration](../architecture/decisions/ADR-017-heapcare-brand-migration.md). This is a staged identity migration, not a product rewrite. Initial README branding changes are open as draft PRs across all 11 repositories. Source namespaces, project/assembly names, NuGet IDs, database identifiers, OIDC realm/client IDs, Docker/Compose names, deployment settings, organization/repository names and external URLs have not yet been changed. The `heapcare.in` domain has not been purchased or configured. Do not use it for production URLs, email addresses, redirect URIs, CORS or CSP until domain ownership, DNS and HTTPS are established. Complete the dependency inventory, coordinated source/configuration migration, administrative GitHub renames and full CI/Docker/integration/E2E/local-stack verification before closing this milestone.
+
+## HeapCare identity migration — execution update (2026-11-27)
+
+HeapCare is the product-facing brand. The following technical migrations are merged: HeapCare.ApiClient (PR #4), HeapCare.Caching (PR #6) and HeapCare.Observability (PR #5). Their latest migration-branch build/test/pack or build/test/format checks passed; the Observability 1.0.1 packages were published to GitHub Packages.
+
+Public Site and authenticated Web branding changes have passed their build checks. Local launcher names have been updated and the local tooling/Keycloak/Compose/observability validation checks pass. The Local full-stack workflow is being updated to consume the new HeapCare Observability package identities and the API migration branch.
+
+The API branch now references HeapCare.Observability and HeapCare.Observability.AspNetCore, with NuGet source mapping updated for the new package family. Its latest CI and migration rehearsal are still being validated. The API source namespaces, project/folder paths and solution name have not yet completed the full HeapCare rename.
+
+Do not rename the existing Keycloak realm/client IDs, PostgreSQL database/role, EF migration history, connection-string key or persistent Docker volume names until a tested non-destructive identity/data migration is ready. The GitHub organization and repository names remain unchanged because the connected GitHub capability does not expose the required administrative rename operation. The heapcare.in domain is not purchased or configured; no external DNS, email, certificate, OIDC callback or production origin is assumed.
+
+Remaining gates: finish API namespace/project/solution migration; publish and verify HeapCare.ApiClient and HeapCare.Caching packages; update all downstream consumers; complete Local full-stack Docker, API integration and browser E2E verification; update all cross-repository documentation/links; then perform administrative GitHub renames and the separately gated external identity/domain migration.
