@@ -163,3 +163,8 @@ Web PR #88 merged as 554012ff0cafdab86381addd8c77985fe897dccd. Provider availabi
 The Local full-stack run above predates Web #88, so the new live-region markup has hosted Web CI evidence but has not yet been replayed in the nine-service Local stack.
 
 Still outstanding: manual keyboard completion for all six role workflows, real screen-reader testing, focus/dialog review across authenticated routes, desktop/tablet evidence, contrast, 200%/400% zoom and reflow review, and qualified WCAG 2.2 AA evaluation. WCAG conformance is not claimed.
+### Integrated-stack replay of appointment availability announcements — Local #37
+
+HeapCare.Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run #46047530266 passed the nine-service Docker/observability and tooling jobs against Web 554012ff0cafdab86381addd8c77985fe897dccd, API 745085912684d54a2c2f6ca830ade712d76d9e63 and Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52. The real Keycloak Authorization Code + PKCE browser suite completed 11 tests, including all six persisted roles and PatientRegistrar appointment booking/check-in. This verifies the Web #88 provider-session and available-slot status announcements on the integrated stack.
+
+Manual screen-reader testing, full keyboard-only workflows, contrast, zoom/reflow and WCAG 2.2 AA evaluation remain Not Run; no conformance claim is made.
