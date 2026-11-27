@@ -96,3 +96,19 @@ This checkpoint records engineering evidence only; it is not a production approv
 ### Current release boundaries
 - The authorization regression is automated evidence for this platform-operator escalation path only; it is not a complete endpoint-by-endpoint authorization certification.
 - OTP remains on security hold, and production identity, data-volume, DNS/domain and release-governance gates above remain open.
+
+
+## Engineering continuation — 2026-11-27 (platform-operator inactive-state regression)
+
+### Merged since the previous checkpoint
+- `HeapCare.Api#105` — merged commit `b73c4a2d0137641b4fd8cd9d52ff0764d1f97597`. Extended the isolated platform-operator fixture to seed inactive persisted records and added an integration regression proving that an inactive persisted PlatformOperator is reported as non-operator by the API. This is test-only coverage; it does not change runtime authorization policy.
+- All three PR checks passed for exact head `30b411f6145180caadd57dfd5072acb0d925203c`: Release build/tests/model-drift check, Docker integration verification, and the second build-and-test workflow. The post-merge main-branch CI for PR #104 also completed successfully in run [#46005866195](https://github.com/HeapCare/HeapCare.Api/actions/runs/46005866195).
+
+### New regression in review
+- `HeapCare.Api#106` adds PostgreSQL-backed coverage proving an inactive persisted PlatformOperator cannot list platform tenants, and asserts the denial is attributed to the actor without tenant/resource identifiers. This remains test-only; runtime policy already checks the persisted active operator record.
+
+### Remaining release boundaries
+- These regressions cover forged token claims, inactive persisted operator status and inactive-operator denial on tenant listing; they do not constitute full platform authorization certification. Continue endpoint-by-endpoint authorization coverage for tenant, hospital and department scope.
+- OTP remains on security hold pending confirmation that the historical SMTP credential is revoked/rotated and a fresh security review.
+- Production identity, persisted-volume migration/rollback, backup/PITR restore, privileged-access, incident-response, monitoring and privacy/legal gates remain open.
+- Repository descriptions still contain legacy/placeholder text; metadata changes require a supported GitHub repository-settings action and have not been made.
