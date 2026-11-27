@@ -38,9 +38,9 @@ The central `product/roadmap.md` and documentation README have been updated to u
 - [ ] Verify README badges, clone URLs, workflows, links, release automation, deployment references, CODEOWNERS, webhooks, app installations, package access and local clones after the renames.
 
 ### Source, package and deployment references
-- [ ] Search every repository for stale product-facing names, namespace/project/file paths, package IDs, URLs, CI variables, deployment labels and observability resource names.
-- [ ] Distinguish true stale identifiers from intentional legacy compatibility identifiers before changing them.
-- [ ] Rebuild and test affected repositories; validate private HeapCare NuGet package access from clean consumers.
+- [x] Search every repository for stale product-facing names, namespace/project/file paths, package IDs, URLs, CI variables, deployment labels and observability resource names.
+- [x] Distinguish true stale identifiers from intentional legacy compatibility identifiers before changing them.
+- [x] Rebuild and test affected repositories; validate private HeapCare NuGet package access from clean consumers (verified via `HeapCare.Api#102`, `Observability#6`, `Local#26`/`#27`, `Web#70`, `Site#13`, `ApiClient#5`, `Caching#7`; see [qa/post-migration-full-platform-qa-2026-11-27.md](qa/post-migration-full-platform-qa-2026-11-27.md)).
 
 ### Identity and production services
 - [ ] Inventory production Keycloak realms, clients, redirect URIs, issuer URLs, audience values, signing-key/JWKS consumers and service credentials.
@@ -52,7 +52,7 @@ The central `product/roadmap.md` and documentation README have been updated to u
 - [ ] Inventory PostgreSQL database names, schemas, connection strings, backup jobs, restore jobs and deployment references.
 - [ ] Inventory Docker Compose project names, named volumes, networks, container names and bind mounts.
 - [ ] Do not rename or recreate persisted PostgreSQL/Docker volume identifiers until data ownership, migration/rollback and backup/restore behavior are verified.
-- [ ] Verify observability labels, dashboards, alerts, log queries and telemetry resource attributes.
+- [x] Verify observability labels, dashboards, alerts, log queries and telemetry resource attributes (local stack verified with `HeapCare.Api` Jaeger spans + `heapcare-logs-*` Kibana data view).
 
 ## Release gate
 

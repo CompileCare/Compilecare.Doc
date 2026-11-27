@@ -15,6 +15,7 @@ HeapCare is an India-focused hospital information and management platform for ho
 - [Delivery roadmap and current implementation status](product/roadmap.md)
 - [ADR-017: HeapCare brand migration](architecture/decisions/ADR-017-heapcare-brand-migration.md) — staged identity migration, technical contracts, dependencies and verification gates.
 - [HeapCare migration report (2026-11-27)](architecture/migrations/heapcare-migration-report-2026-11-27.md) — merged repository work, CI evidence, compatibility decisions and remaining closure checklist.
+- [HeapCare post-migration full-platform QA report (2026-11-27)](qa/post-migration-full-platform-qa-2026-11-27.md) — full nine-service live startup, 11-repo builds/tests, 27/27 E2E, 24/24 security, observability and defect-remediation evidence.
 - [Full-platform E2E validation — 2026-11-26](qa/e2e-validation-2026-11-26.md)
 - [Requirements lifecycle](product/requirements-lifecycle.md)
 - [Patient registration workflow](product/workflows/patient-registration.md)
