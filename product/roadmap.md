@@ -799,3 +799,28 @@ This addendum supersedes earlier execution notes above where they describe the G
 - Complete the full post-rename local Docker/OIDC/tenant acceptance against the current main branches, not only individual repository CI.
 - Preserve Keycloak realm/client/audience IDs, PostgreSQL identifiers, EF migration history and persistent Docker volumes until a separately tested identity/data migration is approved.
 - Do not claim production readiness from green CI alone; privacy/legal review, production secrets and key management, provider-native backups/PITR, restore drills, deployment configuration and hospital pilot acceptance remain separate gates.
+
+
+## Phase completion execution directive — 2026-11-27
+
+This directive is authoritative for sequencing and supersedes earlier notes that suggest starting optional performance/capacity work or other new features ahead of the approved phases. Complete the original Phase 3, Phase 4 and Phase 5 scope before proposing out-of-scope additions.
+
+### Execution order and current status
+
+1. **Phase 3 — Database, identity and security: IN PROGRESS; release readiness not complete.** Continue in this order: finish tenant/organization and audit coverage for existing sensitive workflows; obtain pilot-approved audit reader roster, role mapping, retention/deletion/legal-hold policy and export governance; complete representative-data migration/release rehearsal with rollback evidence; define and execute provider-native encrypted backup/PITR and isolated restore drills after a hosting/database provider is selected; complete production signing-key/secret/encryption custody and rotation runbooks; then incident response, privileged access review, monitoring and qualified privacy/legal review. Do not invent retention, RPO/RTO or compliance claims. Owner-dependent approvals and provider configuration remain explicit blockers.
+2. **Phase 4 — Core healthcare domain: PARTIALLY COMPLETE.** Complete the validated group/branch onboarding model and end-to-end tenant/hospital/department provisioning first. Finish the approved initial OPD workflow acceptance and defects. Patient contact storage/verification remains gated by ADR-012 security, privacy, key-management and retention decisions. Workforce identity linking, credential verification/clinical privileging and HR/payroll remain governed sub-roadmap items. Proceed through the already documented hospital-domain sequence only after requirements and acceptance criteria exist; every increment requires permissions, tenant scope, audit, data model, migration, tests and operational design. Do not invent clinical, workforce or financial policy.
+3. **Phase 5 — User experience: IN PROGRESS; manual authenticated acceptance outstanding.** Execute the six-role acceptance matrix against the current merged Local/API/Web stack using synthetic identities/data. Complete keyboard-only workflows, focus/dialog behavior, accessible names/announcements, responsive checks, contrast, zoom/reflow and a real screen-reader pass. Capture sanitized authenticated screenshots for PlatformOperator, HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar and ClinicalUser. Fix defects in small PRs with regression tests and paired documentation. Do not claim WCAG 2.2 AA conformance without a complete qualified evaluation.
+
+### New verified evidence — 2026-11-27
+
+HeapCare.Local run [#45993951443](https://github.com/HeapCare/HeapCare.Local/actions/runs/45993951443) passed on main commit `a2daae6a0f2cbb3eeea07d583ddf0459297b6eae`. The Local tooling validation and full nine-service Docker stack/API telemetry jobs both passed. The full-stack job verified real Keycloak-issued identities, persisted multi-tenant workflows and real Authorization Code + PKCE browser acceptance. This is automated full-stack evidence; it does not replace manual six-role acceptance, screen-reader review or local desktop validation.
+
+### Scope control
+
+- Do not start optional features, load/performance harnesses, mobile/OTP integration, patient portal or external integrations ahead of phase exit criteria.
+- Keep OTP blocked until the historical SMTP credential is confirmed revoked/rotated and the implementation passes a fresh security review; do not reuse the old feature branch as-is.
+- Preserve existing production identity/database/volume contracts unless a separate, rehearsed, reversible migration is required and approved.
+- Every implementation slice needs tests, security/privacy implications, migration/rollback notes where applicable and updated documentation.
+- A phase is complete only when its documented exit criteria and evidence are satisfied. Green CI alone is not phase completion or production approval.
+
+**Out-of-scope work remains paused until Phases 3–5 exit criteria are met.**
