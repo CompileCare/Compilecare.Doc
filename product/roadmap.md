@@ -864,7 +864,7 @@ The following test-only API changes were merged after both the API CI and Docker
 
 These are focused regression tests over existing implementation behavior. They do not approve audit governance, retention/legal hold, export purpose, production key custody or hosting-provider backup policy.
 
-**Next API validation:** PR #116 adds CSV quoting/escaping coverage for commas, embedded double quotes and newlines. Its CI is running; it is not merged or counted as completed.
+**API PR #116 merged:** CSV export quoting/escaping for commas, embedded double quotes and newlines is covered by a PostgreSQL-backed regression test. API CI and Docker integration verification both passed on the final PR head.
 
 ### Phase 5 — authenticated workspace regression coverage
 - **Web PR #71 and #73** are merged with CI green: membership error announcements and named lifecycle confirmation grouping.
