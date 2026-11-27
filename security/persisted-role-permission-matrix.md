@@ -146,3 +146,10 @@ The tests above are API/PostgreSQL regressions. The companion real Keycloak/Loca
 - Local #35: real Keycloak tokens prove availability publication is restricted to HospitalAdmin and availability read to PatientRegistrar; ClinicalUser cannot read availability and PatientRegistrar cannot create provider profiles.
 
 These are synthetic isolated CI tests. They verify current implementation behavior, not product-owner approval of the role model, clinical privileges or minimum-necessary access. Production role sign-off, privacy/legal review and deployment-specific recovery remain separate gates.
+### Clinical note lifecycle and confidentiality — Local #38 — 2026-11-27
+
+- Local PR #38 merged as `fae841e12223e82ff6e7a8c0dfdf571222f744d6`. Real Keycloak-issued ClinicalUser can create an encounter from its assigned in-progress synthetic queue visit, save a note draft, sign it with persisted signer subject, close it and append an attributed amendment.
+- A post-sign note overwrite returns HTTP 409. Re-reading after amendment confirms the original signed assessment is unchanged and amendment history contains one separately attributed item.
+- PatientRegistrar receives HTTP 403 when attempting to read the clinical encounter. This verifies the separation between receptionist and clinical permissions with persisted memberships, not only unit-test principals.
+- Existing PostgreSQL security coverage separately asserts clinical note text does not appear in audit metadata; note content is not placed in URLs, request identifiers or general audit fields.
+- The Local real-OIDC test uses a dedicated synthetic CI patient and explicit placeholder note content in an ephemeral database only. It is not real patient data and does not approve clinical privilege or production use.
