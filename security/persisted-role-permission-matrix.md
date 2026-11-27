@@ -51,12 +51,12 @@ The current resolver contains five tenant roles. `PlatformOperator` is a separat
 - Staff read/manage is currently limited to `HospitalAdmin`; do not broaden it without an approved role design and negative authorization tests.
 - UI navigation and visibility are usability controls only. Every API operation must enforce its own authorization and resource scope.
 
-## Regression coverage merged on 2026-11-26
+## Regression coverage merged through 2026-11-27
 
 - API PR #90 adds PostgreSQL-backed facility read/create/delete checks for all five persisted tenant roles and verifies denied mutations do not change hospital state. CI and Docker Integration Verification passed.
 - API PR #92 adds negative billing coverage for FacilityViewer and ClinicalUser across catalogue, invoice, payment and report reads/writes. It verifies invoice state remains unchanged and the denied operations are attributed in audit metadata. CI and Docker Integration Verification passed.
 - API PR #93 adds negative scheduling coverage for FacilityViewer and ClinicalUser across availability listing, slot retrieval and appointment booking. It verifies denied booking leaves the appointment list unchanged and denials are audited. CI and Docker Integration Verification passed.
-- API PR #94 is currently in validation for broader staff profile and assignment denials across FacilityManager, FacilityViewer, PatientRegistrar and ClinicalUser; do not treat it as merged until its hosted checks pass.
+- API PR #94 adds PostgreSQL-backed staff profile and assignment denials across FacilityManager, FacilityViewer, PatientRegistrar and ClinicalUser. It merged on 2026-11-27 as `e72af18ac6b70aef462d8d554e9f6d66c030cd63` after hosted PR CI, push CI and Docker Integration Verification passed.
 
 These are focused regression slices, not exhaustive proof of every permission, endpoint, data scope or UI route. Continue with positive/negative coverage for each capability and organization scope, including tenant, hospital and department boundaries.
 
