@@ -64,12 +64,37 @@ Use **HeapCare** as the proposed product-facing brand. Apply changes in controll
 
 ## Current execution state
 
-- HeapCare product branding has been introduced in README files on a dedicated `migration/heapcare-branding` branch in each of the 11 repositories.
-- Draft PRs are open in all 11 repositories. The changes are documentation-only and do not imply that source namespaces, package IDs, runtime configuration or repository names have been migrated.
-- The available GitHub connector supports repository reads and file/branch/PR writes, but does not expose organization rename or repository rename operations. Those administrative renames remain blocked until performed through an authorized GitHub administrative workflow.
-- The connector status lookup returned no status contexts for the initial README commits; CI must be verified in GitHub Actions before any PR is marked ready or merged.
-- The domain `heapcare.in` has not been purchased. No new domain, email address, DNS, certificate or production origin is assumed.
+### Completed and merged
+- HeapCare product branding is present in the public website and authenticated Web workspace. The public Site CI and Web CI checks passed for the branding changes.
+- The HeapCare.ApiClient solution, project/test project names, namespaces, public types, package ID and source paths have been migrated and merged (PR #4). Its CI build/test passed.
+- The HeapCare.Caching solution, library/sample/test projects, namespaces, public extension method, package ID, Dockerfile paths, Compose references, CI paths and README examples have been migrated and merged (PR #6). Restore/build/test/pack passed.
+- The HeapCare.Observability solution, core/ASP.NET Core/worker/test project names, namespaces, extension methods, package IDs, sample API references and project paths have been migrated and merged (PR #5). Build, tests, code-format validation and the GitHub Packages publish job passed. The new HeapCare observability packages were published at version 1.0.1.
+- Local macOS/Windows start/stop launcher filenames and user-facing instructions were renamed to HeapCare. Local tooling validation, Keycloak import smoke tests, Docker Compose validation and observability pipeline smoke tests passed on the latest completed validation run.
 
+### In progress
+- The API migration branch now consumes HeapCare.Observability and HeapCare.Observability.AspNetCore 1.0.1, and its NuGet source mapping recognizes both old and new package families. API build, migration rehearsal and integration verification are being rerun.
+- The Local full-stack workflow is being updated to test the API migration branch against the new HeapCare observability packages. The prior full-stack run failed because its pack step still referenced the old observability project paths; this CI integration defect is being corrected.
+- The Site and Web PRs remain open for review/merge despite their branding CI checks passing.
+- The API, Local and documentation PRs remain open. The API's broad source/project folder rename is not yet complete; a proposed automated branch-push job was rejected by the repository's write restrictions and was removed rather than masking the failure. A repeatable migration script is retained for controlled execution, but it has not been applied to the API source tree.
+
+### Remaining compatibility contracts and blockers
+- GitHub organization/repository names remain CompileCare; the available connector does not expose administrative rename operations. No repository has been deleted or recreated.
+- The domain heapcare.in has not been purchased or configured. No DNS, email, HTTPS certificate, production URL, OAuth callback, CORS or CSP origin is assumed.
+- The local Keycloak realm (compilecare), OIDC client/audience IDs, existing issuer, database names/roles, EF migration history, connection-string key and persistent Docker volume names remain intentionally unchanged. Renaming these without migrating users, persisted data and local state would risk authentication lockout or data loss.
+- HeapCare.ApiClient and HeapCare.Caching package identities have been migrated in source, but their publication/consumer rollout still needs verification. The Observability package publication is confirmed.
+- CI status is evaluated against each latest PR head; earlier green runs do not certify later commits.
+
+## Risks and rollback
+
+- **Package breakage:** publish new package IDs, verify restore/build of every consumer, and keep old IDs available through a documented compatibility window.
+- **Authentication lockout:** preserve old OIDC issuer/audience/redirects until a tested identity migration provisions the HeapCare realm/clients and migrates users and roles.
+- **Data loss:** do not rename/drop database objects or Docker volumes as a cosmetic change. Require verified backups and rehearsed restore before any data migration.
+- **Broken deployments:** update deployment settings and code in a coordinated release; retain previous image tags and configuration for rollback.
+- **Broken repository links:** preserve Git history and verify redirects; update cross-repository references only after the administrative organization/repository rename.
+
+## Consequences
+
+HeapCare is now the product-facing brand, and three shared .NET libraries have been migrated and merged with their CI checks passing. The main API and local integration workflows are still in progress. Technical compatibility identifiers remain until their dependent contracts can be migrated safely. This staged approach avoids breaking package consumers, authentication, patient data, tenant isolation and existing local developer environments.
 ## Risks and rollback
 
 - **Package breakage:** use parallel package IDs and a compatibility window; rollback consumers to the existing package if restore/build or runtime validation fails.
