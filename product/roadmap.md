@@ -761,3 +761,10 @@ Follow-up Local run [#45979293490](https://github.com/CompileCare/HeapCare.Local
 - The CI-only synthetic Keycloak client, synthetic user prefix/email, browser credential artifact names and isolated Compose project/container names now use HeapCare identifiers. The existing local realm, issuer, production Web client, API audience and persistent database/volume identifiers remain unchanged.
 - Local CI now uses a single concurrency group to cancel superseded full-stack runs and checks out the merged API `main` branch into `HeapCare.Api`, Web into `HeapCare.Web`, Observability into `HeapCare.Observability`, and this repository into `HeapCare.Local`.
 - The latest Local workflow run [#45980070858](https://github.com/CompileCare/HeapCare.Local/actions/runs/45980070858) is executing against those final identifiers. Its shell/PowerShell, secret-placeholder and Keycloak JSON validation steps have passed; Docker realm-import smoke, Docker observability smoke and the nine-service stack are still running. The earlier full-stack baseline #45978681883 passed.
+
+
+## Administrative HeapCare rename verification — 2026-11-27
+
+The GitHub organization login is now `HeapCare` (organization ID `228320081`), and all 11 repositories are verified under the new owner with HeapCare repository slugs: HeapCare.Api, HeapCare.ApiClient, HeapCare.Caching, HeapCare.Database, HeapCare.Local, HeapCare.Mobile, HeapCare.Observability, HeapCare.OtpService, HeapCare.Site, HeapCare.Web and HeapCare.Doc. Repository IDs were preserved across the rename. The organization-scoped open-PR search returned no open PRs at this checkpoint.
+
+This administrative rename does not change persisted or external identity contracts. Keep the existing Keycloak realm/client/audience identifiers, PostgreSQL database/role names, EF migration history and persistent Docker volume names until a separately rehearsed, reversible migration is approved. Update package access grants, external integrations, clone URLs and local remotes as part of post-rename validation. Do not treat GitHub URL redirects as proof that all consumers have migrated.
