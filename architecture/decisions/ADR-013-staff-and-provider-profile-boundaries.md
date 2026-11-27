@@ -6,7 +6,7 @@
 
 ## Context
 
-CompileCare already models authenticated external identities, tenant memberships, tenant roles and hospital/department scopes. Staff and provider records represent people and their organizational/workforce context; they must not become a second identity or authorization system.
+HeapCare already models authenticated external identities, tenant memberships, tenant roles and hospital/department scopes. Staff and provider records represent people and their organizational/workforce context; they must not become a second identity or authorization system.
 
 A staff member may work at more than one hospital or department, may hold multiple assignments over time, and may have a provider designation in addition to a non-clinical workforce role. Employment status, organizational assignment, application access and clinical credentialing are related but distinct concepts.
 
@@ -18,7 +18,7 @@ A staff member may work at more than one hospital or department, may hold multip
 4. **Treat provider designation as a workforce classification, not credential verification.** A provider profile may record operational specialty/designation metadata, but must not imply that a professional licence, registration, qualification or scope of practice has been verified.
 5. **Preserve history.** Deactivate or end-date profiles and assignments instead of physically deleting records that have operational history. Prevent overlapping or contradictory active assignments where the business rule requires it; make changes auditable.
 6. **Minimize sensitive data.** The initial slice excludes government identifiers, payroll/bank details, biometrics, background checks, credential-document storage and other high-risk employment data. Add such data only through a separately reviewed design with purpose, access, retention, encryption and audit controls.
-7. **Use the modular monolith.** Implement workforce/staff-provider capability within the existing CompileCare.Api modular architecture and tenant-aware persistence. Do not introduce a separate service or identity provider for this capability.
+7. **Use the modular monolith.** Implement workforce/staff-provider capability within the existing HeapCare.Api modular architecture and tenant-aware persistence. Do not introduce a separate service or identity provider for this capability.
 
 ## Initial scope
 
