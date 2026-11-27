@@ -225,6 +225,16 @@ Hosted verification runs 45749260863 and 45749260926 passed Release build, EF mo
 - Verifies PatientRegistrar can list the session and read its generated slot.
 - Verifies FacilityManager cannot publish availability, ClinicalUser cannot read availability, and PatientRegistrar cannot create a staff profile.
 
-The companion **HeapCare.Web PR #86** adds the user-facing real-OIDC path: PatientRegistrar searches and selects a separately seeded synthetic patient, loads the published availability, books a selected slot and checks the patient in through the browser. Its corrected workflow is in progress at this revision. Record the result only after Web CI and the exact-head real-OIDC browser suite pass; API fixture success is not evidence that the UI journey has passed.
+The companion **HeapCare.Web PR #86** adds the user-facing real-OIDC path: PatientRegistrar searches and selects a separately seeded synthetic patient, loads the published availability, books a selected slot and checks the patient in through the browser. The paired real-OIDC browser journey subsequently passed in Local #36 / run #46046213095: PatientRegistrar searched for a synthetic patient by unique family-name field, selected the future published slot, booked the appointment and checked the patient in. The full-stack run completed 11 browser tests. Appointment scheduling remains staff-assisted and production activation remains subject to hospital policy validation.
 
 The complete workflow still requires pilot-hospital agreement on scheduling roles, provider credential/privilege validation, session-change handling, cancellation and rescheduling reasons, check-in window, no-show grace period, queue operation, timezone configuration and data-retention policy. Automated synthetic acceptance does not authorize live clinical use.
+
+## Full real-OIDC appointment booking/check-in acceptance — 2026-11-27
+
+HeapCare.Local PR #36 merged as 085448ba36bc05338aafab604c7e9d5787bbf3d4. Full-stack run #46046213095 passed Local tooling validation and the nine-service Docker/API/OIDC job. The real Keycloak Authorization Code + PKCE browser suite completed 11 passing tests. The PatientRegistrar journey searched the synthetic appointment patient using the unique family-name field, selected the future published provider slot, booked the appointment and checked the patient in through the UI.
+
+The integrated run checked out API 9a4a517add68c5af08fc914533b387e6883440be, Web 3b81a70e9113382067c9002421bbdcd528b2a22c, and Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52. API #124 is a later test-only concurrency regression merged as 745085912684d54a2c2f6ca830ade712d76d9e63; it passed its own Release build, EF model-drift, full test and Docker/PostgreSQL checks.
+
+Web #88 subsequently merged as 554012ff0cafdab86381addd8c77985fe897dccd, announcing provider-session and available-slot counts through polite status regions. Hosted Web CI passed, but a later Local full-stack replay against this Web commit is not yet recorded.
+
+Release boundary: all CI records and identities are synthetic. Hospital policy approval, provider credential/privilege validation, cancellation/rescheduling, no-show grace, check-in timing, timezone configuration and retention remain pilot-hospital decisions. Automated acceptance does not authorize live clinical use.
