@@ -1,6 +1,6 @@
 # ADR-017: HeapCare brand migration
 
-- **Status:** Proposed / in progress
+- **Status:** Accepted / in progress
 - **Date:** 2026-11-27
 - **Decision owner:** Product owner
 - **Scope:** Product brand, source identifiers, repositories, packages, deployment and operational references
@@ -106,3 +106,30 @@ HeapCare is now the product-facing brand, and three shared .NET libraries have b
 ## Consequences
 
 HeapCare becomes the proposed product-facing identity immediately in the documentation-first stage. Technical identifiers remain CompileCare until each dependent contract can be migrated safely. This staged approach is intentionally slower than a global search-and-replace, but protects production behavior, patient data, tenant isolation and developer workflows.
+
+
+## Progress update — 2026-11-27
+
+### Completed and merged
+- Documentation and roadmap now use HeapCare as the product brand.
+- HeapCare Observability, API Client and Caching project identities are migrated; NuGet packages were published to the existing CompileCare GitHub Packages owner namespace.
+- Public Site project/solution paths, .NET namespaces, assembly identity, UI branding, logo asset and Docker build paths are migrated and merged.
+- Local developer environment scripts, container identities, Prometheus scrape labels, telemetry service name, Compose build paths and CI checkouts now prefer HeapCare local names. Existing local checkouts are detected and reused.
+- Database operations documentation and scripts use HeapCare while preserving the actual database/role and historical backup/restore identifiers.
+- Mobile and OTP repositories are currently scaffolds; their product-facing documentation is branded HeapCare, with no app/service code identifiers yet to migrate.
+- Web workspace technical migration is under PR #69: package name, API client module path/imports and session-storage selection keys are migrated. Existing session values are moved from legacy keys on first read.
+- API technical migration is under PR #101: solution/project/folder names, namespaces, EF context/snapshot namespaces, package references, Docker paths, API service identity and connection-string key support are migrated. The API supports new ConnectionStrings:HeapCare and the legacy ConnectionStrings:CompileCare fallback.
+
+### Verification evidence
+- HeapCare API .NET build/unit tests and package-feed restore have passed on a recent branch head.
+- PostgreSQL migration rehearsal has passed: the legacy API revision and HeapCare API revision were built from source with isolated package feeds, then upgrade and fresh-database migrations were exercised.
+- Local nine-service stack validation, OIDC/PKCE browser acceptance and telemetry smoke checks have passed on the current local migration branch; a rerun is in progress after the latest checkout-path changes.
+- API Docker integration and Web Docker/CSP checks are being rerun after the latest test connection/client compatibility fixes. Do not merge their PRs until the latest head checks are green.
+
+### Remaining external/admin work
+- The GitHub organization and repository slugs are still CompileCare. The connected GitHub actions available in this session do not expose the organization/repository rename administration operation. Renames must be done through authorized GitHub organization settings; after that, update remotes, workflow repository coordinates, package owner URLs, badges and links.
+- The domain has not been purchased or configured. Existing support email and public origins remain unchanged.
+- Production Keycloak realm, issuer, client IDs and API audience remain compatibility identifiers. The Web local-storage selection key migration is complete, but the identity realm/client migration requires an explicit user/account migration plan and dual-issuer/dual-client rollout.
+- PostgreSQL database/role/schema names, EF migration IDs/history and persistent Docker volume names remain unchanged to protect existing data. A separate, rehearsed data migration is required before changing them.
+- New HeapCare NuGet packages are published under the existing GitHub Packages owner. Production consumers need package read access granted to their repositories or a valid package-read credential; CI uses isolated local package feeds and does not prove production package authorization.
+- The final residual-reference audit and all post-merge main-branch, Docker, integration, E2E and deployment verification remain mandatory before declaring the brand migration complete.
