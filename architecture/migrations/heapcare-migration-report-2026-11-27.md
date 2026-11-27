@@ -61,9 +61,9 @@ The final Site PR head passed:
 - The latest migration-triggered Local run exposed a Keycloak import startup defect: Keycloak requires an import filename matching the preserved realm ID (`compilecare-realm.json`), while the branding change had renamed the file to `heapcare-realm.json`. The realm ID, client IDs and issuer remain unchanged intentionally. The file and all Compose, configuration-script and CI references have now been restored to the compatible filename. The post-fix Local full-stack workflow is running; its final result is not yet available.
 
 ### Packages
-HeapCare Observability, API Client and Caching packages were published to GitHub Packages under the existing CompileCare organization package owner. API and Docker CI use ephemeral local feeds to validate the actual package contract without relying on cross-repository package permissions.
+HeapCare Observability, API Client and Caching package publishing workflows have all completed successfully on the current main branches. The API Client and Caching publish jobs both passed their Pack and Publish to GitHub Packages steps; the Observability publish job also passed. API and Docker CI use ephemeral local feeds to validate the actual package contract without depending on cross-repository package permissions.
 
-**Production requirement:** grant the intended consumer repositories read access to the new private HeapCare packages, or configure a valid package-read credential in their deployment environments. The CI local-feed tests do not prove production package authorization.
+**Production requirement:** grant the intended consumer repositories read access to the new private HeapCare packages, or configure a valid package-read credential in their deployment environments. Successful publishing and local-feed CI do not prove production consumer authorization.
 
 ## Compatibility retained intentionally
 
