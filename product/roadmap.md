@@ -1007,7 +1007,7 @@ This section supersedes earlier pending notes in this roadmap and records only c
 
 - Web #80 and #85 merged the six-role real-Keycloak workspace checks. Local #36's full-stack browser run passed all six identities: HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator. The checks cover main landmark/heading, first-stop skip-link focus, visible focus outline, focus transfer, responsive overflow, accessible names and form labels.
 - Web #88 merged as 554012ff0cafdab86381addd8c77985fe897dccd. Appointment availability now announces provider-session count and available-slot count through polite status semantics, with component regression tests. Its hosted Web pipeline passed Vitest, production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke.
-- The Local #36 integrated run predates Web #88. The new announcement-only change has hosted Web CI evidence but no subsequent Local full-stack replay at this revision.
+- **Local #37** merged as `e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4`. Full-stack run [#46047530266](https://github.com/HeapCare/HeapCare.Local/actions/runs/46047530266) passed both Local tooling validation and the full nine-service job against Web `554012ff0cafdab86381addd8c77985fe897dccd` (including Web #88), API `745085912684d54a2c2f6ca830ade712d76d9e63`, and Observability `1a06382e4eeed3e0070a0def2b89b8d11512dd52`. The real Keycloak Authorization Code + PKCE browser suite completed 11 passing tests, including all six role accessibility cases and the PatientRegistrar appointment, booking and check-in path. This verifies the Web #88 availability announcement change in the integrated stack.
 
 ### Remaining release gates
 
@@ -1015,3 +1015,7 @@ This section supersedes earlier pending notes in this roadmap and records only c
 - Provider credentials and clinical privileges require hospital-side verification; the synthetic provider profile proves scheduling API behavior only.
 - Scheduling, cancellation, rescheduling, no-show policy, check-in window, hospital timezone and retention require pilot-hospital approval.
 - Production backup/PITR, encryption/key custody, retention/legal hold, restore cadence, production RPO/RTO, hosting/region and tenant-level recovery remain owner-dependent gates.
+
+### Final Local replay after Web #88 — 2026-11-27
+
+Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run #46047530266 passed Local validation and the full nine-service Docker/observability workflow. Exact cross-repository heads were API 745085912684d54a2c2f6ca830ade712d76d9e63, Web 554012ff0cafdab86381addd8c77985fe897dccd, and Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52. The real Keycloak Authorization Code + PKCE suite completed 11 passing tests, including six persisted-role accessibility checks and the PatientRegistrar booking/check-in workflow. This replay includes Web #88's provider-session and available-slot status announcements.
