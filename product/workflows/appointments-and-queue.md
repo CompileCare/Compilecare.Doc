@@ -1,6 +1,6 @@
 # Workflow: Appointments, walk-ins, check-in and queue
 
-**Status:** Proposed workflow for pilot validation  
+**Status:** Implemented foundation; authenticated browser acceptance in progress; hospital pilot validation pending  
 **Related decision:** [ADR-014 — Appointment scheduling and queue boundaries](../../architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md)
 
 ## Purpose
@@ -170,7 +170,7 @@ Patient self-booking, recurring rosters, leave integration, waitlists, service c
 
 ## Appointment slot selection UI — 2026-11-25
 
-The workspace uses the reusable `AppointmentSlotGrid` component from [CompileCare.Web PR #31](https://github.com/CompileCare/CompileCare.Web/pull/31) to render the slots returned by the existing availability API.
+The workspace uses the reusable `AppointmentSlotGrid` component from [HeapCare.Web PR #31](https://github.com/HeapCare/HeapCare.Web/pull/31) to render the slots returned by the existing availability API.
 
 - Every slot is a native button with an accessible name that includes the appointment time and whether the slot is available.
 - Unavailable slots are disabled and cannot be selected.
@@ -189,14 +189,14 @@ The scheduling service maps PostgreSQL concurrency failures to the existing HTTP
 - When two requests reserve the same available slot concurrently, exactly one booking succeeds; the competing request receives 409. The API does not silently move the appointment to another slot or automatically retry a potentially stale choice.
 - A client receiving 409 should preserve the user's context, reload the current availability/queue state and ask the user to choose again.
 
-This behavior is implemented in [CompileCare.Api PR #60](https://github.com/CompileCare/CompileCare.Api/pull/60), merged as `b31832ef8a416373532bcfe46b9e171dcc9890e7). Its integration suite exercises concurrent booking and verifies the loser receives a conflict response rather than an internal-server error.
+This behavior is implemented in [HeapCare.Api PR #60](https://github.com/HeapCare/HeapCare.Api/pull/60), merged as `b31832ef8a416373532bcfe46b9e171dcc9890e7). Its integration suite exercises concurrent booking and verifies the loser receives a conflict response rather than an internal-server error.
 
 Verification for the UI increment includes keyboard and pointer selection, available/unavailable/selected states, 375px and desktop layouts, hospital timezone display, in-flight/confirmed disabling and booking-conflict recovery. CI and Docker checks must execute and pass before merge. Keep mocked UI tests separate from real Keycloak/API/PostgreSQL acceptance.
 
 
 ## Queue row presentation and accessible status — 2026-11-25
 
-The follow-on [CompileCare.Web PR #32](https://github.com/CompileCare/CompileCare.Web/pull/32) extracts the queue row into `QueueEntryRow` without changing the appointment/queue/encounter boundaries or the server-side transition rules.
+The follow-on [HeapCare.Web PR #32](https://github.com/HeapCare/HeapCare.Web/pull/32) extracts the queue row into `QueueEntryRow` without changing the appointment/queue/encounter boundaries or the server-side transition rules.
 
 - Each queue entry is exposed as a named article using its queue token number.
 - The current status is rendered as a named status region so changes can be announced to assistive technology.
@@ -212,6 +212,19 @@ Verification for the UI increment includes keyboard navigation through the actio
 
 ### Cross-hospital encounter denial and audit verification — 2026-11-26
 
-[CompileCare.Api PR #61](https://github.com/CompileCare/CompileCare.Api/pull/61), merged as `ac8ef92aa8063321bc07f838c4e512945f8f2182`, extends the cross-hospital clinical-scope integration test. A clinical user assigned to Hospital A cannot read a Hospital B encounter or queue-linked encounter, update its note, sign it or create it from a queue entry. Each attempt returns 404, records the requested tenant and validated actor issuer/subject with Rejected outcome and 404 status, and leaves the Hospital B owner's note unsigned and unchanged.
+[HeapCare.Api PR #61](https://github.com/HeapCare/HeapCare.Api/pull/61), merged as `ac8ef92aa8063321bc07f838c4e512945f8f2182`, extends the cross-hospital clinical-scope integration test. A clinical user assigned to Hospital A cannot read a Hospital B encounter or queue-linked encounter, update its note, sign it or create it from a queue entry. Each attempt returns 404, records the requested tenant and validated actor issuer/subject with Rejected outcome and 404 status, and leaves the Hospital B owner's note unsigned and unchanged.
 
 Hosted verification runs 45749260863 and 45749260926 passed Release build, EF model-drift, 12 unit tests, 97 PostgreSQL integration tests and isolated Docker verification.
+
+
+## Real Keycloak provider and appointment acceptance — 2026-11-27
+
+**HeapCare.Local PR #35** merged after the full nine-service Local run [#46041076667](https://github.com/HeapCare/HeapCare.Local/actions/runs/46041076667) passed on current main. Its real-Keycloak/API acceptance provisions only synthetic CI identities and records, then:
+- Creates an operational provider profile and effective assignment through the staff API. This does not establish credential verification or clinical privileging.
+- Publishes a future, date-specific provider availability session using the hospital IANA timezone (`Asia/Kolkata`).
+- Verifies PatientRegistrar can list the session and read its generated slot.
+- Verifies FacilityManager cannot publish availability, ClinicalUser cannot read availability, and PatientRegistrar cannot create a staff profile.
+
+The companion **HeapCare.Web PR #86** adds the user-facing real-OIDC path: PatientRegistrar searches and selects a separately seeded synthetic patient, loads the published availability, books a selected slot and checks the patient in through the browser. Its corrected workflow is in progress at this revision. Record the result only after Web CI and the exact-head real-OIDC browser suite pass; API fixture success is not evidence that the UI journey has passed.
+
+The complete workflow still requires pilot-hospital agreement on scheduling roles, provider credential/privilege validation, session-change handling, cancellation and rescheduling reasons, check-in window, no-show grace period, queue operation, timezone configuration and data-retention policy. Automated synthetic acceptance does not authorize live clinical use.
