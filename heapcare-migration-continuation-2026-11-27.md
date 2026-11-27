@@ -1,7 +1,7 @@
 # HeapCare Brand Migration — Continuation Report
 
 **Date:** 2026-11-27  
-**Status:** GitHub organization rename verified; repository slug cleanup, source references and production identity cutover remain separately tracked.
+**Status:** GitHub organization and all 11 repository slug renames verified; source-reference cleanup and production identity cutover remain separately tracked.
 
 ## Verified GitHub organization state
 
@@ -16,10 +16,10 @@ All 11 repositories are present under `HeapCare`:
 - `HeapCare.Caching`
 - `HeapCare.Database`
 - `HeapCare.Local`
-- `HeapCare.Mobile` — repository slug still needs rename from `CompileCare.Mobile`
+- `HeapCare.Mobile`
 - `HeapCare.Observability`
-- `HeapCare.OtpService` — repository slug still needs rename from `CompileCare.OtpService`
-- `HeapCare.Site` — repository slug still needs rename from `CompileCare.Site`
+- `HeapCare.OtpService`
+- `HeapCare.Site`
 - `HeapCare.Web`
 - `HeapCare.Doc`
 
@@ -32,9 +32,9 @@ The central `product/roadmap.md` and documentation README have been updated to u
 ## Remaining cutover checklist
 
 ### GitHub repository identity
-- [ ] Rename `CompileCare.Mobile` to `HeapCare.Mobile`.
-- [ ] Rename `CompileCare.OtpService` to `HeapCare.OtpService`.
-- [ ] Rename `CompileCare.Site` to `HeapCare.Site`.
+- [x] Rename `CompileCare.Mobile` to `HeapCare.Mobile`.
+- [x] Rename `CompileCare.OtpService` to `HeapCare.OtpService`.
+- [x] Rename `CompileCare.Site` to `HeapCare.Site`.
 - [ ] Verify README badges, clone URLs, workflows, links, release automation, deployment references, CODEOWNERS, webhooks, app installations, package access and local clones after the renames.
 
 ### Source, package and deployment references
