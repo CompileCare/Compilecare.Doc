@@ -923,3 +923,33 @@ Independent API authorization, Local integration, Web UX and documentation work 
 
 - **HeapCare.Web PR #76** merged as `8dcb5417bf9b690d7bcdff97ae96e929ef9beafa`. Playwright now verifies the authenticated workspace's main landmark, keyboard skip-link focus, accessible control names and labelled form fields for all five persisted tenant-role contexts.
 - The role contexts in PR #76 are intentionally UI-mocked. Real OIDC browser acceptance remains a separate lane, and manual six-role accessibility, real screen-reader, zoom/reflow, contrast and qualified WCAG 2.2 AA evaluation remain outstanding.
+
+
+## Parallel phase execution update — 2026-11-27 (HeapCare migration continuation)
+
+### Phase 3 — database, identity and security hardening
+
+- **HeapCare.Api PR #122 merged** as `cab471452c6c1904fde0f7b407001c065e64dd00` after the Release build, EF Core model-drift check, full API test suite and Docker/PostgreSQL integration verification passed on the exact PR head. The new regression proves that an audit CSV export includes requesting-tenant actor metadata and excludes another tenant's actor metadata.
+- **HeapCare.Api PR #123 merged** as `9a4a517add68c5af08fc914533b387e6883440be`. PostgreSQL-backed coverage verifies that a department-scoped PatientRegistrar can transition a queue entry inside the assigned department, receives a non-disclosing 404 for a queue entry in another department, and leaves the denied entry in `Waiting`. Both allowed and rejected transitions are asserted in the audit store with validated tenant, issuer, subject, action, hospital resource, outcome and HTTP status. Release build, EF model-drift, complete API tests and Docker/PostgreSQL verification passed on exact head `69c73091e18c142f2240b64efe1c511f04dc1be8`.
+- These tests harden existing authorization and audit behavior; they do not change role grants or approve the product role model. Audit retention/legal hold, export-purpose governance, operational access reviews, privacy/legal approval, production key custody and provider-native backup/PITR remain separate release gates.
+
+### Phase 4 — hospital workflows and real OIDC acceptance
+
+- **HeapCare.Web PR #79 merged** as `0e4310b3ff1701da6f7e3518b9f3ad1efadf5251`. The real-Keycloak ClinicalUser browser journey now consumes a synthetic in-progress walk-in, requests the live department/date queue, opens the linked encounter, retrieves department-scoped patient identity and requires identity confirmation. The test intentionally does not enter or sign a clinical note.
+- **HeapCare.Local PR #31 remains open** at head `73ec0efc823e57c878d999d24a3a8205deb38a5f`. It creates separate runner-temporary Keycloak identities for tenant roles, synthetic tenant/hospital/department records and an in-progress OPD walk-in. It now also verifies with real-issued tokens that PatientRegistrar and ClinicalUser can read the synthetic department queue while FacilityManager is denied.
+- The earlier Local full-stack run `46035812237` built and started all nine services and passed persisted-role API checks, but the browser test expected the empty clinical note's `Review and sign` button to be enabled. The application correctly kept signing disabled because no note content had been entered. **HeapCare.Web PR #81 merged** to correct this test expectation without entering, saving or signing clinical content.
+- The refreshed Local full-stack run `46036979607` is currently validating Local head `73ec0efc823e57c878d999d24a3a8205deb38a5f` against current Web main `2d35fd4b72ce21ca5e44ca5ba31c5434349ab044`. Local tooling has passed; the complete nine-service stack is still running. The run has not yet passed the real-OIDC browser stage. Keep PR #31 unmerged until its exact-head integrated run is green.
+- This closes neither the full appointment-to-check-in acceptance nor the billing/receipt workflow acceptance on the real OIDC stack. Existing unit, integration and Web browser checks remain supporting evidence, not a substitute for the coupled Local acceptance run or pilot validation.
+
+### Phase 5 — authenticated workspace quality and accessibility
+
+- **HeapCare.Web PR #80 merged** as `829e93ac19a96cb1d0016500313fa957630e8d14`. Real-Keycloak browser checks cover HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator. For each identity, the suite checks a single main landmark and level-one heading, first-stop skip-link focus and visible outline, focus transfer to main content, and page-level overflow at 768px, 375px and 320px.
+- **HeapCare.Web PR #81 merged** as `2d35fd4b72ce21ca5e44ca5ba31c5434349ab044`. The ClinicalUser browser test now asserts that signing remains disabled for an empty note after patient identity confirmation. It remains non-mutating and does not create or sign clinical content.
+- Web main CI `46036812116` passed unit tests, production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke on the merged main head. The new authenticated accessibility spec still needs execution in the full nine-service real-Keycloak environment; that acceptance is part of the active Local #31 run and is not yet claimed as passed.
+- Automated browser coverage does not replace manual keyboard workflow review, screen-reader testing, contrast and zoom/reflow review, desktop/tablet evidence, or a qualified WCAG 2.2 AA assessment. No conformance claim is made.
+
+### Parallel execution and release constraints
+
+- Phase-specific merged evidence in this increment: API PRs #122 and #123; Web PRs #79, #80 and #81. Local PR #31 remains open pending real nine-service/OIDC verification. The duplicate Web PR #82 was closed as superseded by merged PR #81.
+- Continue API security, Local integration, Web experience and documentation work in parallel when repository/file dependencies allow. Merge only after required checks pass on the exact current head. Never infer cross-repository acceptance from a component-only CI pass.
+- Preserve database, migration-history, Keycloak realm/client, OIDC issuer/audience and persistent-volume identifiers. Production backup/PITR, encryption-key custody, provider/region selection, isolated restore drill, retention/legal-hold policy, pilot role approval and hospital-group/branch semantics remain explicit owner-dependent gates.
