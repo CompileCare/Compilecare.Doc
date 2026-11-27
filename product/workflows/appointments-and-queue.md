@@ -1,6 +1,6 @@
 # Workflow: Appointments, walk-ins, check-in and queue
 
-**Status:** Implemented foundation; authenticated browser acceptance in progress; hospital pilot validation pending  
+**Status:** Implemented foundation; real-OIDC automated browser acceptance passed; hospital pilot validation pending  
 **Related decision:** [ADR-014 — Appointment scheduling and queue boundaries](../../architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md)
 
 ## Purpose
