@@ -4,7 +4,7 @@
 
 ## 1. Purpose and safety boundary
 
-CompileCare stores sensitive hospital and patient workflow data. Backup and recovery must preserve confidentiality, integrity, tenant isolation, auditability and availability.
+HeapCare stores sensitive hospital and patient workflow data. Backup and recovery must preserve confidentiality, integrity, tenant isolation, auditability and availability.
 
 This document defines the controls and evidence required before a deployment can be considered operationally recoverable. It does not claim that backups, point-in-time recovery (PITR), cross-region recovery or tenant-level restoration are currently configured.
 
@@ -125,7 +125,7 @@ Maintain these records in the approved restricted operations system, not in publ
 - Latest successful backup and restore-drill evidence references.
 - Incident contacts, escalation path and cutover authority.
 
-## 8. Current CompileCare status and release gates
+## 8. Current HeapCare status and release gates
 
 - PostgreSQL is the selected primary relational database.
 - The local Docker stack and CI migration rehearsal validate application migrations and local integration behavior; they do **not** prove managed production backups, PITR, key recovery or disaster recovery.
@@ -136,3 +136,16 @@ Maintain these records in the approved restricted operations system, not in publ
 ## 9. Change control
 
 Any change to database topology, tenant isolation, document storage, identity provider, key management, backup retention or recovery process requires this baseline and the deployment-specific runbook to be reviewed. Add a testable recovery acceptance criterion to the feature's Definition of Done whenever a change introduces a new durable data store.
+
+
+### Local CI logical backup/restore smoke evidence — 2026-11-27
+
+HeapCare.Local PR #34 merged the isolated PostgreSQL logical backup/restore step. The merged-main run [#46041076667](https://github.com/HeapCare/HeapCare.Local/actions/runs/46041076667) passed the nine-service stack, real-Keycloak persisted-role API acceptance, logical backup/restore step, real-OIDC browser acceptance and cleanup.
+
+The CI step:
+- Creates a custom-format logical archive from the disposable local PostgreSQL CI database with `pg_dump`.
+- Restores the archive into a separate empty database with `pg_restore`; it does not overwrite the source.
+- Compares every application table's row count between source and restored databases.
+- Removes the temporary archive and restore database on success or failure.
+
+**Evidence boundary:** this is a repeatable logical dump/restore smoke test using one ephemeral local PostgreSQL service. It is not a provider-native backup, physical/base backup, continuous WAL archive, PITR, encryption/key-custody test, off-site or cross-region recovery, tenant-level restore, or production disaster-recovery drill. No production RPO/RTO is measured or approved by this CI run. All provider, storage, encryption, retention, geographic and recovery objectives in this baseline remain open until configured and independently exercised.
