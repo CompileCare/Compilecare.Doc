@@ -57,3 +57,27 @@ The central `product/roadmap.md` and documentation README have been updated to u
 ## Release gate
 
 Do not declare the migration complete until repository slug cleanup, production identity/configuration review, private package restore, persisted-volume compatibility and full post-rename regression evidence are verified. No production database or user data migration is implied by this report.
+
+
+## Engineering continuation — 2026-11-27 (latest checkpoint)
+
+### Merged since the previous checkpoint
+- `HeapCare.Local#29` — expanded the isolated PostgreSQL/Keycloak acceptance harness to exercise all five persisted tenant roles (HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser) plus a separate PlatformOperator identity. The test verifies server-derived permission claims and role-appropriate hospital/patient access boundaries. Synthetic test identities/data are ephemeral; this does not modify production identity or tenant data. Both Local CI jobs passed in run [#45999845006](https://github.com/HeapCare/HeapCare.Local/actions/runs/45999845006), including the nine-service Docker stack and telemetry verification.
+- `HeapCare.Doc#157` — corrected the audit-governance ADR's HeapCare branding and current API reference.
+- `HeapCare.Doc#158` — recorded the new persisted-role acceptance evidence and retained the distinction between automated authorization checks and manual six-role accessibility acceptance.
+- `HeapCare.Doc#159` — aligned audit pagination/export documentation with the current implementation: UTC query window capped at 90 days, page size capped at 100, deterministic offset ordering by OccurredAtUtc and Id, and export capped at 31 days / 5,000 rows. Keyset pagination remains a future scale evaluation, not a current feature.
+- `HeapCare.Api#103` — merged the user-visible audit CSV filename correction to `heapcare-audit-events.csv`, with an integration assertion. PR checks passed: Release build/tests/model-drift, Docker integration and PostgreSQL migration rehearsal. Merge commit: `3903df4c9e7260e51c7358bbf2b251e6da62f946`.
+
+### Current CI and pull-request state
+- The HeapCare organization-wide open-PR search returned no open pull requests at this checkpoint.
+- The post-merge API main-branch CI run [#46003258837](https://github.com/HeapCare/HeapCare.Api/actions/runs/46003258837) is still running. The PR-level checks passed, but the main-branch run must complete before its status is recorded as green.
+
+### Remaining acceptance and release gates
+- The automated persisted-role matrix is additional evidence, not full endpoint-by-endpoint authorization certification. Continue positive and negative tenant/hospital/department boundary coverage for each sensitive capability.
+- Phase 5 still requires manual authenticated acceptance for all six roles, including keyboard-only operation, focus visibility/order, dialogs, responsive reflow/zoom, contrast and screen-reader behavior. Do not claim WCAG conformance without qualified evaluation.
+- Audit governance remains constrained by unapproved external decisions: authorized audit-reader roster and scope, retention/archive/legal-hold periods, export purpose/approval and emergency-access review. Do not broaden audit access or export behavior without hospital/security/privacy/legal approval.
+- Production readiness remains on hold pending production signing-key and secret custody/rotation, backup/PITR and isolated restore evidence, incident-response ownership, privileged-access review, monitoring/alert validation and privacy/legal review.
+- OTP remains on security hold. Do not revive the closed unmerged implementation branch until the historically committed SMTP credential is confirmed revoked/rotated and a new implementation passes security review.
+- Existing Keycloak realm/client/audience, PostgreSQL database/role, connection-string fallback and persistent Docker volume identifiers remain compatibility contracts. No domain, DNS, mail, certificate or production origin is assumed configured.
+
+This checkpoint records engineering evidence only; it is not a production approval or a declaration that the brand/identity migration is fully closed.
