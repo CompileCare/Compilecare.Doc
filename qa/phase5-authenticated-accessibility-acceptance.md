@@ -1,7 +1,14 @@
 # Phase 5 — Authenticated workspace accessibility acceptance
 
 **Status:** Automated authenticated full-stack smoke passed on 2026-11-27; manual six-role accessibility and local desktop acceptance remain not yet executed  
-**Scope:** Existing CompileCare OPD workspaces only. This is an acceptance record and execution checklist, not a WCAG conformance statement.
+**Scope:** Existing HeapCare OPD workspaces only. This is an acceptance record and execution checklist, not a WCAG conformance statement.
+
+
+### Real-Keycloak persisted-role verification — 2026-11-27
+
+HeapCare.Local PR #29 merged on main as `93ae61f4742c9e5caf41ef4088bcb8a832a5dbb4`. Pull-request workflow run [#45999845006](https://github.com/HeapCare/HeapCare.Local/actions/runs/45999845006) passed both jobs: local tooling validation and the full nine-service Docker stack/API telemetry verification. The harness provisions synthetic identities for all five persisted tenant roles (HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar and ClinicalUser), plus a separate PlatformOperator identity. It verifies server-derived role permissions and tenant hospital-read behavior, and checks positive/negative patient-search access for the relevant roles. The test data and identities are ephemeral and confined to the isolated CI stack.
+
+This is automated authorization/identity acceptance evidence, not manual accessibility evidence. It does not execute the six-role keyboard, screen-reader, contrast, zoom/reflow or authenticated desktop review below. It also does not certify every endpoint/capability combination; focused API PostgreSQL tests remain the source for individual resource and action authorization.
 
 ## Evidence already present
 
@@ -117,7 +124,7 @@ Web PR #64 merged as `1a73684e7ac3c4660cf343855499a594792401c3`. Module URLs now
 
 ### Full-stack local CI after Web PR #67
 
-[CompileCare.Local run #45946047300](https://github.com/CompileCare/CompileCare.Local/actions/runs/45946047300) passed the nine-service Docker/observability stack and real Keycloak/OIDC acceptance.
+[HeapCare.Local run #45946047300](https://github.com/HeapCare/HeapCare.Local/actions/runs/45946047300) passed the nine-service Docker/observability stack and real Keycloak/OIDC acceptance.
 
 - API, Npgsql traces and Collector-fed API metrics were verified through Jaeger/Prometheus; Kibana data view was provisioned over Elasticsearch logs.
 - Real Keycloak-issued tokens passed issuer/audience checks.
