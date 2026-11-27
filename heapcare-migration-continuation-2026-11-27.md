@@ -119,3 +119,10 @@ This checkpoint records engineering evidence only; it is not a production approv
 - `HeapCare.Api#106` merged as `1fd3cbaa9aea42e12149ff9d0d8a6d4aab964264`. PostgreSQL-backed integration coverage now proves an inactive persisted PlatformOperator cannot list platform tenants; all three required checks passed for the exact PR head.
 - `HeapCare.Api#107` adds regression coverage for department membership scope integrity: a department cannot be paired with a different hospital, and department-only input must be normalized to the department's actual persisted parent hospital. All three CI workflows are queued/running; do not merge until they pass on the exact head.
 - This is test-only coverage of existing service validation and canonicalization; no runtime authorization policy was changed.
+
+
+## Engineering continuation — scoped membership access verification
+
+- `HeapCare.Api#107` covers mismatched department/hospital parent rejection and canonical parent resolution for department-only membership scopes. CI is still running; merge remains blocked pending all required checks.
+- `HeapCare.Api#108` adds a PostgreSQL-backed integration test for hospital-scoped HospitalAdmin membership listings. It verifies in-scope hospital and department memberships remain visible while other-hospital and tenant-wide memberships are excluded from both page results and total count. CI is running; no merge until all required checks pass.
+- Both changes are regression tests only. The production service implementation was reviewed and left unchanged.
