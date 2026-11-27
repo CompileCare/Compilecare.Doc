@@ -2,7 +2,7 @@
 
 - **Status:** Implemented and merged for the initial advisory increment
 - **Date:** 2026-11-24
-- **Decision owners:** CompileCare product and architecture; each pilot hospital validates its manual identity-verification procedure
+- **Decision owners:** HeapCare product and architecture; each pilot hospital validates its manual identity-verification procedure
 - **Scope:** Read-only duplicate candidate detection before patient registration
 
 ## Context

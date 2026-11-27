@@ -2,7 +2,7 @@
 
 - **Status:** Accepted for the initial delivery architecture; future service extraction remains evidence-driven
 - **Date:** 2026-11-24
-- **Decision owner:** CompileCare Product & Engineering
+- **Decision owner:** HeapCare Product & Engineering
 - **Review trigger:** When product scope, deployment constraints, module ownership, scaling, security or resilience requirements materially change
 
 ## Context

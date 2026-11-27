@@ -2,7 +2,7 @@
 
 - **Status:** Accepted for the current API foundation
 - **Date:** 2026-11-23
-- **Decision owner:** CompileCare Product & Engineering
+- **Decision owner:** HeapCare Product & Engineering
 - **Review trigger:** Material change in hosting, customer deployment, licensing, performance, data residency, or operational requirements
 
 ## Context

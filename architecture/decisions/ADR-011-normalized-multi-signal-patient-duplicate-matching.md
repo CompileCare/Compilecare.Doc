@@ -2,7 +2,7 @@
 
 - **Status:** Implemented and merged in CompileCare.Api PR #17
 - **Date:** 2026-11-24
-- **Decision owners:** CompileCare product and architecture; pilot hospitals validate registration and identity-review procedures
+- **Decision owners:** HeapCare product and architecture; pilot hospitals validate registration and identity-review procedures
 - **Scope:** Improve advisory duplicate candidates inside the selected hospital using currently supported patient demographics
 
 ## Context

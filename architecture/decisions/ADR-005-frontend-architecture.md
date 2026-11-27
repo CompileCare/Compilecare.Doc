@@ -2,7 +2,7 @@
 
 - **Status:** Proposed
 - **Date:** 2026-11-23
-- **Decision owner:** CompileCare Product & Engineering (proposed)
+- **Decision owner:** HeapCare Product & Engineering (proposed)
 - **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
 
 ## Context

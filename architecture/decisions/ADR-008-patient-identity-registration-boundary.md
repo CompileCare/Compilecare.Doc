@@ -2,7 +2,7 @@
 
 - **Status:** Accepted product direction; implementation and pilot configuration pending
 - **Date:** 2026-11-24
-- **Decision owners:** CompileCare product and architecture; hospital-specific configuration requires pilot approval
+- **Decision owners:** HeapCare product and architecture; hospital-specific configuration requires pilot approval
 - **Scope:** Tenant-owned patient identity, hospital registration, identity matching and lifecycle boundaries
 
 ## Context

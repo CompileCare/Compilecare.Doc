@@ -2,7 +2,7 @@
 
 - **Status:** Accepted for the initial MRN implementation increment
 - **Date:** 2026-11-24
-- **Decision owners:** CompileCare product and architecture; each hospital approves its own prefix and numbering length
+- **Decision owners:** HeapCare product and architecture; each hospital approves its own prefix and numbering length
 - **Scope:** Hospital-local Medical Record Number (MRN) policy, allocation, lookup and authorization
 
 ## Context
