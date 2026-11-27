@@ -753,3 +753,11 @@ Local run [#45978681883](https://github.com/CompileCare/CompileCare.Local/action
 The Keycloak import filename was restored to `compilecare-realm.json` to match the intentionally preserved `compilecare` realm ID. The import filename is the only remaining CompileCare-named file path in the Local repository and is a Keycloak compatibility requirement, not an unfinished product-facing label.
 
 Follow-up Local run [#45979293490](https://github.com/CompileCare/CompileCare.Local/actions/runs/45979293490) is now checking the merged API `main` branch and the `HeapCare.Local` checkout directory. Do not treat this follow-up as complete until both jobs finish green.
+
+
+### Latest HeapCare CI synchronization — 2026-11-27 15:45 IST
+
+- Web run [#45979824743](https://github.com/CompileCare/CompileCare.Web/actions/runs/45979824743) passed after the real-OIDC browser suite was switched to the `HEAPCARE_BROWSER_TEST_USER_FILE` contract used by Local CI.
+- The CI-only synthetic Keycloak client, synthetic user prefix/email, browser credential artifact names and isolated Compose project/container names now use HeapCare identifiers. The existing local realm, issuer, production Web client, API audience and persistent database/volume identifiers remain unchanged.
+- Local CI now uses a single concurrency group to cancel superseded full-stack runs and checks out the merged API `main` branch into `HeapCare.Api`, Web into `HeapCare.Web`, Observability into `HeapCare.Observability`, and this repository into `HeapCare.Local`.
+- The latest Local workflow run [#45980070858](https://github.com/CompileCare/CompileCare.Local/actions/runs/45980070858) is executing against those final identifiers. Its shell/PowerShell, secret-placeholder and Keycloak JSON validation steps have passed; Docker realm-import smoke, Docker observability smoke and the nine-service stack are still running. The earlier full-stack baseline #45978681883 passed.
