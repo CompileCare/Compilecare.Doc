@@ -117,14 +117,14 @@ HeapCare becomes the proposed product-facing identity immediately in the documen
 - Local developer environment scripts, container identities, Prometheus scrape labels, telemetry service name, Compose build paths and CI checkouts now prefer HeapCare local names. Existing local checkouts are detected and reused.
 - Database operations documentation and scripts use HeapCare while preserving the actual database/role and historical backup/restore identifiers.
 - Mobile and OTP repositories are currently scaffolds; their product-facing documentation is branded HeapCare, with no app/service code identifiers yet to migrate.
-- Web workspace technical migration is under PR #69: package name, API client module path/imports and session-storage selection keys are migrated. Existing session values are moved from legacy keys on first read.
-- API technical migration is under PR #101: solution/project/folder names, namespaces, EF context/snapshot namespaces, package references, Docker paths, API service identity and connection-string key support are migrated. The API supports new ConnectionStrings:HeapCare and the legacy ConnectionStrings:CompileCare fallback.
+- Web workspace technical migration PR #69 is merged: package name, API client module path/imports and session-storage selection keys are migrated. Existing session values are moved from legacy keys on first read.
+- API technical migration PR #101 is merged: solution/project/folder names, namespaces, EF context/snapshot namespaces, package references, Docker paths, API service identity and connection-string key support are migrated. The API supports new ConnectionStrings:HeapCare and the legacy ConnectionStrings:CompileCare fallback.
 
 ### Verification evidence
 - HeapCare API .NET build/unit tests and package-feed restore have passed on a recent branch head.
 - PostgreSQL migration rehearsal has passed: the legacy API revision and HeapCare API revision were built from source with isolated package feeds, then upgrade and fresh-database migrations were exercised.
-- Local nine-service stack validation, OIDC/PKCE browser acceptance and telemetry smoke checks have passed on the current local migration branch; a rerun is in progress after the latest checkout-path changes.
-- API Docker integration and Web Docker/CSP checks are being rerun after the latest test connection/client compatibility fixes. Do not merge their PRs until the latest head checks are green.
+- Local run #45978681883 passed the nine-service stack, real Keycloak-issued identities, persisted multi-tenant workflows, OIDC/PKCE browser acceptance and telemetry. A follow-up run #45979293490 is validating the merged API main branch and HeapCare.Local checkout directory.
+- API, Web and Site migration PRs are merged. Latest post-merge API, Web and Site CI checks are green.
 
 ### Remaining external/admin work
 - The GitHub organization and repository slugs are still CompileCare. The connected GitHub actions available in this session do not expose the organization/repository rename administration operation. Renames must be done through authorized GitHub organization settings; after that, update remotes, workflow repository coordinates, package owner URLs, badges and links.
@@ -145,6 +145,6 @@ The source/project migration PRs are merged across the 11 existing repositories;
 
 Latest CI runs are green for API, Web, public Site, Database documentation, Observability, API Client and Caching. The API Client and Caching GitHub Packages publish jobs both passed; Observability publishing also passed. Production package read permissions still need validation for deployment consumers.
 
-The most recent Local full-stack run failed before this refresh because the realm import file was renamed to a filename that did not match its preserved realm ID. The filename and all Compose, script and CI references have been corrected. Local validation and the Docker observability pipeline smoke job have passed on the post-fix run; the nine-service Docker stack is still executing, so final multi-tenant/OIDC/telemetry acceptance remains pending.
+The most recent earlier Local full-stack run failed because the realm import file was renamed to a filename that did not match its preserved realm ID. The filename and all Compose, script and CI references have been corrected. Post-fix Local run #45978681883 passed both jobs, including the complete nine-service Docker stack, persisted multi-tenant workflows, real Keycloak-issued identities, PKCE browser acceptance and telemetry. Follow-up run #45979293490 is validating the merged API main branch and HeapCare.Local checkout directory.
 
 The connected GitHub actions available in this session do not provide organization or repository rename administration. The existing organization and repository slugs therefore remain unchanged. No HeapCare domain/DNS/email/certificate/production origin is configured. Production OIDC identity and persisted database/volume identifiers remain compatibility contracts pending a separately rehearsed migration.
