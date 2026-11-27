@@ -936,7 +936,7 @@ Independent API authorization, Local integration, Web UX and documentation work 
 ### Phase 4 — hospital workflows and real OIDC acceptance
 
 - **HeapCare.Web PR #79 merged** as `0e4310b3ff1701da6f7e3518b9f3ad1efadf5251`. The real-Keycloak ClinicalUser browser journey now consumes a synthetic in-progress walk-in, requests the live department/date queue, opens the linked encounter, retrieves department-scoped patient identity and requires identity confirmation. The test intentionally does not enter or sign a clinical note.
-- **HeapCare.Local PR #31 remains open** at head `73ec0efc823e57c878d999d24a3a8205deb38a5f`. It creates separate runner-temporary Keycloak identities for tenant roles, synthetic tenant/hospital/department records and an in-progress OPD walk-in. It now also verifies with real-issued tokens that PatientRegistrar and ClinicalUser can read the synthetic department queue while FacilityManager is denied.
+- **HeapCare.Local PR #31 merged** as `bddfa886e0c35e29cda0e5bda7a435a75e2f1a63`. It creates separate runner-temporary Keycloak identities for tenant roles, synthetic tenant/hospital/department records and an in-progress OPD walk-in. It verifies with real-issued tokens that PatientRegistrar and ClinicalUser can read the synthetic department queue while FacilityManager is denied. Its full browser acceptance was subsequently completed in Local #36 / run #46046213095.
 - The earlier Local full-stack run `46035812237` built and started all nine services and passed persisted-role API checks, but the browser test expected the empty clinical note's `Review and sign` button to be enabled. The application correctly kept signing disabled because no note content had been entered. **HeapCare.Web PR #81 merged** to correct this test expectation without entering, saving or signing clinical content.
 - The refreshed Local full-stack run `46036979607` is currently validating Local head `73ec0efc823e57c878d999d24a3a8205deb38a5f` against current Web main `2d35fd4b72ce21ca5e44ca5ba31c5434349ab044`. Local tooling has passed; the complete nine-service stack is still running. The run has not yet passed the real-OIDC browser stage. Keep PR #31 unmerged until its exact-head integrated run is green.
 - This closes neither the full appointment-to-check-in acceptance nor the billing/receipt workflow acceptance on the real OIDC stack. Existing unit, integration and Web browser checks remain supporting evidence, not a substitute for the coupled Local acceptance run or pilot validation.
@@ -950,7 +950,7 @@ Independent API authorization, Local integration, Web UX and documentation work 
 
 ### Parallel execution and release constraints
 
-- Phase-specific merged evidence in this increment: API PRs #122 and #123; Web PRs #79, #80 and #81. Local PR #31 remains open pending real nine-service/OIDC verification. The duplicate Web PR #82 was closed as superseded by merged PR #81.
+- Phase-specific merged evidence in this increment: API PRs #122 and #123; Web PRs #79, #80 and #81; Local PR #31 is merged and its real nine-service/OIDC verification is recorded in Local #36 / run #46046213095. The duplicate Web PR #82 was closed as superseded by merged PR #81.
 - Continue API security, Local integration, Web experience and documentation work in parallel when repository/file dependencies allow. Merge only after required checks pass on the exact current head. Never infer cross-repository acceptance from a component-only CI pass.
 - Preserve database, migration-history, Keycloak realm/client, OIDC issuer/audience and persistent-volume identifiers. Production backup/PITR, encryption-key custody, provider/region selection, isolated restore drill, retention/legal-hold policy, pilot role approval and hospital-group/branch semantics remain explicit owner-dependent gates.
 
@@ -981,3 +981,37 @@ This update supersedes the earlier Phase 4 note that Local PR #31 was still open
 ### Current release boundary
 
 Phases 3–5 have stronger merged implementation and CI acceptance evidence, but none is declared production-ready solely from these tests. Product/clinical role approval, privacy/legal review, operational backup/PITR, secrets and key custody, retention/legal hold, hosting/region selection, hospital scheduling policy and a production-like recovery drill remain explicit gates.
+
+---
+
+## Final Phase 3–5 execution record — 2026-11-27
+
+This section supersedes earlier pending notes in this roadmap and records only changes that are merged and independently verified.
+
+### Phase 3 — tenant security, audit and database recovery
+
+- API #122 added PostgreSQL-backed audit CSV tenant isolation: requesting-tenant actor metadata is included while another tenant's actor metadata is excluded.
+- API #123 merged as 9a4a517add68c5af08fc914533b387e6883440be. A department-scoped PatientRegistrar can transition an in-scope queue entry but gets a non-disclosing 404 for a peer department. The denied queue entry remains Waiting and both allowed/denied audit attribution is checked.
+- API #124 merged as 745085912684d54a2c2f6ca830ade712d76d9e63. Eight simultaneous PostgreSQL-backed appointment check-in requests all return the same queue-entry ID and token; a direct database query confirms exactly one appointment-linked queue row remains. Release build, xUnit analyzers, EF model-drift, full tests and Docker/PostgreSQL checks passed.
+- Local #33 merged as bb252b944b84e1d431d0cbd23459059e12167732. Real Keycloak synthetic identities verify ClinicalUser cannot read cashier invoices or record payments and FacilityViewer cannot read invoices.
+- Local #34 merged as 704aa3e24682e5c386d4975df32c5c2b33bac709. The full-stack workflow creates a disposable PostgreSQL custom-format logical backup, restores to a separate empty database and compares application-table row counts. This is a logical dump/restore smoke test, not provider-native backup, WAL/PITR, cross-region DR, tenant-level restore or production RPO/RTO evidence.
+
+### Phase 4 — provider, availability, appointment, queue and billing workflows
+
+- Local #35 merged as 44ec59dacdfeb3810785ce4e843032a69dd86f10. Real Keycloak/API acceptance creates a synthetic provider profile and effective department assignment, publishes future availability in Asia/Kolkata, and verifies PatientRegistrar can discover the session and slot. FacilityManager cannot publish availability, ClinicalUser cannot read it and PatientRegistrar cannot create provider staff profiles.
+- Web #86 merged as 3a029ad55f053223a9612d6038e30a6cb1e7e125; Web #87 merged as 3b81a70e9113382067c9002421bbdcd528b2a22c. The PatientRegistrar browser workflow searches a synthetic patient using the API's field-based family-name query, selects a future published slot, books the appointment and checks the patient in.
+- Local #36 merged as 085448ba36bc05338aafab604c7e9d5787bbf3d4. Full-stack run #46046213095 passed both tooling validation and the full nine-service job. The full-stack job passed real Keycloak persisted-role API acceptance, PostgreSQL logical backup/restore, cleanup and the real Authorization Code + PKCE browser suite (11 tests). Recorded cross-repository SHAs: API 9a4a517add68c5af08fc914533b387e6883440be, Web 3b81a70e9113382067c9002421bbdcd528b2a22c, Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52.
+- API #124 is a test-only follow-up merged after the integrated run. It passed Release build, EF model-drift, full tests and Docker/PostgreSQL verification; no API runtime behavior or authorization grant changed.
+
+### Phase 5 — authenticated accessibility baseline
+
+- Web #80 and #85 merged the six-role real-Keycloak workspace checks. Local #36's full-stack browser run passed all six identities: HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator. The checks cover main landmark/heading, first-stop skip-link focus, visible focus outline, focus transfer, responsive overflow, accessible names and form labels.
+- Web #88 merged as 554012ff0cafdab86381addd8c77985fe897dccd. Appointment availability now announces provider-session count and available-slot count through polite status semantics, with component regression tests. Its hosted Web pipeline passed Vitest, production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke.
+- The Local #36 integrated run predates Web #88. The new announcement-only change has hosted Web CI evidence but no subsequent Local full-stack replay at this revision.
+
+### Remaining release gates
+
+- Manual keyboard-only completion across all six role workflows, screen-reader review, desktop/tablet visual checks, contrast, zoom/reflow and qualified WCAG 2.2 AA evaluation remain Not Run. No conformance claim is made.
+- Provider credentials and clinical privileges require hospital-side verification; the synthetic provider profile proves scheduling API behavior only.
+- Scheduling, cancellation, rescheduling, no-show policy, check-in window, hospital timezone and retention require pilot-hospital approval.
+- Production backup/PITR, encryption/key custody, retention/legal hold, restore cadence, production RPO/RTO, hosting/region and tenant-level recovery remain owner-dependent gates.
