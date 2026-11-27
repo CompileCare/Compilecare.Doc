@@ -60,3 +60,13 @@ The GitHub Actions workflow builds the .NET 8 application and the Docker image o
 The public site labels current implementation foundations separately from planned/deferred modules. A successful public website deployment is not evidence that the hospital platform itself is production-ready or that the listed planned capabilities are operational.
 
 Do not publish pricing, customer references, support SLAs, regulatory certifications or general-availability claims without approved evidence.
+
+
+## Additional public-site technology and container runtime verification — 2026-11-27
+
+- Site PR #6 and #7 expanded the technology inventory with exact shared-package versions, OpenTelemetry instrumentation, HTML5/Razor, CSS3, JavaScript, npm, Git, Chromium, Google Fonts (DM Sans/Manrope), jsDelivr, Simple Icons, Bash, PowerShell and Windows Batch. The technology page contains 66 logo images and each image has a non-empty alt attribute.
+- Site PR #8 added a real container smoke test: CI starts the .NET 8 image on port 8080, verifies GET /health and HTTP 200 for /, /features, /technology, /about and /contact, captures logs on failure and always removes the container.
+- Site PR #10 completed exact .NET security, migration and observability package version details. The public-site build, Docker build, runtime startup, route smoke tests and cleanup passed.
+- The public site remains an informational website; it is not connected to patient data or the authenticated hospital workspace. The /demo page does not present a fake login or fabricated operational records.
+
+**Live deployment remains unverified.** Site issue #9 tracks deployment to compilecare.site, but provider/service, DNS authority and deployment connection have not been confirmed. Do not claim the custom domain is live until provider deployment, TLS, WebSocket, route and CDN/CSP checks are executed against the actual domain.
