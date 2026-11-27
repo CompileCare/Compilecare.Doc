@@ -7,7 +7,7 @@
 
 ## Executive status
 
-The coordinated source/project migration is merged across all 11 repositories. The API, Web and public Site received additional technical-identifier PRs after the initial README/branding PRs. The existing GitHub organization and repository slugs remain CompileCare because the connected GitHub actions in this session do not expose the organization/repository rename administration operation.
+The coordinated source/project migration is merged across all 11 repositories. The API, Web and public Site received additional technical-identifier PRs after the initial README/branding PRs. Post-merge API restore/build/test and EF checks passed; post-merge Web audit/unit/build/browser E2E/Docker checks passed. The existing GitHub organization and repository slugs remain CompileCare because the connected GitHub actions in this session do not expose the organization/repository rename administration operation.
 
 No production database, Keycloak realm, persistent Docker volume, external email identity or production origin was renamed. Those are compatibility contracts and require separate, rehearsed transitions.
 
@@ -58,7 +58,7 @@ The final Site PR head passed:
 ### Local environment
 - Shell/PowerShell syntax, secret-placeholder checks, Keycloak realm import, OpenTelemetry Collector configuration, Compose validation and observability pipeline smoke checks passed.
 - A previous full-stack run passed the nine-service stack, persisted multi-tenant workflow, real Keycloak Authorization Code + PKCE browser acceptance and telemetry checks.
-- A newer post-merge full-stack run is still in progress at the time of this report.
+- The latest post-merge Local main-branch full-stack run passed, including the nine-service stack, persisted multi-tenant workflows, real Keycloak Authorization Code + PKCE browser acceptance and telemetry checks.
 
 ### Packages
 HeapCare Observability, API Client and Caching packages were published to GitHub Packages under the existing CompileCare organization package owner. API and Docker CI use ephemeral local feeds to validate the actual package contract without relying on cross-repository package permissions.
@@ -81,7 +81,7 @@ HeapCare Observability, API Client and Caching packages were published to GitHub
 - [ ] Provision and validate HeapCare Keycloak realm/client/audience identities; migrate users/roles with a tested recovery path; keep legacy identity until the transition is verified.
 - [ ] Grant private HeapCare package read access to production consumer repositories and validate deployment restore/publish using the intended credentials.
 - [ ] Decide whether PostgreSQL database/role/schema names and persistent Docker volume names need to change. If yes, prepare backup, copy/restore, cutover and rollback procedures; never delete old volumes during a brand-only release.
-- [ ] Complete post-merge main-branch CI, Docker, migration, browser E2E and Local full-stack verification.
+- [ ] Post-merge API CI/EF checks, Web audit/unit/build/browser E2E/Docker checks and Local full-stack verification passed. Continue monitoring normal release CI after future changes.
 - [ ] Run a final residual-reference audit and classify each remaining CompileCare reference as GitHub slug/owner, legacy fallback, identity/database/persisted-data compatibility or defect.
 
 ## Closure rule
