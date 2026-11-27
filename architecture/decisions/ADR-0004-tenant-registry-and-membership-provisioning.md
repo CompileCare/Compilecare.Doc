@@ -107,6 +107,17 @@ Implementation and hosted PostgreSQL integration tests do not constitute product
 
 The registry prevents membership rows from authorizing access to unknown or inactive tenants. Platform privileges are separate from customer tenant roles. Tenant administrators can manage memberships only within their assigned organization scope, and protected administrator invariants prevent accidental lockout. Operational onboarding and tenant offboarding remain controlled platform responsibilities.
 
+## Current implementation boundary — hospital group and branches
+
+The current persistence model permits one tenant to own multiple independent Hospital records. Hospital uniqueness is tenant-scoped, and each hospital is the parent of its own Department → Ward → Room → Bed hierarchy. This supports a tenant with one hospital or multiple hospitals, but it does **not** create a first-class hospital-group entity, branch entity, or parent/child relationship between hospitals. Hospital creation is currently a tenant-wide administration operation.
+
+This is a source-derived description of the current implementation, not a product decision that every multi-hospital customer should be represented as a group. Before adding group/branch entities or changing onboarding, the product owner and pilot hospital must decide whether a branch is:
+- an independent Hospital record under the same tenant;
+- a separately modelled branch belonging to a group-level Hospital; or
+- another organizational concept with distinct licensing, identity, reporting, or operational boundaries.
+
+Do not introduce a new hierarchy, alter tenant scope semantics, or migrate customer data until that decision and its authorization/reporting implications are approved.
+
 ## Open questions
 
 - Who is the designated production platform operator and what is the approved identity onboarding/revocation procedure?
