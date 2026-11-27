@@ -2,7 +2,7 @@
 
 - **Status:** Proposed — requires product, hospital-user, privacy and legal validation
 - **Date:** 2026-11-24
-- **Decision owners:** CompileCare Product & Engineering; hospital stakeholders validate workflows
+- **Decision owners:** HeapCare Product & Engineering; hospital stakeholders validate workflows
 - **Related:** [Product Blueprint v1](../../product/blueprint-v1.md), [ADR-002](ADR-002-multi-tenancy.md), [ADR-0004 tenant registry](ADR-0004-tenant-registry-and-membership-provisioning.md)
 - **Review trigger:** Before tenant registry, patient master, facility scope or cross-facility access is implemented.
 
