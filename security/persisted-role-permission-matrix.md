@@ -126,3 +126,13 @@ The source paths above were verified against the renamed HeapCare.Api main tree.
 
 - HeapCare.Local PR #30 merged as `981a63809db69861ec316d8bcb82a8d8ae5fee7`. The real-Keycloak acceptance script provisions synthetic data and verifies HospitalAdmin and PatientRegistrar can review duplicate candidates; FacilityManager, FacilityViewer and ClinicalUser are denied without submitted patient-name disclosure.
 - The successful full-stack verification used isolated synthetic users and test data. It does not authorize production clinical use or replace the full endpoint/scope acceptance matrix.
+
+
+### OPD queue department-scope regression — 2026-11-27
+
+- **API PR #121 merged** as `9429d838c3c301f6b5434a29b25c4662aded6fc7`. PostgreSQL-backed coverage verifies a department-scoped ClinicalUser cannot list a different department's queue in the same hospital. The API returns a non-disclosing 404 and the denied audit event records the tenant, validated issuer/subject, `ListDepartmentQueue` action and status. No queue data is disclosed.
+- **API PR #123 merged** as `9a4a517add68c5af08fc914533b387e6883440be`. A department-scoped PatientRegistrar can transition a queue entry in its assigned department, but receives a non-disclosing 404 for a queue entry in a peer department. The test verifies a successful `Called` transition and a `Waiting` queue item unchanged after the denied request. Both outcomes have separate audit events with validated tenant, issuer/subject, queue-entry resource ID, outcome and HTTP status.
+- These tests validate resource-level organization-scope enforcement beyond the broad `queue.read` and `queue.manage` role grants. They do not alter the role resolver or approve broader queue responsibilities.
+- API PR #122 also adds an audit CSV tenant-isolation regression: requesting-tenant actor metadata is included while another tenant's actor metadata is excluded. This is test evidence for tenant-bound export filtering, not approval of export purpose, retention or legal-hold policy.
+
+The tests above are API/PostgreSQL regressions. The companion real Keycloak/Local acceptance remains a separate integration gate and must not be inferred from these component tests.
