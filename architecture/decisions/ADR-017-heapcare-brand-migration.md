@@ -148,3 +148,17 @@ Latest CI runs are green for API, Web, public Site, Database documentation, Obse
 The most recent earlier Local full-stack run failed because the realm import file was renamed to a filename that did not match its preserved realm ID. The filename and all Compose, script and CI references have been corrected. Post-fix Local run #45978681883 passed both jobs, including the complete nine-service Docker stack, persisted multi-tenant workflows, real Keycloak-issued identities, PKCE browser acceptance and telemetry. Follow-up run #45979293490 is validating the merged API main branch and HeapCare.Local checkout directory.
 
 The connected GitHub actions available in this session do not provide organization or repository rename administration. The existing organization and repository slugs therefore remain unchanged. No HeapCare domain/DNS/email/certificate/production origin is configured. Production OIDC identity and persisted database/volume identifiers remain compatibility contracts pending a separately rehearsed migration.
+
+## Execution correction — 2026-11-27
+
+The following current state supersedes earlier progress paragraphs in this ADR that described the GitHub administrative rename as pending:
+
+- The GitHub organization is **HeapCare** and all 11 repository names use the HeapCare brand. Repository IDs and history were preserved.
+- CI repository coordinates and NuGet feed owner references were corrected in the API, API Client and Caching workflows. The post-fix API, API Client, Caching and Observability main-branch runs (#45984268087, #45984273706, #45984278571 and #45984332659) all passed.
+- API Client and Caching publication jobs to GitHub Packages passed in runs #45984273706 and #45984278571. Actual production-consumer package-read authorization remains to be verified from consuming identities.
+- Web #45983835225, Local tooling #45983816999 and Database backup/restore #45970305638 also passed. The Site run #45972538371 passed.
+- No open PRs were returned by the HeapCare organization-wide open-PR search at this checkpoint.
+
+The OTP service is intentionally not treated as a completed implementation: its main branch is a scaffold, and the earlier implementation PR #1 was closed without merge because of unresolved security blockers. The PR also recorded a previously committed SMTP credential that requires revocation/rotation. The OTP feature branch must not be revived until the credential owner confirms rotation and a new security review, implementation and regression suite pass.
+
+The domain `heapcare.in` remains unpurchased/unconfigured. Existing Keycloak realm/client/audience IDs, PostgreSQL names/roles, EF migration history and persistent volume names remain compatibility contracts. Their migration requires a separately rehearsed, reversible identity/data transition.
