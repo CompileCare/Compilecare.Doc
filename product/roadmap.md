@@ -884,3 +884,22 @@ CI is treated as a parallel validation lane. Independent API, Web and documentat
 
 - **API PR #117 merged** as `0407dcfeefdd16d63299e74ba8cc27a9e3ef5e86`. PostgreSQL-backed integration coverage verifies that FacilityManager and FacilityViewer cannot invoke patient duplicate-candidate review. The regression asserts HTTP 403, no submitted patient-name disclosure in the response, and denied audit attribution with tenant, validated issuer/subject, hospital resource and status.
 - This closes a focused negative permission case for the existing duplicate-review capability. It does not constitute complete role/capability or organization-scope coverage, and it does not approve the product role model.
+
+
+## Phase execution update — 2026-11-27 (API PR #118)
+
+### Phase 3 — duplicate-review authorization regression
+
+HeapCare.Api PR [#118](https://github.com/HeapCare/HeapCare.Api/pull/118) merged as `56bfd4018b596834686eb00fb72d425dae10842d` after the hosted API CI and Docker/PostgreSQL integration verification workflows passed on the exact PR head `42135b92862d4f537ef68aa5404f4b36d3ca66bd`. The new PostgreSQL-backed integration test verifies that a persisted `ClinicalUser` cannot invoke patient duplicate-candidate review: the API returns HTTP 403, the response does not disclose submitted patient names, and the denied audit event is attributed to the tenant, validated issuer/subject and hospital resource. This complements PR #117's FacilityManager and FacilityViewer denials. The implementation grants duplicate review to HospitalAdmin and PatientRegistrar; this test-only increment changes no runtime permission. The role design still requires pilot/product-owner approval and complete positive/negative endpoint and organization-scope coverage.
+
+### Phase 4 — next validation focus
+
+Continue validating the existing hospital onboarding and OPD workflows against the merged Local/API/Web stack. The hospital-group/branch model remains an explicit product decision; do not add schema or provisioning semantics until the owner-approved model exists. Verify tenant → hospital → department provisioning, then execute the synthetic-data OPD journey and close reproducible defects with API/Web regression tests and paired documentation. Patient contact storage remains gated by ADR-012 approvals. Workforce identity, credential verification and clinical privileging remain separately governed sub-roadmap items.
+
+### Phase 5 — next validation focus
+
+The existing Playwright accessibility suite currently verifies the public shell (skip link, focus visibility, landmarks, accessible names, image alt text, reduced motion and narrow viewport overflow). It does not establish authenticated six-role accessibility acceptance. Continue with authenticated acceptance for PlatformOperator, HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar and ClinicalUser, capturing sanitized evidence for keyboard workflows, focus/dialog behavior, announcements, responsive layouts and zoom/reflow. A real screen-reader pass and qualified WCAG 2.2 AA evaluation remain separate requirements; do not claim conformance from automated checks alone.
+
+### Parallel execution constraints
+
+Independent API authorization, Local integration, Web UX and documentation work may proceed concurrently when they do not modify shared files or depend on unmerged changes. CI is monitored per PR and merges require green required checks on the exact PR head. Provider selection, production identity/key custody, retention/legal-hold policy, pilot role approval and hospital-group/branch semantics remain owner-dependent gates; no production or clinical policy is inferred.
