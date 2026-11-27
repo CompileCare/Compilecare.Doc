@@ -1,7 +1,7 @@
 # Persisted tenant role-to-permission matrix
 
-**Status:** Source-derived implementation snapshot, reviewed 2026-11-26.  
-**Source of truth for this snapshot:** `CompileCare.Api/src/CompileCare.Api/Security/TenantRolePermissions.cs` and `CompileCare.Api/src/CompileCare.Api/Middleware/TenantContextMiddleware.cs`.  
+**Status:** Source-derived implementation snapshot, reviewed 2026-11-27.  
+**Source of truth for this snapshot:** `HeapCare.Api/src/HeapCare.Api/Security/TenantRolePermissions.cs` and `HeapCare.Api/src/HeapCare.Api/Middleware/TenantContextMiddleware.cs`.  
 **Important:** This records what the current API implementation grants. It is not, by itself, product-owner approval of the intended job responsibilities, a clinical privilege model, or proof that every endpoint and resource scope is correctly enforced.
 
 ## Trust and evaluation model
@@ -94,3 +94,8 @@ This snapshot does not lift the production/pilot HOLD. Authenticated Keycloak ac
 - API PR #100 merged as `0a8f326cea2be23984a68e90e100188b311b7a4b`: hospital- and department-scoped HospitalAdmin memberships cannot query or export tenant-wide audit events despite having the persisted audit-read permission. The service-level tenant-wide scope guard returns 403. Release, push and Docker checks passed.
 
 These additions close specific gaps in the five-role matrix. They do not replace the full authenticated Keycloak/API/PostgreSQL acceptance matrix or product/clinical approval of role responsibilities.
+
+
+### Source-path and latest regression review — 2026-11-27
+
+The source paths above were verified against the renamed HeapCare.Api main tree. Additional merged regression slices are recorded in this matrix: PR #96 covers hospital- and department-scoped HospitalAdmin restrictions for patient identifiers; PR #97 covers non-clinical-role denial for OPD encounter operations; PR #98 expands FacilityManager scheduling/billing denial coverage and patient search/registration denials for FacilityManager/FacilityViewer; PR #99 explicitly denies HospitalAdmin access to OPD encounter operations; and PR #100 denies tenant-wide audit query/export for hospital- and department-scoped HospitalAdmin memberships. These additions strengthen focused cases but do not establish exhaustive positive/negative coverage for every policy, endpoint and scope combination.

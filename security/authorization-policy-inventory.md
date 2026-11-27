@@ -1,11 +1,11 @@
 # API authorization policy inventory
 
-**Status:** Source-derived inventory, reviewed 2026-11-26.  
+**Status:** Source-derived inventory, reviewed 2026-11-27.  
 **Purpose:** Provide a traceable starting point for role-based authorization review and authenticated acceptance. This is not a role-to-permission grant matrix and is not a substitute for tests or a live authorization review.
 
 ## Source of truth and trust model
 
-The API defines named authorization policies in `src/CompileCare.Api/Security/AuthorizationPolicies.cs`. Tenant permission policies require an authenticated principal and a permission claim on the dedicated `CompileCareTenantMembership` identity. The API creates that identity after resolving the validated OIDC issuer/subject against an active persisted tenant membership and deriving permissions from the persisted role. Token-supplied role and permission claims are not the source of authorization.
+The API defines named authorization policies in `src/HeapCare.Api/Security/AuthorizationPolicies.cs`. Tenant permission policies require an authenticated principal and a permission claim on the dedicated `CompileCareTenantMembership` identity. The API creates that identity after resolving the validated OIDC issuer/subject against an active persisted tenant membership and deriving permissions from the persisted role. Token-supplied role and permission claims are not the source of authorization.
 
 Every tenant-scoped route group must retain its tenant-scoped endpoint metadata and authenticated requirement. Individual operations then apply the narrow policy listed below. Platform-operator operations use separate platform-operator metadata and policy. The `X-Tenant-ID` header selects context; it never grants access.
 
@@ -74,3 +74,7 @@ For every capability above, maintain positive and negative integration coverage 
 ## Release gate
 
 Do not treat this inventory as proof of role correctness. Before production/pilot approval, reconcile the persisted role-to-permission resolver with the product role matrix, inspect every endpoint and service-level scope check, execute the complete positive/negative PostgreSQL integration matrix, and repeat authenticated local Keycloak/API/Web acceptance. Any permission expansion requires a reviewed change, explicit negative tests and updated user/developer documentation.
+
+## Latest authorization regression evidence — 2026-11-27
+
+The source-derived role matrix now records the merged API PRs #96–#100. In brief: PR #96 covers hospital/department-scoped patient identifier denial; PR #97 covers OPD encounter denials for FacilityManager, FacilityViewer and PatientRegistrar; PR #98 adds FacilityManager scheduling/billing denials and patient search/registration denials for FacilityManager/FacilityViewer; PR #99 explicitly denies HospitalAdmin OPD encounter access; and PR #100 verifies hospital/department-scoped HospitalAdmin cannot query/export tenant-wide audit data. These are targeted regression tests, not an exhaustive authorization certification. The next review must compare every current endpoint registration and service/persistence scope guard with the latest HeapCare.Api source and preserve the distinction between policy-level and resource-level authorization.
