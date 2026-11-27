@@ -695,7 +695,7 @@ Exact checked-out commits recorded by the run:
 
 - CompileCare.Local: `13e815ac30f319bad05af1d0615f2b2c20495d0e`
 - CompileCare.Api: `0a8f326cea2be23984a68e90e100188b311b7a4b`
-- CompileCare.Web: `1b7da7e1f44fc8e9c43c3a4b14c1140c`
+- CompileCare.Web: `1b7da7aa8e4d5e3ebae79f17986e44560d68edd9`
 - CompileCare.Observability: `935f6629d5abb92296385ec2e0c1ec04060b3fb7`
 
 **Remaining acceptance gates:** manual authenticated role/workflow execution, UI visual review, keyboard-only and screen-reader review, contrast/zoom/reflow, Mac/Windows launcher acceptance, production ingress/TLS, provider-native PostgreSQL PITR/restore, signing-key rotation, clinical governance and pilot sign-off remain open. Hosted Linux CI is not a substitute for those activities.
