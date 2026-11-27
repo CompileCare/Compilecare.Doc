@@ -744,3 +744,12 @@ The latest Local full-stack run identified a Keycloak import filename compatibil
 A previous full-stack baseline did pass the nine-service environment, persisted tenant workflows, real Keycloak PKCE browser acceptance and API telemetry. The current rerun is specifically validating the merged HeapCare checkout/path/package changes plus the corrected Keycloak import contract.
 
 The repository source trees for API, Web, Site, Database, Observability and documentation contain no remaining CompileCare-named file paths. Local retains only `local/keycloak/compilecare-realm.json`, intentionally named to match the preserved legacy realm ID. GitHub organization/repository slugs remain unchanged because repository/organization administration is not exposed by the connected GitHub actions. No HeapCare domain, DNS, email, certificate or production origin is configured. Production Keycloak migration, package read grants and any persisted database/volume rename remain separate, non-destructive release gates.
+
+
+### Post-fix Local full-stack verification — 2026-11-27 15:35 IST
+
+Local run [#45978681883](https://github.com/CompileCare/CompileCare.Local/actions/runs/45978681883) has completed successfully. Both jobs passed. The full-stack job confirms the nine-service Compose stack, real Keycloak-issued identities, persisted multi-tenant workflows, real Authorization Code + PKCE browser acceptance and API telemetry. The validation job confirms macOS/Windows launchers, Keycloak realm import, OpenTelemetry Collector configuration, Compose configuration and the Docker observability pipeline.
+
+The Keycloak import filename was restored to `compilecare-realm.json` to match the intentionally preserved `compilecare` realm ID. The import filename is the only remaining CompileCare-named file path in the Local repository and is a Keycloak compatibility requirement, not an unfinished product-facing label.
+
+Follow-up Local run [#45979293490](https://github.com/CompileCare/CompileCare.Local/actions/runs/45979293490) is now checking the merged API `main` branch and the `HeapCare.Local` checkout directory. Do not treat this follow-up as complete until both jobs finish green.
