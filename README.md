@@ -1,8 +1,8 @@
-# CompileCare Documentation
+# HeapCare Documentation
 
 > **Brand migration in progress:** HeapCare is the product brand. Repository names, source namespaces, package IDs, database identifiers, OIDC realm/client IDs, and deployment identifiers remain unchanged until their coordinated migration is implemented and validated.
 
-CompileCare is an India-focused hospital information and management platform for hospitals, clinics, and healthcare provider organizations. This repository is the product, architecture, workflow, and engineering documentation source of truth.
+HeapCare is an India-focused hospital information and management platform for hospitals, clinics, and healthcare provider organizations. This repository is the product, architecture, workflow, and engineering documentation source of truth.
 
 > **Status:** Foundation documentation — draft v1. Product scope and several architecture decisions remain proposals until reviewed and approved with hospital stakeholders and technical owners.
 
@@ -43,11 +43,11 @@ CompileCare is an India-focused hospital information and management platform for
 ## Delivery status
 
 1. **Phase 1 — Backend foundation:** API foundation and shared observability are implemented and merged.
-2. **Phase 2 — Developer platform:** ApiClient foundation and resilience/error contracts are implemented and merged. Database operations ownership, migration, backup/restore and environment runbooks are also established in CompileCare.Database (PR #1). Package publication and consuming-application validation, plus platform-specific operational automation, remain release tasks.
-3. **Phase 3 — Database and security:** PostgreSQL/EF Core 10, OIDC/JWT tenant membership, facility RBAC, append-only request audit, global tenant registry/lifecycle, trusted initial membership provisioning and organization-scope authorization are implemented and merged in CompileCare.Api (PRs #12–#13). Broader asynchronous/cross-tenant tests, audit querying/retention policy and production operational controls remain.
+2. **Phase 2 — Developer platform:** ApiClient foundation and resilience/error contracts are implemented and merged. Database operations ownership, migration, backup/restore and environment runbooks are also established in HeapCare.Database (PR #1). Package publication and consuming-application validation, plus platform-specific operational automation, remain release tasks.
+3. **Phase 3 — Database and security:** PostgreSQL/EF Core 10, OIDC/JWT tenant membership, facility RBAC, append-only request audit, global tenant registry/lifecycle, trusted initial membership provisioning and organization-scope authorization are implemented and merged in HeapCare.Api (PRs #12–#13). Broader asynchronous/cross-tenant tests, audit querying/retention policy and production operational controls remain.
 4. **Phase 4 — Core healthcare domain:** Hospital hierarchy, patient master/registration, hospital-local MRN, advisory duplicate detection and normalized multi-signal matching are implemented. The initial tenant-scoped staff/provider profile and assignment foundation is also implemented and merged (API PR #18; design/workflow in documentation PR #21). Verified patient-contact capture is designed but not implemented (documentation PR #19). Next delivery is appointments, walk-ins, check-in and queue following ADR-014; patient-contact implementation remains gated on its separate security/privacy decisions, followed by OPD. Broader workforce identity, credentialing, rostering, attendance, leave, payroll, secure employee records and cross-tenant workforce sharing are explicitly retained as later milestones.
 5. **Phase 4 — OPD billing:** Minimal baseline approved for implementation: service catalogue, visit-linked invoices, payments, receipts and daily collection reporting. Tax, discounts, refunds, insurance, payment gateway and accounting integrations remain explicitly deferred pending pilot decisions; see `product/workflows/opd-billing-foundation.md`.
-6. **Phase 5 — User experience:** Reception and clinical workspace UX foundation is specified in `product/workflows/reception-and-clinical-workspace-ux.md`; the next implementation increment is the authenticated shell and API-backed patient lookup in `CompileCare.Web`, separate from the public `CompileCare.Site`.
+6. **Phase 5 — User experience:** Reception and clinical workspace UX foundation is specified in `product/workflows/reception-and-clinical-workspace-ux.md`; the next implementation increment is the authenticated shell and API-backed patient lookup in `HeapCare.Web`, separate from the public `HeapCare.Site`.
 6. **Product-first definition:** The Product Blueprint remains the source of truth. Validate open decisions affecting tenant, patient and clinical data boundaries before expanding into patient-facing and clinical domains.
 
 A merged repository or passing build does not imply that a complete hospital workflow or production readiness has been delivered.
@@ -56,7 +56,7 @@ A merged repository or passing build does not imply that a complete hospital wor
 
 Important decisions must be recorded as ADRs. Documents distinguish implemented facts, accepted decisions, proposals, assumptions and open questions. Update affected requirements, workflows, API contracts and tests when scope or behaviour changes.
 
-CompileCare is exclusively a hospital and healthcare systems product. Unrelated products and repositories are outside this documentation and delivery scope.
+HeapCare is exclusively a hospital and healthcare systems product. Unrelated products and repositories are outside this documentation and delivery scope.
 
 ## Contributing
 
