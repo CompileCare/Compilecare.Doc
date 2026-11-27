@@ -1,9 +1,18 @@
 # Phase 5 — Authenticated workspace accessibility acceptance
 
-**Status:** Planned / not yet executed against the authenticated local stack  
+**Status:** Automated authenticated full-stack smoke passed on 2026-11-27; manual six-role accessibility and local desktop acceptance remain not yet executed  
 **Scope:** Existing CompileCare OPD workspaces only. This is an acceptance record and execution checklist, not a WCAG conformance statement.
 
 ## Evidence already present
+
+### Current merged-main full-stack evidence — 2026-11-27
+
+HeapCare.Local run [#45993951443](https://github.com/HeapCare/HeapCare.Local/actions/runs/45993951443) completed successfully on Local main commit `a2daae6a0f2cbb3eeea07d583ddf0459297b6eae`. Both jobs passed:
+
+- **Local tooling validation:** macOS shell and Windows PowerShell syntax, fail-closed secret placeholders, Keycloak realm import (including Docker import smoke), OpenTelemetry Collector configuration, Compose validation and Docker observability pipeline smoke.
+- **Full nine-service Docker stack and API telemetry verification:** built and ran the complete stack; verified real Keycloak-issued identities, persisted multi-tenant workflows, real Authorization Code + PKCE browser acceptance, and API telemetry. The run cleaned up only its isolated CI stack and CI-only secrets/volumes.
+
+This is current merged-main automated full-stack evidence, not the manual authenticated accessibility review. It does not execute every role/workflow in the matrix below, test a developer's Mac environment, provide screen-reader evidence, or establish WCAG conformance. The role-by-role manual matrix remains outstanding.
 
 The Web repository currently has an automated e2e/accessibility.spec.ts suite covering the signed-out/public workspace:
 
