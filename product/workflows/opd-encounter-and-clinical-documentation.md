@@ -103,3 +103,15 @@ The clinical queue presentation is extracted into `ClinicalQueueRow` in [Compile
 This is a presentation-only change. The existing identity verification step remains mandatory before clinical note content is displayed or edited. Draft saving, signing, closing, cancellation and append-only amendments retain their existing permission checks and API contracts. Do not add patient names or note content to the clinical queue list, browser storage, general logs or telemetry.
 
 Verification includes keyboard operation, status announcements, desktop/tablet/375px layouts, and busy/opening states. API integration and real Keycloak authorization are verified separately from mocked Web component tests.
+
+## Real Keycloak clinical note lifecycle and signed-note UI acceptance — 2026-11-27
+
+HeapCare.Local PR #38 merged as `fae841e12223e82ff6e7a8c0dfdf571222f744d6`. Full-stack run [#46050151054](https://github.com/HeapCare/HeapCare.Local/actions/runs/46050151054) passed Local tooling validation, nine-service Docker/API/observability startup, persisted-role API acceptance, PostgreSQL logical backup/restore, the real Keycloak Authorization Code + PKCE browser suite and cleanup.
+
+The API acceptance uses the real ClinicalUser token against a separate synthetic patient and in-progress OPD visit. It creates an encounter, saves a draft, signs with persisted signer attribution, verifies a second note update is rejected (409), closes the encounter, appends an amendment, re-reads the encounter, and verifies that the signed original remains unchanged. A PatientRegistrar token is denied encounter read with HTTP 403.
+
+The browser acceptance reopens this second encounter through the ClinicalUser workspace, requires patient identity confirmation, asserts all signed note fields are read-only, verifies Review and sign is not available, and displays the append-only amendment. A separate original encounter remains empty and unsigned, proving the sign action stays disabled until required note fields are entered.
+
+Run #46050151054 checked out API `745085912684d54a2c2f6ca830ade712d76d9e63`, Web `baab2966baeafd8f07e94bf45ab02f8ef3ecc1e9`, and Observability `1a06382e4eeed3e0070a0def2b89b8d11512dd52`. The real-OIDC suite completed 11 passing tests.
+
+**Synthetic-data boundary:** all added note strings are explicit CI placeholders in a disposable database. No actual patient history, examination findings, diagnosis, treatment or care plan is entered. The automation does not approve clinical privileges or make the platform production-ready.

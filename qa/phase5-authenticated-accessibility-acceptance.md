@@ -168,3 +168,11 @@ Still outstanding: manual keyboard completion for all six role workflows, real s
 HeapCare.Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run #46047530266 passed the nine-service Docker/observability and tooling jobs against Web 554012ff0cafdab86381addd8c77985fe897dccd, API 745085912684d54a2c2f6ca830ade712d76d9e63 and Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52. The real Keycloak Authorization Code + PKCE browser suite completed 11 tests, including all six persisted roles and PatientRegistrar appointment booking/check-in. This verifies the Web #88 provider-session and available-slot status announcements on the integrated stack.
 
 Manual screen-reader testing, full keyboard-only workflows, contrast, zoom/reflow and WCAG 2.2 AA evaluation remain Not Run; no conformance claim is made.
+
+### Signed clinical note read-only UI acceptance — Local #38
+
+Web #89 and Local #38 jointly verify the ClinicalUser signed-note presentation with real Keycloak credentials. Local #38 merged as `fae841e12223e82ff6e7a8c0dfdf571222f744d6`; run [#46050151054](https://github.com/HeapCare/HeapCare.Local/actions/runs/46050151054) passed the nine-service stack and 11-test Authorization Code + PKCE browser suite against API `7450859`, Web `baab296`, and Observability `1a06382`.
+
+The browser reopens a second, separate synthetic encounter that the real ClinicalUser API fixture drafted, signed, closed and amended. It confirms patient identity before content is shown, note controls are read-only, Review and sign is absent, and the amendment history is visible. The original empty encounter remains untouched and continues to test that signing is disabled when required note content is empty.
+
+All note values are explicit CI placeholder strings only. Manual screen-reader testing, complete keyboard-only workflows, contrast, zoom/reflow and qualified WCAG 2.2 AA evaluation remain outstanding; this is not a conformance claim.
