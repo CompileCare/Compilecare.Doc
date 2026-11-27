@@ -824,3 +824,28 @@ HeapCare.Local run [#45993951443](https://github.com/HeapCare/HeapCare.Local/act
 - A phase is complete only when its documented exit criteria and evidence are satisfied. Green CI alone is not phase completion or production approval.
 
 **Out-of-scope work remains paused until Phases 3–5 exit criteria are met.**
+
+
+## Parallel execution and phase checkpoint — 2026-11-27
+
+### Completed in this execution
+- Web PR #71 merged after both CI runs passed: unit tests, production build, Chromium browser E2E, real-OIDC suite discoverability and Docker smoke validation. The change adds regression coverage that membership-list failures are announced through an alert and rejected membership creation preserves the entered OIDC subject while announcing an actionable conflict.
+- Documentation PR #168 merged. It records the source-verified current tenant-to-hospital hierarchy and explicitly leaves HospitalGroup/Branch semantics as an open product decision; no speculative schema change is authorized.
+- The organization-wide open-PR search returned no open pull requests immediately after these merges.
+
+### New independent validation work in progress
+- API PR for audit pagination stability: add a PostgreSQL-backed integration test proving records with identical OccurredAtUtc values are ordered by descending ID consistently across page boundaries. This protects the documented deterministic offset-pagination contract. CI must pass before merge.
+- Phase 5 remains open for authenticated six-role manual acceptance, keyboard/focus behavior in authenticated workflows, responsive/zoom checks and an actual screen-reader pass. Existing public-shell E2E checks and Web CI are not substitutes for those manual checks.
+
+### Live pending-task register
+| Phase | Status | Remaining work / gate |
+|---|---|---|
+| 3 — Database, identity and security | In progress | Finish sensitive workflow scope/audit coverage; obtain pilot-approved audit reader/role, retention/deletion/legal-hold and export governance; migration/rollback rehearsal with representative data; select provider and prove encrypted backup/PITR plus isolated restore; production key/secret custody and rotation; incident response, privileged-access review, monitoring and qualified privacy/legal review |
+| 4 — Core healthcare domain | Partially complete | Confirm tenant/hospital/department onboarding and hospital-group/branch product model; finish OPD acceptance/defects; keep patient contact storage gated by ADR-012; define governed workforce identity/credentialing/privileging and HR/payroll sub-roadmap |
+| 5 — User experience | In progress | Six-role authenticated acceptance using synthetic identities/data; keyboard-only workflows; focus/dialog behavior; accessible announcements; responsive, contrast, zoom/reflow and screen-reader validation; sanitized role-based evidence |
+
+### Execution controls
+- Independent repository tasks are developed concurrently where they do not share files or depend on unmerged changes. CI is monitored while independent work proceeds; no task is marked complete until its own checks and integration evidence are verified.
+- No separate coding-agent/background-worker facility is exposed in this session. GitHub API operations and independent repository updates can be orchestrated concurrently, but this does not imply persistent workers.
+- Owner/provider/legal/pilot decisions remain blockers and will not be invented. Preserve existing Keycloak, database, migration-history and persistent-volume identifiers until a rehearsed reversible migration is approved.
+- OTP remains on security hold pending confirmation that the historical SMTP credential is revoked/rotated and a fresh security review. No production-readiness or WCAG 2.2 AA conformance claim is made from CI alone.
