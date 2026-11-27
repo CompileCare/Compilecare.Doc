@@ -162,3 +162,34 @@ The following current state supersedes earlier progress paragraphs in this ADR t
 The OTP service is intentionally not treated as a completed implementation: its main branch is a scaffold, and the earlier implementation PR #1 was closed without merge because of unresolved security blockers. The PR also recorded a previously committed SMTP credential that requires revocation/rotation. The OTP feature branch must not be revived until the credential owner confirms rotation and a new security review, implementation and regression suite pass.
 
 The domain `heapcare.in` remains unpurchased/unconfigured. Existing Keycloak realm/client/audience IDs, PostgreSQL names/roles, EF migration history and persistent volume names remain compatibility contracts. Their migration requires a separately rehearsed, reversible identity/data transition.
+
+
+## Execution refresh — 2026-11-27 (latest verified repository work)
+
+### Completed since the previous checkpoint
+- Web PR #71 merged after both Web CI runs passed. Membership list and mutation failures now have regression coverage for accessible alert announcements and preservation of the OIDC subject on rejected creation.
+- Web PR #72 merged; the browser-test guide now uses HeapCare product-facing branding while preserving compatibility-sensitive OIDC identifiers.
+- Web PR #73 merged after its CI checks passed; membership lifecycle confirmation tests assert the named accessible group and confirm/cancel actions.
+- API PR #111 merged after API CI and Docker integration verification passed. PostgreSQL-backed coverage now verifies deterministic audit ordering across page boundaries when events share the same timestamp.
+- API PR #112 merged after API CI and Docker integration verification passed. Invalid, empty-GUID and repeated `X-Tenant-ID` values are verified to return HTTP 400 Problem Details.
+- Site PR #14 merged after Site CI passed. The legacy `support@compilecare.com` address is no longer published by the HeapCare public contact page.
+- Site PR #15 merged after Site CI passed. The page now accurately says the official HeapCare support contact is not yet published and does not direct visitors to an unsupported repository issue channel.
+- Docs PR #168 records the source-verified tenant-to-hospital hierarchy and leaves group/branch semantics explicitly undecided.
+- Docs PR #169 refreshes the Phase 3–5 pending-task register and execution controls.
+- Docs PR #170 updates ADR-012 decision-owner branding without changing its proposed status or unresolved privacy/security gates.
+- Docs PR #171 updates decision-owner labels in ADR-001 through ADR-006 and ADR-008 through ADR-011, preserving historical implementation references and technical identifiers.
+
+### In progress at this checkpoint
+- API PR #113 adds PostgreSQL-backed CSV export regression coverage for all spreadsheet formula prefixes (`=`, `+`, `-`, `@`) and leading whitespace before a formula. Its API CI and Docker integration checks must pass before merge.
+- Phase 3 release readiness remains open: pilot-approved audit reader/role mapping, purpose and export governance, retention/deletion/legal-hold policy, representative-data migration and rollback rehearsal, provider-backed encrypted backup/PITR and isolated restore evidence, production key/secret custody and rotation, and qualified privacy/legal review are not established by repository CI.
+- Phase 4 remains partial. Existing tenant-owned multiple-Hospital support does not define a HospitalGroup/Branch business model. Do not add that hierarchy until the product owner and pilot hospitals approve the model and migration requirements.
+- Phase 5 still requires authenticated six-role acceptance, keyboard/focus and responsive/zoom evaluation, and an actual screen-reader pass. Automated CI is not a substitute for manual accessibility evaluation and does not establish WCAG 2.2 AA conformance.
+
+### External identity and compatibility status
+- HeapCare is the GitHub organization and product-facing brand. Repository IDs and Git history were preserved during renames.
+- The official HeapCare support email/domain is not configured. `heapcare.in` remains unpurchased/unconfigured; no DNS, certificate, production origin, OAuth callback, CORS or CSP origin is assumed.
+- The old support email was removed from the public contact page rather than replaced with an invented address.
+- Keycloak realm/client/audience IDs, PostgreSQL database/role names, EF migration history, legacy connection-string fallback and persistent Docker volume names remain compatibility contracts. Any transition requires an independently reviewed, reversible migration and verified backup/restore.
+- OTP remains on security hold pending confirmation that the historical SMTP credential has been revoked/rotated and a fresh security review is complete.
+
+This refresh supersedes earlier status sentences in this ADR where they conflict with the verified merges and checks listed above. Historical migration evidence and old PR links are retained intentionally.
