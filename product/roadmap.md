@@ -639,3 +639,10 @@ All hosted checks passed: CI `45856806161` (12 unit and 164 integration tests), 
 CompileCare.Api PR #96 is merged as `41533bf7dfe34cc16fdd3f90aa99c1b3726ecc7f`. PostgreSQL-backed integration coverage verifies that a hospital-scoped HospitalAdmin can operate only within its assigned hospital, while cross-hospital policy/identifier access and department-scoped access to hospital-wide MRN operations are denied with non-disclosing 404 responses. The tests assert rejected audit attribution, no patient/MRN data in denied responses, and unchanged policy/identifier state after denied writes. Hosted PR CI, push CI and Docker Integration Verification all passed on head `853a24c5377b3ba94bfa14281b439f50f5508fb8`.
 
 This closes a focused patient-identifier organization-scope regression gap; it does not establish exhaustive organization-scope coverage for every domain or production acceptance.
+
+
+### OPD encounter role-denial regression — 2026-11-27
+
+API PR #97 merged as `ac99bd91602e03d3e6cd483a8bdba0971395eca7`. PostgreSQL-backed integration coverage verifies that FacilityManager, FacilityViewer and PatientRegistrar memberships cannot read or mutate OPD encounters. The regression exercises direct and queue-linked reads, encounter creation, note updates, signing, amendments, closure and cancellation. Each denied operation must return 403, disclose no clinical note content, leave the encounter unchanged, and create a denied audit event attributed to the validated tenant, issuer and subject. Hosted Release build/test, push build/test and Docker Integration Verification all passed on head `19e9781bbe0a15c5a27fea4355de73def42c6844`.
+
+This closes the identified non-clinical role-denial slice for the OPD encounter endpoints. It does not replace clinical workflow acceptance, clinical governance review, or exhaustive scope validation for every future clinical capability.

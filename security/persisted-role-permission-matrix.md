@@ -78,3 +78,10 @@ This snapshot does not lift the production/pilot HOLD. Authenticated Keycloak ac
 - API PR #96 merged as `41533bf7dfe34cc16fdd3f90aa99c1b3726ecc7f`. PostgreSQL-backed tests verify hospital-scoped HospitalAdmin access within its assigned hospital and denial of cross-hospital policy/identifier operations. Department-scoped HospitalAdmin is denied hospital-wide MRN policy, identifier listing, lookup and assignment operations.
 - Denials use non-disclosing 404 responses, expose no patient/MRN data, are attributed as rejected audit events, and leave policy/identifier state unchanged. Hosted PR CI, push CI and Docker Integration Verification passed.
 - This is focused coverage for the patient-identifier boundary; continue validating tenant, hospital and department scopes across each remaining domain and operation.
+
+
+### OPD encounter role-denial regression — 2026-11-27
+
+- API PR #97 merged as `ac99bd91602e03d3e6cd483a8bdba0971395eca7`. PostgreSQL-backed tests cover FacilityManager, FacilityViewer and PatientRegistrar denial for encounter read (by encounter and queue), create, note update, sign, amend, close and cancel.
+- Denials return 403 without disclosing clinical note content; persisted encounter state remains unchanged; denied audit records include tenant, validated issuer/subject and HTTP status attribution.
+- Hosted Release build/test, push build/test and Docker Integration Verification passed. ClinicalUser access remains separately granted and organization-scoped; the test is not a clinical acceptance or regulatory-compliance claim.
