@@ -133,3 +133,7 @@ HeapCare becomes the proposed product-facing identity immediately in the documen
 - PostgreSQL database/role/schema names, EF migration IDs/history and persistent Docker volume names remain unchanged to protect existing data. A separate, rehearsed data migration is required before changing them.
 - New HeapCare NuGet packages are published under the existing GitHub Packages owner. Production consumers need package read access granted to their repositories or a valid package-read credential; CI uses isolated local package feeds and does not prove production package authorization.
 - The final residual-reference audit and all post-merge main-branch, Docker, integration, E2E and deployment verification remain mandatory before declaring the brand migration complete.
+
+
+### Merge completion update
+All 11 original repository migration PRs are merged, and the additional technical identifier PRs for the API, Site and Web are also merged. The API and Web solution/source/package identities and the Site project/assembly identity now use HeapCare on main. The Local main branch now prefers HeapCare local checkout paths and HEAPCARE_* environment variables while detecting old checkout folders. The only remaining CompileCare identifiers are classified compatibility or administrative references described above, not overlooked source-project names.
