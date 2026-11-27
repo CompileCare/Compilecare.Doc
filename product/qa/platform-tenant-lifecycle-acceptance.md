@@ -1,18 +1,18 @@
 # Platform tenant lifecycle — local acceptance
 
 **Status:** Pending developer-machine Docker acceptance  
-**Implementation:** CompileCare.Web PR #36, merge commit `54589758db04848d25e2e078f3619c1932cc645a`  
-**API dependencies:** CompileCare.Api PR #57 (platform self-status) and PR #58 (initial-administrator activation guard), both merged.
+**Implementation:** HeapCare.Web PR #36, merge commit `54589758db04848d25e2e078f3619c1932cc645a`  
+**API dependencies:** HeapCare.Api PR #57 (platform self-status) and PR #58 (initial-administrator activation guard), both merged.
 
 ## Purpose
 
-Verify the platform control plane against the real local Keycloak, CompileCare API and PostgreSQL stack. Hosted CI verifies compilation, component behavior, browser E2E and Docker image/container smoke; it does not prove the developer's local OIDC realm, client configuration, seeded identities or persisted platform-operator record are correct.
+Verify the platform control plane against the real local Keycloak, HeapCare API and PostgreSQL stack. Hosted CI verifies compilation, component behavior, browser E2E and Docker image/container smoke; it does not prove the developer's local OIDC realm, client configuration, seeded identities or persisted platform-operator record are correct.
 
 Use synthetic identities and tenant data only. Do not use production credentials, patient data or real customer records.
 
 ## Preconditions
 
-- Pull the latest merged `main` branches for CompileCare.Api, CompileCare.Web, CompileCare.Local and Compilecare.Doc.
+- Pull the latest merged `main` branches for HeapCare.Api, HeapCare.Web, HeapCare.Local and HeapCare.Doc.
 - Start the documented local Docker Compose stack and verify API, Web, Keycloak and PostgreSQL are healthy.
 - Configure the Web OIDC client to use the local Keycloak realm and the API audience.
 - Create a synthetic PlatformOperator through the approved Development-only bootstrap flow, or use an already provisioned synthetic operator.
