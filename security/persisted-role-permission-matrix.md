@@ -101,3 +101,9 @@ These additions close specific gaps in the five-role matrix. They do not replace
 ### Source-path and latest regression review — 2026-11-27
 
 The source paths above were verified against the renamed HeapCare.Api main tree. Additional merged regression slices are recorded in this matrix: PR #96 covers hospital- and department-scoped HospitalAdmin restrictions for patient identifiers; PR #97 covers non-clinical-role denial for OPD encounter operations; PR #98 expands FacilityManager scheduling/billing denial coverage and patient search/registration denials for FacilityManager/FacilityViewer; PR #99 explicitly denies HospitalAdmin access to OPD encounter operations; and PR #100 denies tenant-wide audit query/export for hospital- and department-scoped HospitalAdmin memberships. These additions strengthen focused cases but do not establish exhaustive positive/negative coverage for every policy, endpoint and scope combination.
+
+
+### Patient duplicate-review negative authorization — 2026-11-27
+
+- API PR #117 merged as `0407dcfeefdd16d63299e74ba8cc27a9e3ef5e86`. PostgreSQL-backed tests verify FacilityManager and FacilityViewer receive HTTP 403 when invoking patient duplicate-candidate review. Responses do not disclose the submitted patient names; denied audit events retain tenant, validated issuer/subject, hospital resource, outcome and HTTP status attribution.
+- PatientRegistrar and HospitalAdmin remain the currently implemented roles with duplicate-review permission. This test-only regression does not change role grants or establish product-owner approval of duplicate review responsibilities.

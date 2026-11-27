@@ -878,3 +878,9 @@ These automated checks do not replace the manual six-role authenticated accessib
 
 ### Execution rule
 CI is treated as a parallel validation lane. Independent API, Web and documentation changes were started while other workflows were running. Merge decisions were made only after each PR's own required checks passed and the exact PR head was verified.
+
+
+### Patient duplicate-review role denial — 2026-11-27
+
+- **API PR #117 merged** as `0407dcfeefdd16d63299e74ba8cc27a9e3ef5e86`. PostgreSQL-backed integration coverage verifies that FacilityManager and FacilityViewer cannot invoke patient duplicate-candidate review. The regression asserts HTTP 403, no submitted patient-name disclosure in the response, and denied audit attribution with tenant, validated issuer/subject, hospital resource and status.
+- This closes a focused negative permission case for the existing duplicate-review capability. It does not constitute complete role/capability or organization-scope coverage, and it does not approve the product role model.
