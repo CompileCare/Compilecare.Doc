@@ -238,3 +238,9 @@ The integrated run checked out API 9a4a517add68c5af08fc914533b387e6883440be, Web
 Web #88 subsequently merged as 554012ff0cafdab86381addd8c77985fe897dccd, announcing provider-session and available-slot counts through polite status regions. Hosted Web CI passed, but a later Local full-stack replay against this Web commit is not yet recorded.
 
 Release boundary: all CI records and identities are synthetic. Hospital policy approval, provider credential/privilege validation, cancellation/rescheduling, no-show grace, check-in timing, timezone configuration and retention remain pilot-hospital decisions. Automated acceptance does not authorize live clinical use.
+
+### Integrated acceptance of appointment availability status announcements — 2026-11-27
+
+Web #88's provider-session and available-slot `role=status` announcements have now been replayed through the full Local stack. HeapCare.Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4; run #46047530266 passed the nine-service job and 11 real Keycloak browser tests against Web 554012ff0cafdab86381addd8c77985fe897dccd and API 745085912684d54a2c2f6ca830ade712d76d9e63.
+
+This closes the integrated automation gate for the appointment availability announcement change. Manual assistive-technology and hospital pilot acceptance remain separate.
