@@ -923,3 +923,30 @@ Independent API authorization, Local integration, Web UX and documentation work 
 
 - **HeapCare.Web PR #76** merged as `8dcb5417bf9b690d7bcdff97ae96e929ef9beafa`. Playwright now verifies the authenticated workspace's main landmark, keyboard skip-link focus, accessible control names and labelled form fields for all five persisted tenant-role contexts.
 - The role contexts in PR #76 are intentionally UI-mocked. Real OIDC browser acceptance remains a separate lane, and manual six-role accessibility, real screen-reader, zoom/reflow, contrast and qualified WCAG 2.2 AA evaluation remain outstanding.
+
+
+## Parallel phase execution update — 2026-11-27 (HeapCare migration continuation)
+
+### Phase 3 — tenant isolation and audit export
+
+- **HeapCare.Api PR #122 merged** as `cab471452c6c1904fde0f7b407001c065e64dd00` after the Release build, EF Core model-drift check, complete API test suite and Docker/PostgreSQL integration verification passed on the exact PR head. The PostgreSQL-backed regression seeds two synthetic tenants and verifies that an audit CSV export includes the requesting tenant's actor metadata but excludes the second tenant's metadata.
+- **HeapCare.Api PR #123 remains under validation.** It adds a same-hospital, cross-department PatientRegistrar queue-transition denial test, asserting a non-disclosing 404, rejected audit attribution and unchanged queue state. An initial Release build found a misplaced assertion in the preceding clinical-queue test (`CS0103: queueEntry does not exist in the current context`). The assertion was removed from that unrelated test; the corrected PR head is undergoing Release build/test, EF model-drift and Docker/PostgreSQL verification. Do not merge until all required checks pass on the exact current head.
+- Audit governance, retention/legal hold, export-purpose controls, operational access reviews and privacy/legal approval remain separate release gates. A passing isolation regression is not a production governance approval.
+
+### Phase 4 — persisted hospital workflows and real OIDC
+
+- **HeapCare.Web PR #79 merged** as `0e4310b3ff1701da6f7e3518b9f3ad1efadf5251`. The real-Keycloak ClinicalUser browser journey now consumes a synthetic in-progress walk-in, checks the live department/date queue response, opens the encounter, retrieves the department-scoped patient identity, and confirms identity before clinical documentation. The automated journey intentionally does not enter or sign a clinical note.
+- **HeapCare.Local PR #31 remains open.** It provisions separate synthetic Keycloak identities for persisted roles, tenant/hospital/department fixtures, and an in-progress synthetic walk-in using runner-temporary credentials with restricted permissions. Local tooling, Keycloak realm, Compose and observability validations have passed.
+- A full-stack attempt built the nine-service stack and passed persisted-role API verification, but its real-OIDC browser suite exposed a stale cross-repository checkout: the run used Web `549fea9`, before PR #79, and therefore still asserted the old empty-queue message. A newer Local run is in progress against current HeapCare.Web main `829e93ac19a96cb1d0016500313fa957630e8d14`; its full-stack build/acceptance has not yet passed. Keep PR #31 unmerged until that exact integrated run is green.
+
+### Phase 5 — authenticated accessibility regression
+
+- **HeapCare.Web PR #80 merged** as `829e93ac19a96cb1d0016500313fa957630e8d14`. Real-Keycloak browser coverage now checks the authenticated shell for HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator: one main landmark and level-one heading, first-stop skip-link focus with a visible outline, focus transfer to main content, and no page-level horizontal overflow at 768px, 375px or 320px.
+- Web PR #80 passed unit tests, production build, browser E2E, isolated real-OIDC suite discovery and Docker/CSP smoke checks on its exact PR head. The full integrated real-OIDC execution of these checks remains coupled to Local PR #31's current run.
+- Automated checks are not a manual screen-reader review, a complete keyboard workflow review, contrast/zoom/reflow evaluation, or qualified WCAG 2.2 AA conformance assessment. Those remain open acceptance work.
+
+### Parallel execution and release constraints
+
+- API PR #122 is merged; API PR #123 and Local PR #31 remain open pending exact-head validation. Web PR #79 and #80 are merged.
+- Keep independent API, Web, Local and documentation work in parallel where shared-file and dependency boundaries allow. Never treat a successful Web-only pipeline as proof that the cross-repository nine-service stack passed.
+- Preserve existing database, migration-history, Keycloak realm/client, OIDC issuer/audience and persistent-volume identifiers. Production backup/PITR, encryption-key custody, provider/region selection, recovery drill, pilot role approval and hospital-group/branch semantics remain explicit owner-dependent gates.
