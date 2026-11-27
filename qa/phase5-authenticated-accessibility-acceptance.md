@@ -143,3 +143,28 @@ The following automated Web regressions were merged after their hosted Web CI ch
 - **Web PR #73** verifies the membership deactivate/reactivate confirmation surface is exposed as a named `role="group"` and that confirm and cancel actions are discoverable.
 
 These tests improve error and confirmation semantics for the authenticated membership administration workflow. They are component-level automated regressions; they do not establish that all six role workflows have been manually accepted, do not test real assistive technology, and do not change the outstanding keyboard/focus, zoom/reflow, contrast or screen-reader checklist above.
+
+## Latest authenticated real-OIDC acceptance — 2026-11-27
+
+HeapCare.Local PR #36 merged as 085448ba36bc05338aafab604c7e9d5787bbf3d4. Full-stack run #46046213095 passed both Local tooling validation and the full nine-service Docker/observability job. The run checked out API 9a4a517add68c5af08fc914533b387e6883440be, Web 3b81a70e9113382067c9002421bbdcd528b2a22c, and Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52.
+
+The real Keycloak Authorization Code + PKCE browser suite completed 11 passing tests:
+- All six workspace identities: HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator.
+- Main landmark/heading, keyboard skip-link first-stop, visible focus treatment and focus transfer to main content.
+- Authenticated PatientRegistrar journey with synthetic patient search, provider availability/slot selection, appointment booking/check-in, plus OPD queue/encounter and billing/receipt assertions.
+- Synthetic tenant, patient, provider, appointment, queue, invoice and payment records only; no real patient or clinical-note data.
+
+This is automated Linux CI evidence for the recorded repository SHAs. It does not complete the manual desktop matrix below.
+
+### Additional Web accessibility feedback — Web #88
+
+Web PR #88 merged as 554012ff0cafdab86381addd8c77985fe897dccd. Provider availability results now announce provider-session count and available-slot count through semantic polite status regions. Vitest covers both announcements; hosted Web CI passed component tests, production build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke.
+
+The Local full-stack run above predates Web #88, so the new live-region markup has hosted Web CI evidence but has not yet been replayed in the nine-service Local stack.
+
+Still outstanding: manual keyboard completion for all six role workflows, real screen-reader testing, focus/dialog review across authenticated routes, desktop/tablet evidence, contrast, 200%/400% zoom and reflow review, and qualified WCAG 2.2 AA evaluation. WCAG conformance is not claimed.
+### Integrated-stack replay of appointment availability announcements — Local #37
+
+HeapCare.Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run #46047530266 passed the nine-service Docker/observability and tooling jobs against Web 554012ff0cafdab86381addd8c77985fe897dccd, API 745085912684d54a2c2f6ca830ade712d76d9e63 and Observability 1a06382e4eeed3e0070a0def2b89b8d11512dd52. The real Keycloak Authorization Code + PKCE browser suite completed 11 tests, including all six persisted roles and PatientRegistrar appointment booking/check-in. This verifies the Web #88 provider-session and available-slot status announcements on the integrated stack.
+
+Manual screen-reader testing, full keyboard-only workflows, contrast, zoom/reflow and WCAG 2.2 AA evaluation remain Not Run; no conformance claim is made.

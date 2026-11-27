@@ -149,3 +149,7 @@ The CI step:
 - Removes the temporary archive and restore database on success or failure.
 
 **Evidence boundary:** this is a repeatable logical dump/restore smoke test using one ephemeral local PostgreSQL service. It is not a provider-native backup, physical/base backup, continuous WAL archive, PITR, encryption/key-custody test, off-site or cross-region recovery, tenant-level restore, or production disaster-recovery drill. No production RPO/RTO is measured or approved by this CI run. All provider, storage, encryption, retention, geographic and recovery objectives in this baseline remain open until configured and independently exercised.
+
+### Repeat logical restore verification on the real-OIDC acceptance stack — 2026-11-27
+
+Local #36 integrated run #46046213095 passed the same custom-format pg_dump / separate-database pg_restore smoke step before running the real Keycloak browser suite. This confirms the merged CI step remains compatible with the persisted-role, OPD billing and appointment acceptance database state. It remains an ephemeral logical restore smoke test only; no provider-native PITR or production recovery objective is established.
