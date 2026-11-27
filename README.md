@@ -1,5 +1,7 @@
 # CompileCare Documentation
 
+> **Brand migration in progress:** HeapCare is the product brand. Repository names, source namespaces, package IDs, database identifiers, OIDC realm/client IDs, and deployment identifiers remain unchanged until their coordinated migration is implemented and validated.
+
 CompileCare is an India-focused hospital information and management platform for hospitals, clinics, and healthcare provider organizations. This repository is the product, architecture, workflow, and engineering documentation source of truth.
 
 > **Status:** Foundation documentation — draft v1. Product scope and several architecture decisions remain proposals until reviewed and approved with hospital stakeholders and technical owners.
