@@ -2,7 +2,7 @@
 
 - **Status:** Design proposed for implementation; deployment-specific security, privacy and contact-channel decisions remain open
 - **Date:** 2026-11-24
-- **Decision owners:** CompileCare product, architecture and security; pilot hospitals validate registration, identity-review and contact workflows
+- **Decision owners:** HeapCare product, architecture and security; pilot hospitals validate registration, identity-review and contact workflows
 - **Scope:** Optional patient-owned phone/email contact methods, proof-of-control verification, protected storage and their permitted use in hospital-local duplicate review
 
 ## Context
