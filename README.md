@@ -1,6 +1,6 @@
 # HeapCare Documentation
 
-> **Brand migration in progress:** HeapCare is the product brand. Repository names, source namespaces, package IDs, database identifiers, OIDC realm/client IDs, and deployment identifiers remain unchanged until their coordinated migration is implemented and validated.
+> **Brand migration status:** The GitHub organization and all 11 repository slugs now use HeapCare. Source namespaces, project paths and package IDs have been migrated in the repositories where implementation exists. Legacy database identifiers, EF migration history, Keycloak realm/client/audience IDs and persistent Docker volume names remain intentionally unchanged pending separately tested compatibility migrations.
 
 HeapCare is an India-focused hospital information and management platform for hospitals, clinics, and healthcare provider organizations. This repository is the product, architecture, workflow, and engineering documentation source of truth.
 
@@ -31,7 +31,7 @@ HeapCare is an India-focused hospital information and management platform for ho
 - [API conventions and error contracts](architecture/api-conventions.md)
 - [Tenant model](architecture/multi-tenancy.md)
 - [ADR-006: Tenant, organization and patient data boundaries](architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md)
-- [ADR-007: Reuse CompileCare shared observability](architecture/decisions/ADR-007-shared-observability-reuse.md)
+- [ADR-007: Reuse HeapCare shared observability](architecture/decisions/ADR-007-shared-observability-reuse.md)
 - [Architecture Decision Records](architecture/decisions/)
 - [Security and privacy principles](security/security-and-privacy.md)
 - [Integration testing strategy](engineering/integration-testing-strategy.md)
