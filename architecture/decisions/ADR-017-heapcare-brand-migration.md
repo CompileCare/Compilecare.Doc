@@ -137,3 +137,14 @@ HeapCare becomes the proposed product-facing identity immediately in the documen
 
 ### Merge completion update
 All 11 original repository migration PRs are merged, and the additional technical identifier PRs for the API, Site and Web are also merged. The API and Web solution/source/package identities and the Site project/assembly identity now use HeapCare on main. The Local main branch now prefers HeapCare local checkout paths and HEAPCARE_* environment variables while detecting old checkout folders. The only remaining CompileCare identifiers are classified compatibility or administrative references described above, not overlooked source-project names.
+
+
+## Execution refresh — 2026-11-27 15:30 IST
+
+The source/project migration PRs are merged across the 11 existing repositories; an open-PR audit currently returns no open PRs in any of them. Main-branch tree inspection confirms no CompileCare-named file paths in API, API Client, Caching, Database, Mobile, Observability, OTP, Site, documentation or Web. Local retains one intentionally legacy-named Keycloak realm import file, `local/keycloak/compilecare-realm.json`, because its internal realm ID remains `compilecare` and Keycloak requires the import filename to match the realm ID.
+
+Latest CI runs are green for API, Web, public Site, Database documentation, Observability, API Client and Caching. The API Client and Caching GitHub Packages publish jobs both passed; Observability publishing also passed. Production package read permissions still need validation for deployment consumers.
+
+The most recent Local full-stack run failed before this refresh because the realm import file was renamed to a filename that did not match its preserved realm ID. The filename and all Compose, script and CI references have been corrected. Local validation and the Docker observability pipeline smoke job have passed on the post-fix run; the nine-service Docker stack is still executing, so final multi-tenant/OIDC/telemetry acceptance remains pending.
+
+The connected GitHub actions available in this session do not provide organization or repository rename administration. The existing organization and repository slugs therefore remain unchanged. No HeapCare domain/DNS/email/certificate/production origin is configured. Production OIDC identity and persisted database/volume identifiers remain compatibility contracts pending a separately rehearsed migration.
