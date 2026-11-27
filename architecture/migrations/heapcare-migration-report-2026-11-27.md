@@ -58,7 +58,7 @@ The final Site PR head passed:
 ### Local environment
 - Shell/PowerShell syntax, secret-placeholder checks, Keycloak realm import, OpenTelemetry Collector configuration, Compose validation and observability pipeline smoke checks passed.
 - A previous full-stack run passed the nine-service stack, persisted multi-tenant workflow, real Keycloak Authorization Code + PKCE browser acceptance and telemetry checks.
-- The latest migration-triggered Local run exposed a Keycloak import startup defect: Keycloak requires an import filename matching the preserved realm ID (`compilecare-realm.json`), while the branding change had renamed the file to `heapcare-realm.json`. The realm ID, client IDs and issuer remain unchanged intentionally. The file and all Compose, configuration-script and CI references have now been restored to the compatible filename. The post-fix Local full-stack workflow is running; its final result is not yet available.
+- The latest migration-triggered Local run exposed a Keycloak import startup defect: Keycloak requires an import filename matching the preserved realm ID (`compilecare-realm.json`), while the branding change had renamed the file to `heapcare-realm.json`. The realm ID, client IDs and issuer remain unchanged intentionally. The file and all Compose, configuration-script and CI references have now been restored to the compatible filename. Post-fix Local run [#45978681883](https://github.com/CompileCare/CompileCare.Local/actions/runs/45978681883) passed both validation and full-stack jobs, including the nine-service stack, persisted multi-tenant workflows, real Keycloak-issued identities, Authorization Code + PKCE browser acceptance and telemetry. A follow-up run [#45979293490](https://github.com/CompileCare/CompileCare.Local/actions/runs/45979293490) is validating the merged API `main` branch and the renamed `HeapCare.Local` checkout directory.
 
 ### Packages
 HeapCare Observability, API Client and Caching package publishing workflows have all completed successfully on the current main branches. The API Client and Caching publish jobs both passed their Pack and Publish to GitHub Packages steps; the Observability publish job also passed. API and Docker CI use ephemeral local feeds to validate the actual package contract without depending on cross-repository package permissions.
@@ -83,7 +83,8 @@ HeapCare Observability, API Client and Caching package publishing workflows have
 - [ ] Decide whether PostgreSQL database/role/schema names and persistent Docker volume names need to change. If yes, prepare backup, copy/restore, cutover and rollback procedures; never delete old volumes during a brand-only release.
 - [ ] Post-merge API CI/EF checks, Web audit/unit/build/browser E2E/Docker checks and Local full-stack verification passed. Continue monitoring normal release CI after future changes.
 - [ ] Run a final residual-reference audit and classify each remaining CompileCare reference as GitHub slug/owner, legacy fallback, identity/database/persisted-data compatibility or defect.
-- [ ] Complete the post-fix Local full-stack run after restoring the Keycloak import filename to match the preserved `compilecare` realm.
+- [x] Complete the post-fix Local full-stack run after restoring the Keycloak import filename to match the preserved `compilecare` realm (run #45978681883 passed).
+- [ ] Complete the follow-up Local run against the merged API `main` branch and `HeapCare.Local` checkout path (run #45979293490 is in progress).
 
 ## Closure rule
 
