@@ -133,3 +133,13 @@ Web PR #64 merged as `1a73684e7ac3c4660cf343855499a594792401c3`. Module URLs now
 - Exact API/Web/Observability commit SHAs are recorded in the roadmap entry for this run.
 
 **This does not complete the manual checklist below.** Authenticated role-by-role clinical workflows, manual visual acceptance, keyboard-only review, assistive technology, contrast, zoom/reflow, reduced motion and WCAG 2.2 AA assessment remain Not Run until performed on the target local environment with synthetic data. No accessibility certification or production/pilot approval is claimed.
+
+
+## Membership administration accessibility regression evidence — 2026-11-27
+
+The following automated Web regressions were merged after their hosted Web CI checks passed:
+
+- **Web PR #71** adds coverage that membership-list failures are exposed through an accessible `role="alert"`, and that a rejected membership creation displays an actionable conflict message while preserving the entered OIDC subject for correction.
+- **Web PR #73** verifies the membership deactivate/reactivate confirmation surface is exposed as a named `role="group"` and that confirm and cancel actions are discoverable.
+
+These tests improve error and confirmation semantics for the authenticated membership administration workflow. They are component-level automated regressions; they do not establish that all six role workflows have been manually accepted, do not test real assistive technology, and do not change the outstanding keyboard/focus, zoom/reflow, contrast or screen-reader checklist above.
