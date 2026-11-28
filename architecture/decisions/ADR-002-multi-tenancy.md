@@ -6,7 +6,7 @@
 - **Review trigger:** Before implementation of the affected capability, or when assumptions/constraints materially change
 
 ## Context
-CompileCare serves multiple client organizations. Tenant isolation is a security boundary across APIs, data, caches, files, jobs, messages, logs, and analytics.
+HeapCare serves multiple client organizations. Tenant isolation is a security boundary across APIs, data, caches, files, jobs, messages, logs, and analytics.
 
 ## Decision
 - Tenant is the top-level customer isolation boundary.

@@ -2,7 +2,7 @@
 
 ## Purpose and scope
 
-CompileCare models the physical hospital structure as:
+HeapCare models the physical hospital structure as:
 
 `Tenant → Hospital → Department → Ward → Room → Bed`
 
@@ -60,4 +60,4 @@ The Web client sends the active tenant header for every request. It reloads chil
 
 ## Verification status
 
-The Web implementation is tracked in [CompileCare.Web PR #34](https://github.com/CompileCare/CompileCare.Web/pull/34), stacked after the visual foundation and Reception/appointment/queue/clinical UI slices. Hosted CI runs 45741273030 and 45741268665 passed Vitest, production build, Chromium browser E2E and Docker smoke on head `6a307da8c0466ab6de89512ecdf8e3f651230743`. A real authenticated local-stack walkthrough remains required before marking the Antigravity facility-hierarchy scenario complete.
+The Web implementation is tracked in [HeapCare.Web PR #34](https://github.com/HeapCare/HeapCare.Web/pull/34), stacked after the visual foundation and Reception/appointment/queue/clinical UI slices. Hosted CI runs 45741273030 and 45741268665 passed Vitest, production build, Chromium browser E2E and Docker smoke on head `6a307da8c0466ab6de89512ecdf8e3f651230743`. A real authenticated local-stack walkthrough remains required before marking the Antigravity facility-hierarchy scenario complete.

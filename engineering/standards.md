@@ -6,7 +6,7 @@
 Short-lived branches:
 - `feature/<ticket>-<name>` (e.g., `feature/CC-123-patient-registration`)
 - `bugfix/<ticket>-<name>` (e.g., `bugfix/CC-124-tenant-scope`)
-- `docs/<name>` (e.g., `docs/compilecare-foundation-v1`)
+- `docs/<name>` (e.g., `docs/heapcare-foundation-v1`)
 - `refactor/<name>`
 - `hotfix/<name>`
 - `infra/<name>`

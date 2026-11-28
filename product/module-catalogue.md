@@ -42,7 +42,7 @@ Foundation → Patient + Staff/Provider → Appointments + Walk-ins + Check-in/Q
 
 ## Deferred hospital modules and capability boundaries (2026-11-26)
 
-The following modules are retained in the CompileCare product plan. They are not part of the initial OPD MVP merely because their high-level capability appears in the catalogue.
+The following modules are retained in the HeapCare product plan. They are not part of the initial OPD MVP merely because their high-level capability appears in the catalogue.
 
 | Module | Bounded responsibilities | Planned capability increments | Status |
 |---|---|---|---|

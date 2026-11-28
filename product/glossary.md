@@ -1,10 +1,10 @@
-# CompileCare Glossary
+# HeapCare Glossary
 
 **Status:** Draft; terminology should be validated with hospital stakeholders and updated as workflows become concrete.
 
 | Term | Working definition |
 |---|---|
-| Tenant | A customer organization and top-level isolation boundary within CompileCare. |
+| Tenant | A customer organization and top-level isolation boundary within HeapCare. |
 | Hospital Group | An optional organization grouping multiple hospitals under a tenant. |
 | Hospital | A healthcare organization/site operating clinical and administrative services. |
 | Branch/Campus | A physical location or campus belonging to a hospital. |

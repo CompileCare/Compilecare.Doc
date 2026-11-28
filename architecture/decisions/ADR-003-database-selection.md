@@ -9,7 +9,7 @@
 The initial hospital platform needs a relational transactional store with referential integrity, tenant-scoped constraints, migrations, operational tooling, and mature .NET integration. The API repository has implemented PostgreSQL through Npgsql and EF Core 10.
 
 ## Decision
-- PostgreSQL is the primary database provider for the current CompileCare API foundation.
+- PostgreSQL is the primary database provider for the current HeapCare API foundation.
 - EF Core 10 is the primary ORM/migration mechanism.
 - Tenant-aware keys, unique indexes, composite relationships, query filters, and persistence checks are required where applicable.
 - Production schema changes must be versioned EF Core migrations. Do not use EnsureCreated for production.

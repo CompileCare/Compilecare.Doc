@@ -11,7 +11,7 @@ Define the authenticated hospital workspace around patient registration, appoint
 
 This document specifies user tasks, screen responsibilities, information boundaries and interaction states. It does not invent new backend capabilities, grant permissions, define clinical policy or approve a final visual design. Server-side authorization and workflow state remain authoritative.
 
-The existing `CompileCare.Web` repository is the authenticated hospital application. `CompileCare.Site` remains a separate public-facing site. The first shell and reception lookup increments are merged in CompileCare.Web; authenticated patient workflows remain out of the public site.
+The existing `HeapCare.Web` repository is the authenticated hospital application. `HeapCare.Site` remains a separate public-facing site. The first shell and reception lookup increments are merged in HeapCare.Web; authenticated patient workflows remain out of the public site.
 
 ## Primary personas and scope
 
@@ -138,13 +138,13 @@ Purpose: orient reception staff to the selected facility and expose permitted ne
 
 ## Initial delivery sequence
 
-1. **Application shell — implemented:** React + TypeScript in `CompileCare.Web`, OIDC Authorization Code + PKCE, accessible responsive navigation, session controls and shared loading/error patterns. Web PR #1 is merged.
+1. **Application shell — implemented:** React + TypeScript in `HeapCare.Web`, OIDC Authorization Code + PKCE, accessible responsive navigation, session controls and shared loading/error patterns. Web PR #1 is merged.
 2. **Tenant and hospital context — implemented:** API PR #26 exposes audited current-user active tenant memberships using validated issuer/subject. The web client lets the user select a tenant and loads only hospitals visible under the persisted organization scope. No client-supplied role or tenant header grants access.
 3. **Reception patient lookup and registration — implemented:** Web PR #2 uses the hospital-scoped patient search API with bounded pagination. Patient registration, duplicate-candidate review and hospital-local MRN assignment are merged in Web PR #3 with paired documentation in Doc PR #30. Search results remain in component memory, not browser storage; the API remains authoritative for patient permissions and hospital scope.
 4. **Appointment and arrival — implemented:** booking, walk-in, check-in and queue-token confirmation are merged in Web PR #4 with paired documentation in Doc PR #31.
-5. **Queue operations — implemented:** scoped queue view and permitted lifecycle actions, merged in CompileCare.Web PR #5 with paired documentation in Compilecare.Doc PR #32.
-6. **Clinical workspace — implemented:** scoped clinical queue discovery, queue-linked encounter create/resume, draft note editing, signing, append-only amendments, cancellation and closure against the existing OPD API (CompileCare.Web PR #9). The clinical UI does not expose patient details in queue rows or represent unsupported vitals, diagnoses, prescriptions or diagnostic orders.
-7. **Billing workspace — implemented:** department-scoped visit selection, invoice create/resume, partial/full payment capture, payment history, receipt retrieval/reprint, service catalogue and daily collection (CompileCare.Web PRs #10–#11). API permission and department boundaries remain authoritative.
+5. **Queue operations — implemented:** scoped queue view and permitted lifecycle actions, merged in HeapCare.Web PR #5 with paired documentation in HeapCare.Doc PR #32.
+6. **Clinical workspace — implemented:** scoped clinical queue discovery, queue-linked encounter create/resume, draft note editing, signing, append-only amendments, cancellation and closure against the existing OPD API (HeapCare.Web PR #9). The clinical UI does not expose patient details in queue rows or represent unsupported vitals, diagnoses, prescriptions or diagnostic orders.
+7. **Billing workspace — implemented:** department-scoped visit selection, invoice create/resume, partial/full payment capture, payment history, receipt retrieval/reprint, service catalogue and daily collection (HeapCare.Web PRs #10–#11). API permission and department boundaries remain authoritative.
 8. **Browser acceptance — implemented for the walk-in path:** Playwright Chromium tests cover billing recovery after refresh and permission-denied navigation (Web PR #12), plus patient registration/MRN → walk-in token → queue call/start → clinical identity check and sign/close → queue completion → invoice and payment (Web PR #13). API workflow correctness remains covered by PostgreSQL-backed integration tests.
 9. **Appointment and check-in browser acceptance — implemented:** Web PR #14 verifies hospital patient selection, API-published availability and slot selection, booking confirmation and check-in with a server-issued queue token.
 10. **OIDC session renewal browser acceptance — implemented:** Web PR #15 verifies the short-lived synthetic OIDC session obtains a refreshed access token through the refresh-token grant and uses it on subsequent API requests. No real identity provider, credentials or patient data are used.
@@ -186,11 +186,11 @@ These questions do not block an initial shell and API-backed patient lookup, but
 
 ## Implementation status — 2026-11-24
 
-The authenticated shell, tenant/hospital context and patient lookup are merged in `CompileCare.Web` PRs #1 and #2. Patient registration, duplicate-candidate review and hospital-local MRN assignment are merged in Web PR #3. Its paired documentation update is merged in `Compilecare.Doc` PR #30.
+The authenticated shell, tenant/hospital context and patient lookup are merged in `HeapCare.Web` PRs #1 and #2. Patient registration, duplicate-candidate review and hospital-local MRN assignment are merged in Web PR #3. Its paired documentation update is merged in `HeapCare.Doc` PR #30.
 
 The next implementation slice is being developed on `phase5/appointments-and-arrival` with the paired documentation branch `phase5/appointments-and-arrival-ux`. The web API client now consumes the existing department, availability-session, slot, appointment-booking, appointment-check-in, walk-in and department-queue contracts. The reception UI is being extended with selectable patient search results, guided appointment booking against server-published slots, a separate walk-in flow, returned queue-token confirmation and a department queue view. Department, hospital and tenant scoping remain explicit on every request; queue tokens and booking outcomes are server-owned.
 
-The UI implementation must follow the [CompileCare experience quality bar](../design/experience-quality-bar.md): calm clinical visual hierarchy, responsive desktop/tablet layouts, keyboard-complete selection, visible focus, status text, accessible async feedback and privacy-preserving data handling. This is an implementation standard, not a claim that the current increment has passed visual/accessibility review.
+The UI implementation must follow the [HeapCare experience quality bar](../design/experience-quality-bar.md): calm clinical visual hierarchy, responsive desktop/tablet layouts, keyboard-complete selection, visible focus, status text, accessible async feedback and privacy-preserving data handling. This is an implementation standard, not a claim that the current increment has passed visual/accessibility review.
 
 The current increment is not yet merged. Required release gates are API contract tests, UI behavior tests, production TypeScript build, CI Docker build/container smoke test, and manual desktop/tablet/narrow viewport plus keyboard/accessibility review. No unsupported provider data, appointment lists, queue lifecycle actions or clinical workflows will be fabricated in the UI; missing capabilities will remain explicit follow-up work.
 
@@ -234,7 +234,7 @@ Release gates include Web API contract tests, Vitest suite, production TypeScrip
 
 ## Workspace shell navigation and keyboard access — 2026-11-25
 
-The Phase 5 visual foundation in [CompileCare.Web PR #29](https://github.com/CompileCare/CompileCare.Web/pull/29) refines the authenticated shell without changing its API or authorization model.
+The Phase 5 visual foundation in [HeapCare.Web PR #29](https://github.com/HeapCare/HeapCare.Web/pull/29) refines the authenticated shell without changing its API or authorization model.
 
 - The sidebar reflects the current workspace section using the location hash and exposes the active item with `aria-current="location"`.
 - A dedicated Patient registration entry is rendered only when the selected membership has both `patient.register` and `patient.duplicate.review`; the API continues to authorize registration and duplicate review independently.
@@ -247,7 +247,7 @@ Verification remains pending until the Web unit/build/browser checks and Docker 
 
 ## Active hospital and workspace orientation — 2026-11-25
 
-The shell refinement in [CompileCare.Web PR #29](https://github.com/CompileCare/CompileCare.Web/pull/29) makes the current place in the application and the selected operating context explicit:
+The shell refinement in [HeapCare.Web PR #29](https://github.com/HeapCare/HeapCare.Web/pull/29) makes the current place in the application and the selected operating context explicit:
 
 - The page heading follows the selected Reception, Patient registration, Appointments, Queue, Clinical or Billing section.
 - The organization context panel names the selected hospital when available; before a hospital is selected, it identifies the selected tenant or prompts the user to choose a context.
@@ -259,7 +259,7 @@ This is presentation only. The API continues to validate tenant membership, hosp
 
 ## Accessible patient search selection — 2026-11-25
 
-The follow-on [CompileCare.Web PR #30](https://github.com/CompileCare/CompileCare.Web/pull/30) moves the patient search result interaction into `PatientSearchResults`, a focused Reception feature component.
+The follow-on [HeapCare.Web PR #30](https://github.com/HeapCare/HeapCare.Web/pull/30) moves the patient search result interaction into `PatientSearchResults`, a focused Reception feature component.
 
 - Each result is a native `button`, not a clickable article with a custom keyboard handler.
 - `aria-pressed` communicates the selected patient state; the visible label also changes to “Selected patient”.

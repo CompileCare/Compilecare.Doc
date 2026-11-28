@@ -1,25 +1,25 @@
 # Security and Privacy Baseline
 
-**Status:** Initial API identity and facility-authorization controls are implemented; the full production security baseline remains in progress. This document is not a legal opinion or compliance certification.
+**Status:** Persisted OIDC identity, tenant and organization-scoped authorization, membership administration, platform tenant lifecycle, audit controls and core hospital-workflow security are implemented; the full production security baseline remains in progress. This document is not a legal opinion or compliance certification.
 
-CompileCare may process sensitive patient and operational information. Controls must be designed, implemented, tested, operated, and independently reviewed before production.
+HeapCare may process sensitive patient and operational information. Controls must be designed, implemented, tested, operated, and independently reviewed before production.
 
 ## Implemented API security slice
 
-The current `CompileCare.Api` implementation provides:
+The current `HeapCare.Api` implementation provides:
 - OIDC-compatible JWT Bearer validation of signed tokens, issuer, audience, expiry/lifetime and required subject.
 - HTTPS-only authority/discovery configuration outside the explicitly permitted Development opt-in.
 - Identity matching by the validated token issuer and `sub`; email is not used as a stable identity key.
 - Tenant selection through `X-Tenant-ID`, followed by an exact active membership lookup for `(issuer, subject, tenantId)`. The header is not authentication or proof of tenant access.
-- Facility route authorization based on a role loaded from CompileCare persistence. Current facility roles are `HospitalAdmin`, `FacilityManager`, and `FacilityViewer`.
-- Server-created membership permission claims. Token-supplied CompileCare role/permission claims are not trusted for authorization.
+- Route authorization is derived from persisted tenant membership and organization scopes. Current tenant roles include `HospitalAdmin`, `FacilityManager`, `FacilityViewer`, `PatientRegistrar` and `ClinicalUser`; `PlatformOperator` is a separate platform control-plane identity, not a tenant role.
+- Server-created membership permission claims. Token-supplied legacy role/permission claims are not trusted for authorization.
 - RFC 9457 Problem Details for authentication and authorization failures.
 
-The implementation is the first authenticated tenant boundary for the facility API; it is not a complete identity lifecycle or production security programme. Membership provisioning is currently a trusted operational responsibility. There is no self-service tenant onboarding or membership administration API yet.
+Tenant registry/lifecycle operations and initial tenant-wide HospitalAdmin provisioning are implemented behind the separate `PlatformOperator` control plane. Tenant membership APIs support scoped list, create, update, deactivate and reactivate operations; tenant-wide HospitalAdmin membership management is authorized independently and constrained by the caller's organization scope. The API stores the identity-provider issuer and subject, but does not create or verify accounts in the external OIDC provider: the user identity must already exist there before a membership can be created. Automated identity-provider joiner/mover/leaver synchronization, federation lifecycle and periodic access reviews remain outside the implemented slice. These capabilities do not constitute a complete identity lifecycle or a production security programme.
 
 ## Remaining security controls
 
-- Tenant registry, tenant lifecycle, secure membership provisioning, role assignment and periodic access reviews.
+- Periodic access reviews, documented joiner/mover/leaver approvals, external identity-provider account creation/deprovisioning and membership synchronization, and formal ownership of privileged/support access.
 - Append-only audit of authentication, authorization, sensitive record access, membership/role changes, exports, administrative actions and privileged support activity.
 - Tenant isolation across every data-access path, including relationships, caching, background jobs, message consumers, search, file/object storage, exports and observability.
 - Least privilege, resource-level scope restrictions and controlled break-glass/support access.
@@ -40,7 +40,7 @@ Software supports clinical workflows. AI or automated outputs must not be repres
 
 ## Threat model
 
-See [CompileCare initial application threat model](threat-model.md) for the current trust boundaries, abuse cases, implemented controls and residual risks. It is an engineering baseline, not an independent assessment or compliance certification.
+See [HeapCare initial application threat model](threat-model.md) for the current trust boundaries, abuse cases, implemented controls and residual risks. It is an engineering baseline, not an independent assessment or compliance certification.
 
 ## Production security gate
 

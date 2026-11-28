@@ -7,7 +7,7 @@
 
 ## Context
 
-CompileCare must support multiple hospitals, branches, modules, integrations and potentially different deployment models. Independent scaling and deployment may be needed over time, but premature service fragmentation increases operational cost, latency, failure modes and development complexity.
+HeapCare must support multiple hospitals, branches, modules, integrations and potentially different deployment models. Independent scaling and deployment may be needed over time, but premature service fragmentation increases operational cost, latency, failure modes and development complexity.
 
 The product blueprint, not the existing repository layout, determines the business capabilities and their ownership. A capability does not require its own repository or deployment.
 
@@ -33,7 +33,7 @@ Adopt a **distributed-system target architecture**, implemented pragmatically:
 
 ## Consequences
 
-- CompileCare can deliver the first hospital workflow without operating a distributed system prematurely.
+- HeapCare can deliver the first hospital workflow without operating a distributed system prematurely.
 - Module boundaries, service ownership, contracts and tenant isolation must be enforced and tested.
 - Deployment, monitoring, secrets, messaging and incident operations become more complex as services are extracted.
 - Repository boundaries remain an implementation decision and may change independently of product capabilities.

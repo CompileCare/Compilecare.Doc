@@ -1,20 +1,20 @@
-# ADR-007: Reuse CompileCare Shared Observability
+# ADR-007: Reuse HeapCare Shared Observability
 
 - **Status:** Accepted architectural direction; package hardening remains open
 - **Date:** 2026-11-24
-- **Decision owners:** CompileCare Engineering
+- **Decision owners:** HeapCare Engineering
 - **Related:** [Product Blueprint v1](../../product/blueprint-v1.md), [ADR-001](ADR-001-distributed-architecture.md)
 - **Review trigger:** Adding a host/service, changing exporters, changing package compatibility, or introducing sensitive telemetry.
 
 ## Context
 
-CompileCare already has shared NuGet packages in **CompileCare.Observability** and **CompileCare.Observability.AspNetCore**. The current **CompileCare.Api** references both and uses the shared host logging, OpenTelemetry and health-check registration extensions.
+HeapCare already has shared NuGet packages in **HeapCare.Observability** and **HeapCare.Observability.AspNetCore**. The current **HeapCare.Api** references both and uses the shared host logging, OpenTelemetry and health-check registration extensions.
 
 Duplicating telemetry bootstrap in individual APIs/services would create inconsistent correlation, configuration, exporters, redaction and operational behaviour. Replacing the library without an evidenced gap would discard existing investment and create parallel implementations.
 
 ## Decision
 
-1. The existing **CompileCare.Observability** and **CompileCare.Observability.AspNetCore** packages are the canonical shared observability foundation for CompileCare .NET hosts.
+1. The existing **HeapCare.Observability** and **HeapCare.Observability.AspNetCore** packages are the canonical shared observability foundation for HeapCare .NET hosts.
 2. New .NET hosts must evaluate and reuse these packages before adding an independent logging, tracing, metrics or health-check stack.
 3. Hosts may add domain-specific instruments, safe enrichers, dependency checks and exporter configuration through supported extension points, but must not create a competing duplicate pipeline.
 4. Shared package changes belong in the Observability repository and require focused tests, compatibility validation, versioning, release notes and consuming-application validation.

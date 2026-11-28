@@ -1,4 +1,4 @@
-# CompileCare Product Blueprint v1
+# HeapCare Product Blueprint v1
 
 **Status:** Draft for product and hospital-user validation  
 **Version:** 1.0-draft  
@@ -8,7 +8,7 @@
 
 ## 1. Product intent
 
-CompileCare is an India-focused hospital information and management platform for healthcare organizations. It should connect administrative and clinical workflows around the patient journey, rather than become a collection of disconnected CRUD screens.
+HeapCare is an India-focused hospital information and management platform for healthcare organizations. It should connect administrative and clinical workflows around the patient journey, rather than become a collection of disconnected CRUD screens.
 
 The platform should work for a single hospital or clinic and be able to grow to a customer group operating multiple hospitals, campuses, branches and departments without redesigning tenant ownership or authorization.
 
@@ -67,13 +67,13 @@ These are personas, not a finalized role matrix. A person may hold multiple scop
 
 **Proposed hierarchy:**
 
-**CompileCare Platform → Tenant/Customer → optional Hospital Group → Hospital → Branch/Campus → Department → Service/Unit → Ward/Room/Bed**
+**HeapCare Platform → Tenant/Customer → optional Hospital Group → Hospital → Branch/Campus → Department → Service/Unit → Ward/Room/Bed**
 
 A tenant represents one customer relationship and is the top-level data-isolation boundary. It may operate one hospital or a group. Branches and departments are not separate tenants merely because they are separate sites. A group is optional. Distinguish the legal/operational hospital, physical campus, organizational department and operational ward/room/bed; allow approved customer variations through configuration.
 
 ### Recommended patient data boundary
 
-- Patient master identity is tenant-owned by default, not globally shared across CompileCare customers.
+- Patient master identity is tenant-owned by default, not globally shared across HeapCare customers.
 - A patient may have registrations/affiliations at multiple hospitals or branches within that tenant, governed by explicit access policy.
 - Encounters, orders, prescriptions, billing records and audit retain tenant and originating facility context.
 - Cross-tenant matching/linking/sharing is disabled by default and requires a separately approved legal, consent, identity and technical model.
@@ -180,17 +180,17 @@ Each module owns its rules and write operations. Modules use explicit applicatio
 
 ## 8. Architecture and technology direction
 
-- Initial hospital core: **modular monolith hosted in CompileCare.Api**, with explicit bounded modules.
+- Initial hospital core: **modular monolith hosted in HeapCare.Api**, with explicit bounded modules.
 - Keep a selective distributed-service path; extract only when deployment, scaling, ownership, security isolation, integration or resilience justifies the cost.
 - Use REST/OpenAPI for synchronous workflows. Add asynchronous messaging only where it improves decoupling/reliability and can be operated safely.
 - Avoid circular dependencies, shared-table writes and business logic in transport endpoints.
-- Existing implementation facts: API uses ASP.NET Core/.NET 10, PostgreSQL and EF Core 10, OIDC/JWT with database-backed tenant membership, versioned REST conventions, and CompileCare.ApiClient.
+- Existing implementation facts: API uses ASP.NET Core/.NET 10, PostgreSQL and EF Core 10, OIDC/JWT with database-backed tenant membership, versioned REST conventions, and HeapCare.ApiClient.
 - React + TypeScript is the proposed web direction, subject to product/UI confirmation. Mobile is deferred until a validated use case and API/auth contract exist.
 - No mandatory cache or message broker for the MVP. Add them only against measurable requirements and tenant-safe semantics.
 
 ### Shared Observability is a platform dependency
 
-Reuse **CompileCare.Observability** and **CompileCare.Observability.AspNetCore** as the canonical shared instrumentation/bootstrap library. Do not recreate Serilog/OpenTelemetry setup, exporters or health-check wiring independently in each host. Hosts and modules may add domain-specific instruments and dependency checks through supported extension points, but must not create a competing duplicate pipeline.
+Reuse **HeapCare.Observability** and **HeapCare.Observability.AspNetCore** as the canonical shared instrumentation/bootstrap library. Do not recreate Serilog/OpenTelemetry setup, exporters or health-check wiring independently in each host. Hosts and modules may add domain-specific instruments and dependency checks through supported extension points, but must not create a competing duplicate pipeline.
 
 Compatibility, framework targets, beta dependency review, package tests, exporter defaults, redaction and release permissions are hardening tasks—not reasons to replace the library. Validate package compatibility and make the smallest required change through the Observability repository.
 
@@ -251,12 +251,12 @@ MVP acceptance requires: documented tenant provisioning; authenticated organizat
 
 1. Validate this blueprint and decisions that affect data ownership and clinical workflow.
 2. Approve tenant/organization/patient boundary and shared observability ADRs.
-3. Implement tenant registry, lifecycle and trusted provisioning in CompileCare.Api.
+3. Implement tenant registry, lifecycle and trusted provisioning in HeapCare.Api.
 
-**Implementation status (2026-11-24):** The global tenant registry and lifecycle controls are merged in CompileCare.Api PR #12. Trusted initial tenant membership provisioning and tenant/hospital/department organization scopes are merged in PR #13. The facility hierarchy, PostgreSQL/EF Core persistence, OIDC/JWT membership authorization and metadata-only audit are also implemented. These provide a platform foundation, not a complete hospital workflow.
+**Implementation status (2026-11-24):** The global tenant registry and lifecycle controls are merged in HeapCare.Api PR #12. Trusted initial tenant membership provisioning and tenant/hospital/department organization scopes are merged in PR #13. The facility hierarchy, PostgreSQL/EF Core persistence, OIDC/JWT membership authorization and metadata-only audit are also implemented. These provide a platform foundation, not a complete hospital workflow.
 4. Membership/role provisioning and organization-scope authorization are implemented; customer onboarding and production operations require further validation.
 5. Patient master, hospital registration/search, hospital-local MRN policy/assignment and the normalized advisory duplicate-candidate API are merged in API PRs #14–#17. ADR-010 records the first pass; ADR-011 records the merged normalized name matcher. ADR-012 defines the next optional verified-contact design, not yet implemented.
-6. **Staff/provider foundation implemented:** tenant-owned profiles, effective-dated hospital/department assignments and scoped staff permissions are merged in CompileCare.Api PR #18, following [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). Profile-to-membership linking remains deferred. A profile or provider designation must not itself grant access or establish credentialing/clinical authority.
+6. **Staff/provider foundation implemented:** tenant-owned profiles, effective-dated hospital/department assignments and scoped staff permissions are merged in HeapCare.Api PR #18, following [ADR-013](../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md) and the [staff/provider workflow](workflows/staff-and-provider-management.md). Profile-to-membership linking remains deferred. A profile or provider designation must not itself grant access or establish credentialing/clinical authority.
 7. Implement appointments, walk-ins, check-in and queue lifecycle following [ADR-014](../architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md) and [the appointment/queue workflow](workflows/appointments-and-queue.md). Keep availability, appointment, queue and encounter ownership separate.
 8. Complete patient-owned contact capture and verification only under the reviewed data-protection design in [ADR-012](../architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md). Keep verified contacts as corroboration for existing name/DOB candidates initially; any contact-only candidate rule needs a separate ADR and pilot validation. Cross-hospital discovery, guardian relationships, emergency registration reconciliation and governed identity merge/correction remain separate and gated on approved privacy/security decisions.
 9. Implement OPD encounter and follow-up.
@@ -285,7 +285,7 @@ Before expanding the clinical domain, complete the following gates:
 2. **Defect closure:** investigate every failing or skipped test; fix root causes without weakening assertions, authorization or security controls. Record PASS, FAIL, BLOCKED and NOT TESTED distinctly.
 3. **Security and operations:** complete audit coverage/retention governance, secret and signing-key lifecycle, encryption review, backup/PITR and restore rehearsal, migration/rollback runbooks, rate/abuse controls, dependency/container scanning and incident response.
 4. **Real acceptance:** obtain role-based hospital stakeholder acceptance and qualified clinical, privacy, legal and security review before any production-readiness claim.
-5. **Observability:** verify a real CompileCare.Api request produces safely redacted logs, metrics and traces through the shared OpenTelemetry pipeline into the local/target backends. Telemetry must not contain PHI, secrets or high-cardinality patient identifiers.
+5. **Observability:** verify a real HeapCare.Api request produces safely redacted logs, metrics and traces through the shared OpenTelemetry pipeline into the local/target backends. Telemetry must not contain PHI, secrets or high-cardinality patient identifiers.
 
 ### 14.2 Web information architecture and application experience
 
@@ -377,7 +377,7 @@ The post-regression remediation baseline is recorded separately from product-sco
 - API PR #76 corrects malformed HTTP request status handling (4xx rather than a generic 500); API PR #77 serializes same-tenant/same-patient booking attempts with a transaction-scoped advisory lock while retaining the PostgreSQL exclusion constraint.
 - Observability PR #4 publishes corrected OTLP/gRPC exporters in package 1.0.1; API PR #78 consumes those packages and adds Npgsql tracing; Local PR #11 configures the gRPC receiver and adds real API-to-Jaeger/Npgsql and API-to-Collector/Prometheus checks to the local verifier.
 - Web PR #45 fixes the Reception landing priority, mobile-width overflow and cancellation-action contrast; Web PR #46 adds static-workspace response headers and retains `X-Frame-Options: DENY`.
-- Local PR #12 provisions the Kibana `CompileCare Logs` data view (`compilecare-logs-*`, timestamp `@timestamp`) during local stack verification.
+- Local PR #12 provisions the Kibana `HeapCare Logs` data view (`compilecare-logs-*`, timestamp `@timestamp`) during local stack verification.
 
 Hosted CI evidence for these PRs passed at merge. This does not replace the required developer-Mac execution of the full local stack, authenticated browser acceptance, visual review or security review. The remaining status is in [the stabilization evidence update](roadmap.md#stabilization-evidence-update--2026-11-26-post-full-platform-regression).
 
@@ -386,7 +386,7 @@ Hosted CI evidence for these PRs passed at merge. This does not replace the requ
 
 ### 14.6 Full-stack hosted verification — 2026-11-26
 
-Local PR #13 (`bc609fc`) adds a hosted CI job that builds and starts PostgreSQL, Keycloak, API, Web, OTel Collector, Jaeger, Prometheus, Elasticsearch and Kibana together. The merged verifier passed against all nine services. It confirmed CompileCare.Api traces in Jaeger with an Npgsql `postgresql` operation and ASP.NET Core request metrics arriving through the Collector Prometheus exporter. Kibana's `compilecare-logs-*` data view was provisioned.
+Local PR #13 (`bc609fc`) adds a hosted CI job that builds and starts PostgreSQL, Keycloak, API, Web, OTel Collector, Jaeger, Prometheus, Elasticsearch and Kibana together. The merged verifier passed against all nine services. It confirmed HeapCare.Api traces in Jaeger with an Npgsql `postgresql` operation and ASP.NET Core request metrics arriving through the Collector Prometheus exporter. Kibana's `compilecare-logs-*` data view was provisioned.
 
 This is hosted Linux Docker evidence. The developer-Mac one-click startup and authenticated local browser workflows still require execution and evidence; neither is inferred from CI.
 
