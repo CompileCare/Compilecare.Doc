@@ -1,7 +1,7 @@
 # Persisted tenant role-to-permission matrix
 
 **Status:** Source-derived implementation snapshot, reviewed 2026-11-28.  
-**Source of truth for this snapshot:** `HeapCare.Api/src/HeapCare.Api/Security/TenantRolePermissions.cs` and `HeapCare.Api/src/HeapCare.Api/Middleware/TenantContextMiddleware.cs`.  
+**Source of truth for this snapshot:** `HeapCare.Api/src/HeapCare.Application/Tenancy/TenantPermissionCatalog.cs`, `HeapCare.Api/src/HeapCare.Api/Security/TenantRolePermissions.cs` (compatibility adapter), and `HeapCare.Api/src/HeapCare.Api/Middleware/TenantContextMiddleware.cs`.  
 **Important:** This records what the current API implementation grants. It is not, by itself, product-owner approval of the intended job responsibilities, a clinical privilege model, or proof that every endpoint and resource scope is correctly enforced.
 
 ## Trust and evaluation model
@@ -169,3 +169,17 @@ These are synthetic isolated CI tests. They verify current implementation behavi
 - PatientRegistrar receives HTTP 403 when attempting to read the clinical encounter. This verifies the separation between receptionist and clinical permissions with persisted memberships, not only unit-test principals.
 - Existing PostgreSQL security coverage separately asserts clinical note text does not appear in audit metadata; note content is not placed in URLs, request identifiers or general audit fields.
 - The Local real-OIDC test uses a dedicated synthetic CI patient and explicit placeholder note content in an ephemeral database only. It is not real patient data and does not approve clinical privilege or production use.
+
+
+## Permission catalogue implementation increment — 2026-11-28
+
+HeapCare.Api PR #155 introduces `TenantPermissionCatalog` in the Application layer as the canonical metadata source for the currently implemented permission codes and the five existing system-role baseline grants.
+
+The catalogue adds:
+- Stable permission code references with module, resource, action, display name, description and a descriptive risk classification.
+- Explicit baseline definitions for HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar and ClinicalUser.
+- Metadata entries for the six existing IPD permission identifiers, all marked non-assignable and omitted from every system-role grant.
+
+The API's `TenantRolePermissions` class now delegates to this catalogue. The existing authorization behavior is intended to remain unchanged: persisted membership still selects one of the five existing roles, and effective access is still constrained by tenant, hospital and department scope.
+
+**This is not yet dynamic RBAC.** The catalogue and role grant definitions are currently code-managed. There is no tenant-custom role persistence, permission editing UI/API, multiple role assignment, per-permission scope assignment or administrator delegation. Adding or changing a permission definition still requires an API code change and deployment. These capabilities are planned as a separate persistence and administration increment and must not be inferred from PR #155.
