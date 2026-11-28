@@ -1,6 +1,6 @@
 # ADR-011: Normalized multi-signal patient duplicate matching
 
-- **Status:** Implemented and merged in CompileCare.Api PR #17
+- **Status:** Implemented and merged in HeapCare.Api PR #17
 - **Date:** 2026-11-24
 - **Decision owners:** HeapCare product and architecture; pilot hospitals validate registration and identity-review procedures
 - **Scope:** Improve advisory duplicate candidates inside the selected hospital using currently supported patient demographics
@@ -71,4 +71,4 @@ Future demographic enrichment, cross-hospital discovery, verified-contact matchi
 
 ## Implementation status — 2026-11-24
 
-The implementation is merged in [CompileCare.Api PR #17](https://github.com/CompileCare/CompileCare.Api/pull/17). It adds persisted normalized name keys, a migration/backfill, tenant/DOB/name indexes and the normalized given-name OR middle-plus-family candidate rule. The final PR head passed the EF Core model-drift check, standard CI and Docker Compose verification: 12 unit tests and 58 PostgreSQL integration tests passed in each verification path, with zero failures. The PR was merged on 2026-11-24. Standard CI and Docker Compose verification completed successfully.
+The implementation is merged in [HeapCare.Api PR #17](https://github.com/HeapCare/HeapCare.Api/pull/17). It adds persisted normalized name keys, a migration/backfill, tenant/DOB/name indexes and the normalized given-name OR middle-plus-family candidate rule. The final PR head passed the EF Core model-drift check, standard CI and Docker Compose verification: 12 unit tests and 58 PostgreSQL integration tests passed in each verification path, with zero failures. The PR was merged on 2026-11-24. Standard CI and Docker Compose verification completed successfully.
