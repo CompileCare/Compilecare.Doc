@@ -198,3 +198,15 @@ This refresh supersedes earlier status sentences in this ADR where they conflict
 ## Latest API verification — 2026-11-27
 
 API PR #116 is now merged after both API CI and Docker integration verification passed. Its PostgreSQL-backed regression test verifies CSV quoting for commas, embedded double quotes and embedded newlines in actor-subject fields. This completes the focused audit CSV serialization test batch #111–#116; it does not replace the outstanding audit governance and production release gates.
+
+
+## Current migration correction — 2026-11-28
+
+The following current facts supersede older execution-status paragraphs above:
+
+- The GitHub organization and all 11 repository names now use HeapCare; repository history and repository identities were preserved.
+- The API source/project migration and shared package alignment are merged. The API's request-local authorization claims now use `heapcare:tenant_id`, `heapcare:tenant_role`, `heapcare:permission` and `heapcare:validated_issuer`.
+- The previous `compilecare:*` request-local claim types are retained only as deny-only compatibility identifiers. They are stripped from inbound authenticated identities and cannot grant permissions. Regression tests include forged legacy and HeapCare namespace claims.
+- The local Keycloak realm/issuer (`compilecare`), OIDC client/audience/scope identifiers, EF migration history, database identifiers, connection-string fallback and local persistent-volume names remain separate technical compatibility contracts. PR #131 did not change them.
+- HeapCare.Api PR #131 merged as `ffc3aa0087af6acd5c1a54e7a29cf7ec82808b09` after exact-head API CI, Docker Integration Verification and PostgreSQL Migration Rehearsal all passed.
+- Production provider discovery, domain/DNS/TLS, secrets and signing-key custody, external identity continuity and provider-native recovery remain owner-dependent. This source migration does not authorize production cutover.
