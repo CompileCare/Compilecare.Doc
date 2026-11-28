@@ -26,6 +26,7 @@ HeapCare is an India-focused hospital information and management platform for ho
 - [Enterprise experience uplift](product/design/enterprise-experience-uplift.md) — visual quality direction, design-system foundations and the Phase 5 refinement sequence.
 - [OPD billing foundation and deferred scope](product/workflows/opd-billing-foundation.md)
 - [IPD admission, transfer, discharge and bed-management workflow](product/workflows/inpatient-admission-transfer-discharge-and-bed-management.md) — initial ADT foundation and remaining hospital-policy gates.
+- [IPD role and workflow approval worksheet](product/decisions/ipd-role-and-workflow-approval-worksheet.md) — hospital sign-off template; all IPD role grants remain closed pending approval.
 - [ADR-018: IPD ADT and bed-management boundaries](architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md) — accepted initial scope; detailed admission rules and role permissions remain open.
 - [ADR-019: Facility-site model and scope inheritance](architecture/decisions/ADR-019-facility-site-model-and-scope-inheritance.md) — proposed design only; not accepted for implementation.
 - [ADR-014: Appointment scheduling and queue boundaries](architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md)
