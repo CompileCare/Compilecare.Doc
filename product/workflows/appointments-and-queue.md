@@ -244,3 +244,20 @@ Release boundary: all CI records and identities are synthetic. Hospital policy a
 Web #88's provider-session and available-slot `role=status` announcements have now been replayed through the full Local stack. HeapCare.Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4; run #46047530266 passed the nine-service job and 11 real Keycloak browser tests against Web 554012ff0cafdab86381addd8c77985fe897dccd and API 745085912684d54a2c2f6ca830ade712d76d9e63.
 
 This closes the integrated automation gate for the appointment availability announcement change. Manual assistive-technology and hospital pilot acceptance remain separate.
+
+
+## Cancellation lifecycle concurrency and integrated acceptance — 2026-11-28
+
+**HeapCare.Api PR #125** merged as `92f0765e42feca47508bd46518ac41521123318f`. Its cancellation lifecycle fix and concurrency guard are now part of the API contract:
+
+- Check-in, cancellation and rescheduling share a PostgreSQL transaction-scoped advisory lock keyed by tenant, hospital and appointment. The service scope-checks the caller before acquiring the lock and rereads the appointment under the lock before making its state decision.
+- An appointment with an existing linked queue entry cannot be cancelled. The API returns HTTP 409, leaves the appointment Booked and does not remove or orphan the queue entry.
+- Cancellation after cancellation, check-in of a cancelled appointment and rescheduling a cancelled appointment return HTTP 409. A role outside the persisted `appointment.manage` policy receives 403.
+- The PostgreSQL race test sends cancellation and first check-in simultaneously and verifies exactly one consistent outcome: Cancelled with no queue row, or Booked with exactly one queue row.
+- Audit attribution distinguishes permission denial (403 / `Denied`) from rejected business transition (409 / `Rejected`).
+
+**HeapCare.Web PR #91** merged as `254521e578bff33b4ba0d6198b9601f2f1ed0496`. On a 409 cancellation conflict, the UI clears the pending confirmation, keeps the existing status (e.g. Booked) and shows refresh guidance. The real-Keycloak PatientRegistrar browser test loads and cancels a synthetic appointment from Appointment management, verifies the 200 response and refreshed Cancelled status, and confirms the patient list displays a reference rather than a patient family name.
+
+**HeapCare.Local PR #39** is the paired full-stack real-Keycloak acceptance and remains pending. Run #46085930218 passed nine-service startup, persisted-role API cancellation checks and PostgreSQL logical restore. Its PatientRegistrar cancellation browser scenario passed, but six role accessibility cases failed because the authenticated accessibility test referenced the main landmark locator before its declaration. **Web PR #93** corrects that test-source ordering; keep the integrated acceptance open until Web #93 CI and a fresh Local #39 run against the merged Web head both pass.
+
+No-show action/grace period, cancellation reason taxonomy, scheduling role mapping, check-in windows and retention remain pilot-hospital decisions. No clinical note or treatment data is part of these synthetic CI scenarios.
