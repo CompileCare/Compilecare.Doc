@@ -1028,3 +1028,31 @@ Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run 
 - The integrated run completed 11 real-OIDC browser tests, including the six persisted-role workspace checks and the clinical, registration, appointment and billing journeys.
 - Exact cross-repository heads for run #46050151054: API `745085912684d54a2c2f6ca830ade712d76d9e63`, Web `baab2966baeafd8f07e94bf45ab02f8ef3ecc1e9`, Observability `1a06382e4eeed3e0070a0def2b89b8d11512dd52`.
 - All clinical note values in this added test were explicitly synthetic CI placeholders in an ephemeral database. No real patient history, examination findings, diagnosis, treatment or care plan was used; this does not authorize production clinical use.
+
+
+---
+
+## Appointment cancellation and lifecycle concurrency — 2026-11-28
+
+### Merged API behavior
+
+- **HeapCare.Api PR #125** merged as `92f0765e42feca47508bd46518ac41521123318f`. Check-in, cancellation and rescheduling use the same PostgreSQL transaction-scoped advisory lock keyed by tenant, hospital and appointment. Each request verifies its scope first, then locks and rereads the appointment before making a lifecycle decision.
+- A booked appointment can be cancelled by an authorized `appointment.manage` user. Once a queue entry exists, cancellation is rejected with HTTP 409; the appointment remains Booked and the existing queue row is preserved.
+- Repeated cancellation, check-in after cancellation and reschedule after cancellation are rejected with HTTP 409. Authorization denials remain 403 and audit as `Denied`; rejected business transitions audit as `Rejected`.
+- PostgreSQL integration coverage races cancellation against first check-in and permits only two consistent outcomes: cancellation wins, leaving Cancelled with no queue entry; or check-in wins, leaving Booked with exactly one appointment-linked queue entry. Release build, xUnit analyzers, EF model-drift, integration suite, migration rehearsal and Docker/PostgreSQL checks passed on the exact API PR head.
+
+### Merged Web behavior
+
+- **HeapCare.Web PR #91** merged as `254521e578bff33b4ba0d6198b9601f2f1ed0496`. The appointment-management workspace handles HTTP 409 by returning the UI to the first cancellation-confirmation step, preserving the Booked status and displaying actionable refresh guidance. It does not optimistically mark the appointment Cancelled.
+- Its real-Keycloak PatientRegistrar browser journey loads a separate synthetic appointment, confirms cancellation through the workspace, verifies HTTP 200 and the refreshed Cancelled state, and checks the appointment list uses a patient reference rather than exposing the synthetic family name.
+
+### Current integrated acceptance status
+
+- **HeapCare.Local PR #39** remains open on head `3fec32d4198b6697d3603e5e4fbaeabe00da8959`. Run [#46085930218](https://github.com/HeapCare/HeapCare.Local/actions/runs/46085930218) passed nine-service startup, persisted-role API acceptance including cancellation and checked-in rejection, and the disposable PostgreSQL logical backup/restore.
+- The same Local run's real-OIDC job failed six accessibility cases with `ReferenceError: Cannot access 'main' before initialization`. The PatientRegistrar appointment cancellation browser journey passed. This was a test declaration-order defect in the authenticated semantic accessibility suite, not an API cancellation failure.
+- **HeapCare.Web PR #93** moves the `main` landmark locator declaration before the semantic DOM checks that use it. Its exact-head Web CI and a fresh Local #39 full-stack replay against the merged Web head are still required before Local #39 can merge or this cross-repository cancellation acceptance can be called complete.
+- The latest merged production cutover inventory is **Docs #185**, merged as `7d0f683c2172926f7a55238c7128431bdedec480`. It preserves the boundary between local compatibility identifiers and unknown production identity/database/domain/backup infrastructure.
+
+### Owner-dependent policy boundary
+
+No-show action, grace period, cancellation reason taxonomy, scheduling role mapping, hospital check-in policy and retention still require pilot-hospital approval. The CI workflow uses synthetic users and appointments only; it does not authorize live clinical use.
