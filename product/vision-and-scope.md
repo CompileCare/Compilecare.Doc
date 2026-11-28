@@ -45,7 +45,7 @@ Registration-to-appointment time, duplicate-record rate, queue wait time, docume
 
 ## Technology and product assumptions
 
-- PostgreSQL and EF Core 10 are the active transactional foundation in CompileCare.Api (see ADR-003); SQL Server is not the current default.
+- PostgreSQL and EF Core 10 are the active transactional foundation in HeapCare.Api (see ADR-003); SQL Server is not the current default.
 - A shared SaaS tenant model is an initial candidate; dedicated/hybrid deployment may be assessed against customer and operational requirements.
 - Tenant may represent a single hospital customer or a hospital group; organization and patient-sharing policy requires validation.
 - Clinical workflows and terminology require qualified hospital-user validation.
