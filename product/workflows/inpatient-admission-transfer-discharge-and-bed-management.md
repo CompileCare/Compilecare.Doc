@@ -98,10 +98,18 @@ Use synthetic patient identities in automated tests and sanitized evidence only.
 
 Medication reconciliation, prescriptions, MAR, nursing notes, vitals/observations, clinical orders, investigations, diagnostics, pharmacy, housekeeping, inventory, patient portal, insurance/TPA/ABDM, invoices, deposits and discharge summaries.
 
+## Hospital isolation and audit hardening — merged 2026-11-28
+
+- **Hospital-scoped list isolation:** API PR #141 adds PostgreSQL integration coverage with two Hospital records under one Tenant and separate synthetic registrations/admissions. A Hospital-scoped member can list only its own Hospital's admissions; requesting a sibling Hospital's list returns a non-disclosing 404. A member scoped to the sibling Hospital sees only that Hospital's admission. Merged as `57a8489b77ee72e0e34cca89401f75736785090f`.
+- **Created Admission audit resource:** API PR #142 adds a request-local audit resource ID override. On successful admission creation, the generated Admission ID is used as the audit resource ID instead of the parent Hospital ID from the create route; existing route-derived IDs remain the fallback. Merged as `22a6dae84b5a8a7c6b549975a321507d308f8b0a`.
+- **Validation:** PR #141 passed 12/12 unit and 245/245 PostgreSQL integration tests plus Release build, EF model-drift guard, migration rehearsal and Docker Integration Verification. PR #142 passed 12/12 unit and 246/246 PostgreSQL integration tests plus the same build/model/migration/Docker gates.
+- **Scope:** These are isolation and audit hardening increments only. They add no permission grants, schema, migration, billing behavior or clinical workflow.
+
 ## Validation checklist
 
 - [x] Admission service only accepts a patient registered at the selected Hospital (API PR #139; authorization remains permission-gated).
-- [ ] Cross-Tenant and cross-Hospital references return a non-disclosing not-found/denied result.
+- [ ] Cross-Tenant references return a non-disclosing not-found/denied result.
+- [x] Hospital-scoped admission-list reads cannot access a sibling Hospital under the same Tenant; sibling requests return a non-disclosing 404 (API PR #141; PostgreSQL integration test).
 - [x] Hospital-scoped admission list supports pagination and department visibility by current placement; out-of-scope placement history is omitted (API PR #140; route remains permission-gated).
 - [ ] Unauthorized roles cannot read or mutate IPD resources.
 - [ ] An inactive or occupied bed cannot receive a new active placement.
@@ -110,7 +118,9 @@ Medication reconciliation, prescriptions, MAR, nursing notes, vitals/observation
 - [ ] Concurrent transfers cannot leave two current placements for one admission.
 - [ ] Cancellation and discharge enforce allowed lifecycle transitions.
 - [ ] Discharge releases the bed and preserves historical placement data.
-- [ ] Audit records validated actor attribution without patient/clinical content.
+- [x] Denied admission reads preserve validated tenant/actor attribution in metadata-only audit records (API PR #138).
+- [x] Successful admission creation records the created Admission ID rather than its parent Hospital ID as the audit resource (API PR #142).
+- [ ] Audit records for all remaining IPD reads/mutations are verified for validated actor attribution without patient/clinical content.
 - [ ] PostgreSQL migration rehearsal and Local real-Keycloak full-stack verification pass.
 
 ## Open policy decisions
