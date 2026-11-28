@@ -41,6 +41,22 @@ The table below is a readable summary of the permission constants returned by th
 
 The current resolver contains five tenant roles. `PlatformOperator` is a separate global operator identity and authorization policy, not a sixth tenant membership role. Its access must be reviewed independently from this table.
 
+
+## IPD permissions — defined, not granted
+
+The API defines six dedicated IPD permission identifiers, but the current `TenantRolePermissions.GetPermissions` resolver does not grant any of them to HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar or ClinicalUser:
+
+- `inpatient.read`
+- `inpatient.admit`
+- `inpatient.bed.assign`
+- `inpatient.bed.transfer`
+- `inpatient.admission.cancel`
+- `inpatient.admission.discharge`
+
+PlatformOperator is a separate global identity and receives no implicit tenant clinical access. HeapCare.Local PR #46 passed real-Keycloak negative authorization verification for all five persisted tenant roles and the platform-only operator across the five current IPD HTTP routes. This is negative-access evidence only; it does not approve a positive role mapping.
+
+**Approval is still required:** use the [IPD role and workflow approval worksheet](../product/decisions/ipd-role-and-workflow-approval-worksheet.md) to record hospital-approved role/operation pairs, resource scope, admission/bed sequencing, mandatory fields, cancellation and discharge rules. Until those decisions are approved and implemented through a separately reviewed change, every IPD operation remains denied to existing roles.
+
 ## Endpoint-policy distinctions and known caveats
 
 - The role grant list is not the same thing as endpoint coverage. The [API authorization policy inventory](authorization-policy-inventory.md) records named policies and endpoint assignments.
