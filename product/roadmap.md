@@ -1126,3 +1126,20 @@ Local PR #43 merged as `a486fdb39792bc82f8e24f7dcf690afa53166f29`; exact-head ru
 ### Phase 4 appointment availability concurrency guard — 2026-11-28
 
 HeapCare.Api PR #133 merged as `0fc0aecd8b80f06e10ce8f797a2b37f3f712c35f`. It adds a PostgreSQL integration regression that sends eight concurrent availability-publication requests for the same tenant/provider/time interval and asserts exactly one creation, seven conflicts and one persisted session. The test exercises the existing provider/time exclusion constraint and service conflict mapping; no scheduling runtime or schema change was made. Exact-head API CI [#46096519916](https://github.com/HeapCare/HeapCare.Api/actions/runs/46096519916) passed **212 integration tests and 12 unit tests**, EF model drift detection and Release build; Docker Integration Verification [#46096519987](https://github.com/HeapCare/HeapCare.Api/actions/runs/46096519987) also passed. This hardens the existing availability publication workflow; it does not close the separate hospital-group, clinical policy or production-readiness gates.
+
+
+### IPD admission creation — merged 2026-11-28
+
+HeapCare.Api PR #138 merged as `f28a94ce92d6c1fbf8c29cf4fb565e897bd73700`, adding PostgreSQL-backed verification that a denied IPD admission read retains the validated Tenant and OIDC actor in the metadata-only audit event while recording the denied permission outcome. The exact-head build/test workflows and Docker Integration Verification passed.
+
+HeapCare.Api PR #139 merged as `727285013da9448fb032b91ed1bd2b06b74de429`, implementing guarded inpatient admission creation:
+- `POST /api/v1/hospitals/{hospitalId}/ipd/admissions` is protected by the dedicated `inpatient.admit` permission.
+- The selected patient must already have a HospitalPatientRegistration at the exact requested Hospital inside the current Tenant.
+- Only Tenant-wide or Hospital-wide organization scope may create an admission; Department-only scope is denied.
+- The service creates an Active admission with a server-generated UTC timestamp and no bed placement. Bed assignment remains a separate operation.
+- A second active admission for the same patient/Hospital returns conflict; the existing PostgreSQL filtered unique index remains the final concurrency arbiter.
+- Existing tenant roles, PlatformOperator and forged external role/permission claims do not receive admission permission. No role-to-IPD grants were changed.
+
+**Exact-head validation on PR #139:** API Release build and model-drift checks passed; unit tests **12/12** and PostgreSQL integration tests **240/240** passed; PostgreSQL migration rehearsal and Docker Integration Verification passed. Evidence: API CI [#46112235715](https://github.com/HeapCare/HeapCare.Api/actions/runs/46112235715), second API CI [#46112231273](https://github.com/HeapCare/HeapCare.Api/actions/runs/46112231273), migration rehearsal [#46112235635](https://github.com/HeapCare/HeapCare.Api/actions/runs/46112235635), and Docker verification [#46112235716](https://github.com/HeapCare/HeapCare.Api/actions/runs/46112235716).
+
+**Still open:** admission mandatory fields/reason catalogue, hospital approval of admission-before-bed-assignment semantics, the six-role positive/negative IPD permission matrix, cancellation and discharge rules, bed reservation/readiness policy, Local real-Keycloak replay, and the Web IPD workspace. Do not describe the complete IPD workflow as finished from admission creation alone. No billing, MRN, clinical-state, medication, nursing or other clinical behavior was added.
