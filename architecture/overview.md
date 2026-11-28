@@ -6,19 +6,19 @@ The [Product Blueprint v1](../product/blueprint-v1.md) is the product-first refe
 
 ## Target and implementation architecture
 
-CompileCare has a distributed-system target, but the first hospital core is implemented as a **modular monolith** with explicit internal boundaries and one primary application deployment. Extract a capability into an independently deployed service only when scaling, deployment, ownership, security isolation, integration or resilience needs justify the operational cost. See [ADR-001](decisions/ADR-001-distributed-architecture.md).
+HeapCare has a distributed-system target, but the first hospital core is implemented as a **modular monolith** with explicit internal boundaries and one primary application deployment. Extract a capability into an independently deployed service only when scaling, deployment, ownership, security isolation, integration or resilience needs justify the operational cost. See [ADR-001](decisions/ADR-001-distributed-architecture.md).
 
 ## Current technology baseline
 
 | Layer | Direction | Status |
 |---|---|---|
 | Web UI | React + TypeScript | Proposed; confirm through product/UI discovery |
-| API | ASP.NET Core / .NET 10 | Implemented in CompileCare.Api |
+| API | ASP.NET Core / .NET 10 | Implemented in HeapCare.Api |
 | Persistence | PostgreSQL + EF Core 10 | Implemented; initial facility hierarchy migrations are merged |
 | API contracts | Versioned REST + OpenAPI | Existing conventions; evolve by module |
 | Authentication | OIDC/JWT with database-backed tenant membership | First validation/authorization slice implemented; identity provider lifecycle and provisioning remain |
-| API client | CompileCare.ApiClient | Reusable foundation implemented; publication/consumer validation remains |
-| Observability | CompileCare.Observability + CompileCare.Observability.AspNetCore | Existing shared packages consumed by CompileCare.Api; retain and reuse |
+| API client | HeapCare.ApiClient | Reusable foundation implemented; publication/consumer validation remains |
+| Observability | HeapCare.Observability + HeapCare.Observability.AspNetCore | Existing shared packages consumed by HeapCare.Api; retain and reuse |
 | Cache | No mandatory cache dependency for the MVP | Introduce only for measured need and tenant-safe semantics |
 | Async messaging | Select per validated workflow | Broker choice not yet made |
 | Background jobs | Select per validated workflow | No framework mandated today |
@@ -29,7 +29,7 @@ PostgreSQL and EF Core 10 are the current implemented transactional baseline. Re
 
 ## Shared observability
 
-The existing CompileCare.Observability and CompileCare.Observability.AspNetCore packages are the canonical shared telemetry/bootstrap foundation for CompileCare .NET hosts. Reuse them for logging, tracing, metrics and health-check wiring rather than creating duplicate pipelines. Package compatibility and security hardening remain review items. See [ADR-007](decisions/ADR-007-shared-observability-reuse.md).
+The existing HeapCare.Observability and HeapCare.Observability.AspNetCore packages are the canonical shared telemetry/bootstrap foundation for HeapCare .NET hosts. Reuse them for logging, tracing, metrics and health-check wiring rather than creating duplicate pipelines. Package compatibility and security hardening remain review items. See [ADR-007](decisions/ADR-007-shared-observability-reuse.md).
 
 ## Logical layers and bounded contexts
 
