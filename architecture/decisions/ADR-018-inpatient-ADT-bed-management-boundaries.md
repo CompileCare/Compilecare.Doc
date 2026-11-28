@@ -7,7 +7,7 @@
 
 ## Context
 
-The current platform has a tenant-scoped Hospital → Department → Ward → Room → Bed hierarchy, hospital patient registrations, staff assignments, OPD encounters and audited role-scoped APIs. The first IPD technical increments now provide admission and bed-placement persistence, dedicated permission contracts, admission read/bed assignment/transfer services, guarded admission creation and selected IPD HTTP routes. The complete ADT workflow, hospital-approved role mapping and Local real-Keycloak/Web acceptance remain incomplete.
+The current platform has a tenant-scoped Hospital → Department → Ward → Room → Bed hierarchy, hospital patient registrations, staff assignments, OPD encounters and audited role-scoped APIs. The first IPD technical increments now provide admission and bed-placement persistence, dedicated permission contracts, admission read/list, bed assignment/transfer services, guarded admission creation and selected IPD HTTP routes. The complete ADT workflow, hospital-approved role mapping and Local real-Keycloak/Web acceptance remain incomplete.
 
 The first inpatient increment must establish a reliable administrative ADT foundation without inventing nursing or clinical policies.
 
@@ -80,8 +80,9 @@ Merged technical implementation on `HeapCare.Api/main`:
 - PR #137: admission read, assignment and transfer HTTP routes behind dedicated IPD permissions; existing roles and PlatformOperator remain denied.
 - PR #138: PostgreSQL audit-attribution regression for denied IPD admission reads.
 - PR #139: guarded admission creation for an existing patient registration at the exact selected Hospital. Admission requires Tenant-wide or Hospital-wide scope, creates an Active episode with server-generated UTC timestamp and no bed placement, and returns conflict for duplicate/concurrent active admissions.
+- PR #140: paginated admission list with optional status filter; Department-only scope is filtered by current placement, and placement history from other departments is omitted. The route is behind `inpatient.read` and no roles were granted this permission.
 
-PR #139 validation passed on exact head: Release build, EF model-drift guard, 12 unit tests, 240 PostgreSQL integration tests, PostgreSQL migration rehearsal and Docker Integration Verification.
+PR #139 validation passed on exact head: Release build, EF model-drift guard, 12 unit tests, 240 PostgreSQL integration tests, PostgreSQL migration rehearsal and Docker Integration Verification. PR #140 exact-head validation passed: Release build, EF model-drift guard, 12 unit tests, 244 PostgreSQL integration tests, PostgreSQL migration rehearsal and Docker Integration Verification.
 
 This is not full IPD workflow completion. Cancellation/discharge services and routes, approved role grants, admission mandatory data/reason policy, confirmed admission/bed sequencing, real-Keycloak Local replay and the Web workspace remain outstanding. No production role mapping is inferred from these technical contracts.
 
