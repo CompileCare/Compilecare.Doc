@@ -1,14 +1,14 @@
 # OIDC signing-key rotation runbook
 
 **Status:** Provider-neutral operational procedure; production execution is not yet evidenced.  
-**Applies to:** CompileCare API JWT validation against the configured OIDC issuer.  
+**Applies to:** HeapCare API JWT validation against the configured OIDC issuer.  
 **Current application configuration:** Authentication__Authority, Authentication__Audience and Authentication__RequireHttpsMetadata. Production requires HTTPS metadata.
 
 This runbook does not select or configure a production identity provider. The production provider, issuer, token lifetimes, metadata/JWKS cache behavior, operational owners and change window must be recorded before this procedure is used. Do not treat the local Keycloak realm or local development keys as production configuration.
 
 ## Security principles
 
-- The identity provider owns private signing keys. CompileCare API instances consume public signing keys through the issuer's OIDC discovery/JWKS metadata; do not copy private signing keys into the API, browser, repository, CI variables or deployment manifests.
+- The identity provider owns private signing keys. HeapCare API instances consume public signing keys through the issuer's OIDC discovery/JWKS metadata; do not copy private signing keys into the API, browser, repository, CI variables or deployment manifests.
 - Use a planned overlap rotation: publish the new public key before activating it for signing, keep the previous public key available while unexpired tokens signed with it may still be presented, then retire the previous key.
 - Never remove or disable the only valid key before confirming that all API instances can validate tokens signed by the replacement key.
 - If compromise is suspected, prioritize containment over compatibility. Do not re-enable a compromised key merely to restore availability.
@@ -29,7 +29,7 @@ This runbook does not select or configure a production identity provider. The pr
 
 1. **Open and approve the change.** Record the issuer, target key identifier, expected overlap window, token lifetime, API replicas and rollback decision-maker. Confirm monitoring and on-call coverage.
 2. **Create the replacement key at the identity provider.** Generate it using the provider's supported key-management workflow and approved algorithm/strength. Keep it passive/inactive for signing initially. Private material remains inside the provider's protected key store/HSM where supported.
-3. **Publish the replacement public key.** Confirm the issuer's JWKS endpoint returns the new key with a unique kid and correct public parameters. Confirm OIDC discovery still advertises the expected issuer and JWKS URI. Do not change CompileCare's issuer or audience to work around key publication.
+3. **Publish the replacement public key.** Confirm the issuer's JWKS endpoint returns the new key with a unique kid and correct public parameters. Confirm OIDC discovery still advertises the expected issuer and JWKS URI. Do not change HeapCare's configured issuer or audience to work around key publication.
 4. **Activate the replacement for signing.** Mint a fresh access token and confirm its header references the expected new kid. Do not paste the token into tickets, chat, logs or screenshots; inspect it only in an approved secure test environment and retain only non-secret metadata such as kid and timestamps.
 5. **Verify API acceptance on every serving instance.** Exercise an authenticated, non-sensitive health/context request with the new-key token. Confirm all API replicas accept it after metadata refresh. Also confirm a still-valid token signed by the previous key remains accepted during the overlap window. Record HTTP result, replica/build identity and timestamp without retaining bearer tokens.
 6. **Observe the overlap.** Monitor authentication failures, 401 rates, identity-provider signing errors, metadata/JWKS fetch failures and clock synchronization. Keep the previous public key published for at least the maximum lifetime of tokens signed by it plus configured clock skew and the measured metadata propagation/cache interval. Use the longest applicable value and document the calculation.
@@ -38,7 +38,7 @@ This runbook does not select or configure a production identity provider. The pr
 
 ## Emergency rotation after suspected compromise
 
-1. Declare the security incident and involve the identity-provider owner, CompileCare security owner and incident lead.
+1. Declare the security incident and involve the identity-provider owner, HeapCare security owner and incident lead.
 2. Disable/revoke the compromised signing key at the provider immediately and ensure it is no longer published as trusted signing material. Do not preserve a compatibility window for a compromised key.
 3. Activate a clean replacement key and verify its public JWKS publication and API acceptance across every serving replica.
 4. Revoke affected identity-provider sessions/refresh tokens as supported, investigate token issuance and access logs, and assess whether client credentials or other secrets were also exposed.
@@ -65,7 +65,7 @@ This runbook does not select or configure a production identity provider. The pr
 | Expired token | Rejected | Test case and 401 outcome |
 | Discovery/JWKS endpoint unavailable | Alert raised; no signature-validation bypass | Alert and recovery record |
 
-**Important test boundary:** Existing CompileCare API integration tests use synthetic local signing configuration. They prove authorization behavior under that test setup; they do not prove production-provider key rollover, JWKS cache refresh or multi-replica behavior. A staging rehearsal against the selected provider and deployed runtime is required.
+**Important test boundary:** Existing HeapCare API integration tests use synthetic local signing configuration. They prove authorization behavior under that test setup; they do not prove production-provider key rollover, JWKS cache refresh or multi-replica behavior. A staging rehearsal against the selected provider and deployed runtime is required.
 
 ## Rotation record
 

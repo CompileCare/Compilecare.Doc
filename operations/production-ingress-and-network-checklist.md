@@ -4,7 +4,7 @@
 
 ## 1. Scope and trust boundaries
 
-CompileCare consists of a browser workspace, ASP.NET Core API, PostgreSQL persistence, OIDC identity provider, and internal observability services. The browser-facing Web and API origins are separate trust boundaries unless deliberately deployed same-origin.
+HeapCare consists of a browser workspace, ASP.NET Core API, PostgreSQL persistence, OIDC identity provider, and internal observability services. The browser-facing Web and API origins are separate trust boundaries unless deliberately deployed same-origin.
 
 The API maps `/metrics` through `MapPrometheusScrapingEndpoint()` without user-authentication metadata, but outside Development/Testing it requires explicit `Observability:Metrics:AllowedNetworks` CIDRs. The middleware normalizes IPv4-mapped IPv6 peers before matching IPv4 CIDRs, rejects missing remote addresses, and returns 404 for sources outside the allowlist. Treat this as an internal monitoring endpoint: **do not expose `/metrics` through the public Internet ingress**. Permit access only from the approved monitoring network or an authenticated internal scrape path. The application CIDR guard is defense in depth; it does not replace the ingress/network boundary.
 
@@ -110,7 +110,7 @@ A failed or untested item remains an open deployment gate. Do not mark productio
 - Web PR #63 disables Nginx version disclosure and CI verifies the response does not contain the exact Nginx version.
 - API PR #83 implements one-year HSTS on trusted HTTPS requests and explicit trusted-proxy configuration.
 - API PR #84 validates production CORS as explicit HTTPS origins; API PR #85 restricts Development CORS to explicit loopback origins.
-- CompileCare.Local binds its published local ports to loopback and explicitly opts into HTTP only for local development.
+- HeapCare.Local binds its published local ports to loopback and explicitly opts into HTTP only for local development.
 - API PR #86 now enforces explicit `Observability:Metrics:AllowedNetworks` CIDRs outside Development/Testing and returns 404 to untrusted sources after trusted forwarded-header processing. The selected ingress must still keep `/metrics` off public routes and use the actual monitoring source CIDRs; the application allowlist is not user authentication. Health endpoint exposure remains a separate ingress rule.
 
 ## 10. Ownership and change control
