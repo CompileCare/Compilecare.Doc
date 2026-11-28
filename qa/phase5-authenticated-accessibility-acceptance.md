@@ -210,3 +210,24 @@ Automated results:
 - CI-only secrets, browser identity artifacts, containers, volumes and network were removed by the successful teardown step.
 
 **Manual boundary remains unchanged:** native Windows High Contrast, keyboard-only completion of the full six-role workflows, screen-reader evaluation, dialog/focus review with assistive technology, real contrast measurements, desktop/tablet acceptance, 200%/400% zoom and reflow, and qualified WCAG 2.2 AA evaluation remain **Not Run**. No WCAG conformance, production readiness or pilot approval is claimed.
+
+
+## Authenticated action focus integrated replay — 2026-11-28
+
+HeapCare.Local PR #43 merged as `a486fdb39792bc82f8e24f7dcf690afa53166f29`. Exact-head full-stack run [#46095789248](https://github.com/HeapCare/HeapCare.Local/actions/runs/46095789248) passed both Local jobs: the full nine-service Docker/telemetry verification and tooling/observability validation. The push tooling run [#46095780228](https://github.com/HeapCare/HeapCare.Local/actions/runs/46095780228) also passed.
+
+Exact checked-out trees for the full-stack job:
+- Local PR merge ref: `080197c88f5d9ca5a3f2691cc8fcc504e74e6ac6` (PR #43 head `522696de66cbd0b405456771d5fce0644e31d5b7`; merged Local main `a486fdb39792bc82f8e24f7dcf690afa53166f29`).
+- HeapCare.Api main: `f2121a4062afb06b69d1be4c8b1d7640cca55fbc`.
+- HeapCare.Web main: `62b3687f1ef77d84986113810740904112064589`.
+- HeapCare.Observability main: `84bc2ec84de9a1378ac376491d6f6e38dfdcabb6`.
+
+Automated evidence:
+- Nine-service stack, API telemetry, Keycloak-issued identities and PostgreSQL-persisted tenant/membership workflows passed.
+- API-to-Jaeger verification found an Npgsql database span; the Collector/Prometheus, Jaeger, Elasticsearch and Kibana paths responded and the HeapCare logs data view was provisioned.
+- PostgreSQL logical backup restored into a separate empty database with matching row counts for all **26 application tables**. This is a CI logical restore smoke, not provider-native PITR, off-site recovery or production DR.
+- The real Authorization Code + PKCE browser suite passed **11/11 tests**. All six persisted roles passed the authenticated accessibility baseline: HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator.
+- For each authenticated role, Playwright emulates forced-colors, verifies visible keyboard focus on the skip link, activates it into main content, then tabs through the authenticated shell to the Sign out button. The test confirms Sign out is `:focus-visible` and has a visible outline style, width and color. This is automated Chromium media-emulation evidence, not native Windows High Contrast.
+- Existing role/tenant workflows for reception, appointment booking/check-in, queue, synthetic clinical encounter, billing/receipt and PlatformOperator control plane remained green. CI-only containers, volumes, network, secrets and browser identity artifacts were cleaned up.
+
+**Manual acceptance remains Not Run:** full keyboard-only completion of each role workflow, native Windows High Contrast, screen-reader testing, focus/dialog review with real assistive technology, contrast measurement, 200%/400% zoom and reflow, desktop/tablet evidence, and qualified WCAG 2.2 AA evaluation. No WCAG conformance, production readiness or pilot approval is claimed.
