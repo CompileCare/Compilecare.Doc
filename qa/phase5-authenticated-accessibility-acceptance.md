@@ -176,3 +176,14 @@ Web #89 and Local #38 jointly verify the ClinicalUser signed-note presentation w
 The browser reopens a second, separate synthetic encounter that the real ClinicalUser API fixture drafted, signed, closed and amended. It confirms patient identity before content is shown, note controls are read-only, Review and sign is absent, and the amendment history is visible. The original empty encounter remains untouched and continues to test that signing is disabled when required note content is empty.
 
 All note values are explicit CI placeholder strings only. Manual screen-reader testing, complete keyboard-only workflows, contrast, zoom/reflow and qualified WCAG 2.2 AA evaluation remain outstanding; this is not a conformance claim.
+
+
+## Integrated authenticated accessibility-baseline update — 2026-11-28
+
+HeapCare.Local PR #39 merged as `28a2123c5f0dc9b25a8f1ead0c08cb59bb4d51f9`. Exact-head full-stack run [#46086998413](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086998413) passed on Local head `855b6f4a19c6bb5cd56e5dfabb539ef35aa0fb65`, using API main `92f0765e42feca47508bd46518ac41521123318f` and Web main `009055abee9de8791c156c0e8e35dcdfafe865ec`.
+
+The real-Keycloak Authorization Code + PKCE browser suite completed **11/11 tests**. All six authenticated role semantic-accessibility baseline cases passed: HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator. The remaining five scenarios covered successful sign-in and persisted-workspace behavior for the applicable roles. The run also verified the nine-service Docker/observability stack, persisted-role API workflows, and an isolated PostgreSQL logical backup/restore with matching row counts for all 26 application tables.
+
+This integrated CI run includes the Web #92 locator initialization fix and Web #94 ARIA IDREF whitespace-tokenization fix. It is evidence for automated role/workspace and semantic checks only. The manual checklist below remains **Not Run**: keyboard-only completion across all six role workflows, dialog/focus behavior with assistive technology, real screen-reader testing, contrast measurements, 200%/400% zoom and reflow, desktop/tablet evidence, and qualified WCAG 2.2 AA evaluation. No WCAG conformance or production/pilot approval is claimed.
+
+The PostgreSQL exercise is a disposable logical dump/restore smoke test, not provider-native backup/PITR, off-site recovery, or a production disaster-recovery drill.
