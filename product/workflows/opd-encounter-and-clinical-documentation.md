@@ -92,7 +92,7 @@ Diagnosis catalogues and coding, allergy/medication reconciliation, prescription
 
 ## Clinical queue row presentation — 2026-11-25
 
-The clinical queue presentation is extracted into `ClinicalQueueRow` in [CompileCare.Web PR #33](https://github.com/CompileCare/CompileCare.Web/pull/33).
+The clinical queue presentation is extracted into `ClinicalQueueRow` in [HeapCare.Web PR #33](https://github.com/HeapCare/HeapCare.Web/pull/33).
 
 - Rows are named by their operational queue token, not patient identity.
 - The API-returned status is announced as a labelled status region.
