@@ -7,7 +7,7 @@ The Memberships workspace allows an authorized tenant HospitalAdmin to administe
 The workflow is limited to:
 - Listing memberships visible within the administrator's manageable organization scope.
 - Creating a membership for an identity that already exists in the configured OIDC identity provider.
-- Assigning an allow-listed CompileCare tenant role and one or more organization scopes.
+- Assigning an allow-listed HeapCare tenant role and one or more organization scopes.
 - Updating an existing membership's role and scope assignments.
 - Deactivating or reactivating a membership.
 
@@ -40,7 +40,7 @@ The create form:
 - Uses the issuer from the currently validated sign-in; it is not editable.
 - Requires the target user's exact OIDC subject.
 - Does not accept email as an identity key.
-- Requires the operator to create the user in the configured identity provider before membership creation. This is an operational precondition: CompileCare stores the membership but does not create or verify identity-provider accounts.
+- Requires the operator to create the user in the configured identity provider before membership creation. This is an operational precondition: HeapCare stores the membership but does not create or verify identity-provider accounts.
 
 The UI displays the subject because administrators need to distinguish identity records. Access to this identifier is restricted to the membership-management permission.
 
@@ -88,18 +88,18 @@ The list is paginated at 50 entries per page. The service applies scope containm
 - Self-management controls are disabled in the UI; the API independently rejects self-update and self-deactivation.
 - A 409 response may indicate a concurrent change, last-administrator protection or another protected lifecycle rule. The UI asks the administrator to refresh and review the current assignments.
 - A 403/404 response is surfaced without substituting a broader list or bypassing scope checks.
-- The create form clearly states that the target user must already exist in the configured identity provider, that CompileCare does not create IdP accounts, and that the OIDC subject (not email) is required.
+- The create form clearly states that the target user must already exist in the configured identity provider, that HeapCare does not create IdP accounts, and that the OIDC subject (not email) is required.
 - Scope editing preserves the full scope set in the update request; changing a role does not silently discard existing scopes.
 
 ## Platform tenant lifecycle is a separate control plane
 
-Global tenant registry operations are not part of this tenant-scoped workspace. The dedicated platform workspace is implemented in [Platform tenant lifecycle](platform-tenant-lifecycle.md) and merged in [CompileCare.Web PR #36](https://github.com/CompileCare/CompileCare.Web/pull/36). It appears only when the API self-status endpoint confirms the caller's persisted PlatformOperator identity. Tenant HospitalAdmin roles never grant platform-operator access.
+Global tenant registry operations are not part of this tenant-scoped workspace. The dedicated platform workspace is implemented in [Platform tenant lifecycle](platform-tenant-lifecycle.md) and merged in [HeapCare.Web PR #36](https://github.com/HeapCare/HeapCare.Web/pull/36). It appears only when the API self-status endpoint confirms the caller's persisted PlatformOperator identity. Tenant HospitalAdmin roles never grant platform-operator access.
 
 The platform workspace can create tenants in Provisioning, provision the initial tenant-wide HospitalAdmin and activate the tenant, suspend active tenants, reactivate suspended tenants and permanently close tenants. The API enforces the state-transition matrix and rejects activation until an active tenant-wide HospitalAdmin exists. Global operations remain protected by the PlatformOperator policy on every request.
 
 ## Verification status
 
-The Web implementation is merged in [CompileCare.Web PR #35](https://github.com/CompileCare/CompileCare.Web/pull/35), merge commit `b8e4a4ec8864884f5e71dc070a319a5f4df07185`.
+The Web implementation is merged in [HeapCare.Web PR #35](https://github.com/HeapCare/HeapCare.Web/pull/35), merge commit `b8e4a4ec8864884f5e71dc070a319a5f4df07185`.
 
 Hosted Web CI runs 45745881098 and 45746024118 passed on final head `2d3ce43014222da08e4e30d25bc4d4bee4ff7916`:
 - 75 Vitest tests across 8 test files.
