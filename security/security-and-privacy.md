@@ -17,12 +17,20 @@ The current `HeapCare.Api` implementation provides:
 
 Tenant registry/lifecycle operations and initial tenant-wide HospitalAdmin provisioning are implemented behind the separate `PlatformOperator` control plane. Tenant membership APIs support scoped list, create, update, deactivate and reactivate operations; tenant-wide HospitalAdmin membership management is authorized independently and constrained by the caller's organization scope. The API stores the identity-provider issuer and subject, but does not create or verify accounts in the external OIDC provider: the user identity must already exist there before a membership can be created. Automated identity-provider joiner/mover/leaver synchronization, federation lifecycle and periodic access reviews remain outside the implemented slice. These capabilities do not constitute a complete identity lifecycle or a production security programme.
 
+## Implemented audit and failure-handling controls
+
+- Append-only metadata audit captures authentication/authorization outcomes, sensitive access, membership and role changes, exports, administrative actions and request correlation. Audit persistence failures fail the protected operation closed and roll back its data transaction.
+- Audit query and CSV export are tenant-filtered and require a server-derived `audit.read` permission plus tenant-wide organization scope. Query ranges and result/export row counts are bounded; CSV cells are neutralized against spreadsheet-formula injection.
+- The audit-store-unavailable response is HTTP 503 Problem Details with the standard `about:blank` type, canonical `Service Unavailable` title, stable machine-readable `code: audit_unavailable`, request path and trace ID. It does not advertise an unverified public domain.
+- HeapCare.ApiClient exposes the optional Problem Details `code` field. Consumers should branch on the stable code where needed and continue to handle payloads without that optional extension.
+
+**Still requires governance approval:** named audit-reader roles/individuals, purpose/reason capture where required, periodic access review, export alerting and monitoring, archival and retention periods, legal hold, approved deletion, cross-hospital/cross-tenant legal boundaries, and incident notification/ownership. A tenant-wide technical permission is not itself an approval of each hospital's audit-review policy.
+
 ## Remaining security controls
 
 - Periodic access reviews, documented joiner/mover/leaver approvals, external identity-provider account creation/deprovisioning and membership synchronization, and formal ownership of privileged/support access.
-- Append-only audit of authentication, authorization, sensitive record access, membership/role changes, exports, administrative actions and privileged support activity.
-- Tenant isolation across every data-access path, including relationships, caching, background jobs, message consumers, search, file/object storage, exports and observability.
 - Least privilege, resource-level scope restrictions and controlled break-glass/support access.
+- Tenant isolation across every data-access path, including relationships, caching, background jobs, message consumers, search, file/object storage, exports and observability.
 - TLS in transit, encryption at rest, key and secret rotation, and secure key storage.
 - Input validation, output encoding, CSRF protections where applicable, rate limiting, abuse protection and secure session/token handling. API CORS configuration accepts only explicit HTTPS origins outside Development. Development is also constrained to explicit HTTP(S) loopback origins (`localhost`, `*.localhost` or loopback IPs); remote hosts, wildcards, credentials, paths, queries and fragments are rejected in every environment. The Web's enforced CSP separately validates runtime API/OIDC origins. Cross-origin deployments must keep both allowlists aligned with the exact deployed hosts, and same-origin deployments should omit the API CORS allowlist.
 - Dependency/container scanning, software supply-chain controls, least-privilege CI and release credentials.
