@@ -1,6 +1,6 @@
 # IPD: Admission, Transfer, Discharge and Bed Management
 
-**Status:** Initial ADT scope accepted; admission creation, paginated admission list/detail reads and bed placement/transfer technical increments are merged. Detailed hospital policy and role grants remain under review.  
+**Status:** Initial IPD ADT technical foundation is merged: admission creation/list/detail, bed assignment and same-hospital transfer. Hospital isolation, transfer concurrency, occupied-bed conflict handling and real-Keycloak negative authorization are verified. All IPD role grants remain closed; hospital policy, cancellation/discharge and the positive Web workflow are incomplete.  
 **Related:** [ADR-018: Inpatient ADT and Bed-Management Boundaries](../../architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md), [ADR-006: Tenant, Organization and Patient Data Boundaries](../../architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md).
 
 ## Implementation checkpoint — 2026-11-28
@@ -109,6 +109,7 @@ Medication reconciliation, prescriptions, MAR, nursing notes, vitals/observation
 
 - **Cross-Hospital and cross-Tenant bed-transfer denial:** API PR #143 seeds a current admission in one Hospital, a sibling Hospital under the same Tenant and a Hospital under a different Tenant. Transfers to both out-of-scope destinations return non-disclosing 404; the original placement remains the only active placement with no end timestamp or end reason. Merged as `32e7b56b7969d0b80b8194b3973949ff4865259a`.
 - **Concurrent transfer conflict:** API PR #144 synchronizes two transfers from the same active placement using a test-only PostgreSQL trigger. Exactly one succeeds, the competing request returns 409, and the final history contains one closed original placement plus one active destination. The test trigger/function are removed in `finally`. Merged as `c718f0ccd8816158d6740faef5a27656da89dc0a`.
+- **Occupied destination bed conflict:** API PR #145 seeds two active admissions in the same Hospital with separate occupied beds and attempts to transfer the first admission into the second patient's bed. The service returns 409 and both original active placements remain unchanged. Merged as `b7663ee29f231c55f4775b7a473af71eb05bc80b`; exact-head validation passed Release build, model-drift guard, 12/12 unit tests, 249/249 PostgreSQL integration tests, PostgreSQL migration rehearsal and Docker Integration Verification.
 - **Validation:** both PRs passed 12/12 unit tests and 247/247 PostgreSQL integration tests, Release build, EF model-drift guard, PostgreSQL migration rehearsal and Docker Integration Verification.
 - **Real-Keycloak negative authorization:** Local PR #46 is merged. Its exact-head full-stack run [#46114200037](https://github.com/HeapCare/HeapCare.Local/actions/runs/46114200037) denied every IPD route for all five persisted tenant roles and platform-only PlatformOperator while also passing nine-service startup, PostgreSQL logical backup/restore, Chromium PKCE and Firefox/WebKit six-role accessibility baseline. Existing IPD permissions remain ungranted. API PR #137's PostgreSQL suite separately covers a PlatformOperator who also has a tenant FacilityViewer membership.
 
@@ -122,7 +123,8 @@ These are automated isolation, concurrency and negative-authorization proofs. Th
 - [x] Hospital-scoped admission-list reads cannot access a sibling Hospital under the same Tenant; sibling requests return a non-disclosing 404 (API PR #141; PostgreSQL integration test).
 - [x] Hospital-scoped admission list supports pagination and department visibility by current placement; out-of-scope placement history is omitted (API PR #140; route remains permission-gated).
 - [x] Current tenant roles and platform-only PlatformOperator are denied all IPD HTTP routes with real Keycloak-issued tokens; API and Local tests preserve the fail-closed default (API PR #137; Local PR #46).
-- [ ] An inactive or occupied bed cannot receive a new active placement.
+- [x] Inactive beds are rejected before creating a placement (API PR #136 PostgreSQL service test).
+- [x] Transfer into an occupied bed returns 409 and leaves both existing admissions' placements unchanged (API PR #145 PostgreSQL integration test).
 - [x] Concurrent attempts to occupy one bed produce one winner and safe conflicts for others (API PR #136 PostgreSQL service tests).
 - [x] Transfer closes the old placement and opens the new placement atomically (API PR #136 PostgreSQL service tests).
 - [x] Concurrent transfers cannot leave two current placements for one admission; one succeeds and one conflicts (API PR #144).
