@@ -248,16 +248,19 @@ This closes the integrated automation gate for the appointment availability anno
 
 ## Cancellation lifecycle concurrency and integrated acceptance — 2026-11-28
 
-**HeapCare.Api PR #125** merged as `92f0765e42feca47508bd46518ac41521123318f`. Its cancellation lifecycle fix and concurrency guard are now part of the API contract:
+**HeapCare.Api PR #125** merged as `92f0765e42feca47508bd46518ac41521123318f`. Its cancellation lifecycle fix and concurrency guard are part of the API contract:
 
 - Check-in, cancellation and rescheduling share a PostgreSQL transaction-scoped advisory lock keyed by tenant, hospital and appointment. The service scope-checks the caller before acquiring the lock and rereads the appointment under the lock before making its state decision.
-- An appointment with an existing linked queue entry cannot be cancelled. The API returns HTTP 409, leaves the appointment Booked and does not remove or orphan the queue entry.
-- Cancellation after cancellation, check-in of a cancelled appointment and rescheduling a cancelled appointment return HTTP 409. A role outside the persisted `appointment.manage` policy receives 403.
-- The PostgreSQL race test sends cancellation and first check-in simultaneously and verifies exactly one consistent outcome: Cancelled with no queue row, or Booked with exactly one queue row.
+- An appointment with an existing linked queue entry cannot be cancelled. The API returns HTTP 409, leaves the appointment Booked and preserves the queue entry.
+- Repeated cancellation, check-in after cancellation and reschedule after cancellation return HTTP 409. A role outside persisted `appointment.manage` policy receives 403.
+- PostgreSQL integration coverage races cancellation against first check-in and verifies exactly one consistent outcome: Cancelled with no queue row, or Booked with exactly one queue row.
 - Audit attribution distinguishes permission denial (403 / `Denied`) from rejected business transition (409 / `Rejected`).
 
 **HeapCare.Web PR #91** merged as `254521e578bff33b4ba0d6198b9601f2f1ed0496`. On a 409 cancellation conflict, the UI clears the pending confirmation, keeps the existing status (e.g. Booked) and shows refresh guidance. The real-Keycloak PatientRegistrar browser test loads and cancels a synthetic appointment from Appointment management, verifies the 200 response and refreshed Cancelled status, and confirms the patient list displays a reference rather than a patient family name.
 
-**HeapCare.Local PR #39** is the paired full-stack real-Keycloak acceptance and remains pending. The first run #46085930218 passed nine-service startup, persisted-role API cancellation checks, PostgreSQL logical restore and the PatientRegistrar cancellation browser journey, but six authenticated accessibility role cases failed because the main landmark locator was referenced before initialization. Attempt 2 was cancelled during the stack rebuild when the PR head advanced. The current PR head is `1d27016a494e7747c2afcd5f294521d1c7f2bfba`; pull-request run [#46086714465](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086714465) is rebuilding the stack against Web main `1e52c1c3eef5eaa6912cb8810184cf515a37c259`, which includes the merged **Web PR #92** locator fix. **Web PR #94** merged as `009055abee9de8791c156c0e8e35dcdfafe865ec`, correcting whitespace tokenization in the ARIA IDREF assertion. The current Local run began before #94 merged; replay its full-stack job against this final Web main before closing the integrated accessibility gate.
+**Authenticated accessibility follow-ups:** Web #92 merged as `1e52c1c3eef5eaa6912cb8810184cf515a37c259`, fixing the main-landmark locator initialization order. Web #94 merged as `009055abee9de8791c156c0e8e35dcdfafe865ec`, fixing whitespace tokenization for multiple ARIA ID references. Both fixes are now in Web main.
+
+**HeapCare.Local PR #39** remains open on final head `855b6f4a19c6bb5cd56e5dfabb539ef35aa0fb65`. The fresh PR tooling run [#46086993790](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086993790) is underway, and the full-stack run [#46086998413](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086998413) is building the nine-service stack against Web `009055a` and API `92f0765`. The earlier run #46085930218 passed the cancellation API and UI journey plus PostgreSQL logical restore, but failed six accessibility cases due to the now-fixed locator order. Treat the integrated acceptance as complete only when #46086998413 passes the full real-Keycloak Authorization Code + PKCE suite on the exact head.
+
 
 No-show action/grace period, cancellation reason taxonomy, scheduling role mapping, check-in windows and retention remain pilot-hospital decisions. No clinical note or treatment data is part of these synthetic CI scenarios.
