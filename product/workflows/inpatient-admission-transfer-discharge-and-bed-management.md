@@ -1,6 +1,6 @@
 # IPD: Admission, Transfer, Discharge and Bed Management
 
-**Status:** Initial IPD ADT technical foundation is merged: admission creation/list/detail, bed assignment and same-hospital transfer. Hospital isolation, transfer concurrency, occupied-bed conflict handling and real-Keycloak negative authorization are verified. All IPD role grants remain closed; hospital policy, cancellation/discharge and the positive Web workflow are incomplete.  
+**Status:** Initial IPD ADT technical foundation is merged: admission creation/list/detail, bed assignment and same-hospital transfer. Hospital/Tenant/department read isolation, transfer concurrency, occupied-bed conflict handling, successful/denied bed-operation audit and real-Keycloak negative authorization are verified. All IPD role grants remain closed; hospital policy, cancellation/discharge and the positive Web workflow are incomplete.  
 **Related:** [ADR-018: Inpatient ADT and Bed-Management Boundaries](../../architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md), [ADR-006: Tenant, Organization and Patient Data Boundaries](../../architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md).
 
 ## Implementation checkpoint — 2026-11-28
@@ -116,11 +116,19 @@ Medication reconciliation, prescriptions, MAR, nursing notes, vitals/observation
 
 These are automated isolation, concurrency and negative-authorization proofs. They do not approve positive IPD role grants, admission/bed sequencing, cancellation/discharge or any broader clinical workflow.
 
+## Admission-detail, department-history and successful-audit verification — merged 2026-11-28
+
+- **Admission-detail isolation:** API PR #147 adds PostgreSQL-backed tests proving a Hospital-scoped member cannot read a sibling Hospital's admission detail, even when requesting the actual Hospital ID, and a Tenant-wide member in another Tenant cannot read the foreign admission. Both paths return non-disclosing 404 without an admission DTO. Merged as `031dfab96a6e7f98dc34fd613b36dade4809c004`; exact-head Release build/test, Docker Integration Verification and the additional build/test workflow passed.
+- **Department-level placement-history privacy:** API PR #149 creates an admission in Department A, transfers it to Department B under Hospital-scoped service access, then reads it with a Department B-only membership. The reader sees the current Department B placement but not the historical Department A movement. Merged as `8c9da9b48aac855f51f26a0be9f9c419b243185b`; exact-head Release build, EF model-drift guard, 12/12 unit tests, 253/253 PostgreSQL integration tests, Docker Integration Verification and additional build/test passed.
+- **Successful bed-operation audit transaction:** API PR #148 invokes the real metadata-only AuditEventMiddleware/service transaction with a synthetic, explicitly scoped test actor. It verifies successful first-bed assignment and same-Hospital transfer each commit the placement/history and audit event together, with validated Tenant/OIDC issuer/subject, endpoint action, IPD resource type, admission ID, route, successful outcome/status and correlation ID. Merged as `74c0a607e3fcb1f1cd4e983822bb690b6684b95c`; exact-head Release build, EF model-drift guard, 12/12 unit tests, 252/252 PostgreSQL integration tests, Docker Integration Verification and additional build/test passed. No role grant or HTTP authorization policy was added.
+- **Fresh Local current-main verification:** Local PR #48 merged as `668cee45f46d9313d968ad64b0385f43ae3c797d`. Full-stack run [#46116355864](https://github.com/HeapCare/HeapCare.Local/actions/runs/46116355864) passed with API SHA `39c40bb7ccdb899b23684b18595293c331a79078` (API main including PRs #143–#146), Web SHA `afb61cfbd77aab837ed65dcb30043519c27a5684` and Observability SHA `84bc2ec84de9a1378ac376491d6f6e38dfdcabb6`. It passed nine-service startup, IPD schema assertions, real-Keycloak negative authorization for all five tenant roles and platform-only PlatformOperator across all five IPD routes, OTel/Npgsql/Collector verification, PostgreSQL logical backup/restore of 28 tables with matching row counts, 11/11 Chromium OIDC tests, 6/6 Firefox and 6/6 Playwright WebKit authenticated accessibility tests, and cleanup. This is negative authorization and Linux CI evidence only, not positive clinical workflow approval or manual accessibility certification.
+
+These PRs add test coverage only. They do not change runtime business behavior, database schema/migrations, IPD permission grants or hospital policy. All six IPD permissions remain ungranted.
 ## Validation checklist
 
 - [x] Admission service only accepts a patient registered at the selected Hospital (API PR #139; authorization remains permission-gated).
 - [x] IPD bed transfer to a sibling Hospital or foreign Tenant returns a non-disclosing 404 and leaves the active placement unchanged (API PR #143).
-- [ ] Other cross-Tenant references return a non-disclosing not-found/denied result.
+- [x] Admission-detail reads across a sibling Hospital and across Tenants return non-disclosing 404 responses (API PR #147). Other cross-Tenant resource-reference paths remain separately gated and must be tested as those workflows are introduced.
 - [x] Hospital-scoped admission-list reads cannot access a sibling Hospital under the same Tenant; sibling requests return a non-disclosing 404 (API PR #141; PostgreSQL integration test).
 - [x] Hospital-scoped admission list supports pagination and department visibility by current placement; out-of-scope placement history is omitted (API PR #140; route remains permission-gated).
 - [x] Current tenant roles and platform-only PlatformOperator are denied all IPD HTTP routes with real Keycloak-issued tokens; API and Local tests preserve the fail-closed default (API PR #137; Local PR #46).
@@ -133,9 +141,10 @@ These are automated isolation, concurrency and negative-authorization proofs. Th
 - [ ] Discharge releases the bed and preserves historical placement data.
 - [x] Denied admission reads preserve validated tenant/actor attribution in metadata-only audit records (API PR #138).
 - [x] Successful admission creation records the created Admission ID rather than its parent Hospital ID as the audit resource (API PR #142).
-- [x] Denied admission read, bed assignment and bed transfer HTTP requests are verified for validated tenant/actor and metadata-only audit attribution (API PRs #138 and #146).
-- [ ] Successful admission, bed assignment and bed transfer audit events have complete positive-path actor/resource verification.
-- [x] PostgreSQL migration rehearsal passes on merged API increments, and Local real-Keycloak full-stack negative authorization verification passes (API PRs #139–#145; Local PR #46).
+- [x] Denied admission read, bed assignment and bed transfer HTTP requests are verified for validated Tenant/actor and metadata-only audit attribution (API PRs #138 and #146).
+- [x] Successful first-bed assignment and same-Hospital bed transfer commit their business placement changes with metadata-only audit events containing validated actor, Tenant, admission resource ID, route, outcome/status and correlation ID (API PR #148).
+- [x] Successful admission creation records the generated Admission ID as its audit resource (API PR #142); the full positive HTTP/OIDC admission workflow remains gated by approved role grants.
+- [x] PostgreSQL migration rehearsal passed for schema-bearing IPD increments. Local real-Keycloak full-stack negative authorization passed and was re-run in Local PR #48 against API main after API PRs #143–#146; five current IPD routes remain denied for all persisted tenant roles and platform-only PlatformOperator.
 
 ## Open policy decisions
 
