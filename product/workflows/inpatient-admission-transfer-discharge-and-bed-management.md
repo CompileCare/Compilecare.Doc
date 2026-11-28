@@ -111,6 +111,7 @@ Medication reconciliation, prescriptions, MAR, nursing notes, vitals/observation
 - **Concurrent transfer conflict:** API PR #144 synchronizes two transfers from the same active placement using a test-only PostgreSQL trigger. Exactly one succeeds, the competing request returns 409, and the final history contains one closed original placement plus one active destination. The test trigger/function are removed in `finally`. Merged as `c718f0ccd8816158d6740faef5a27656da89dc0a`.
 - **Occupied destination bed conflict:** API PR #145 seeds two active admissions in the same Hospital with separate occupied beds and attempts to transfer the first admission into the second patient's bed. The service returns 409 and both original active placements remain unchanged. Merged as `b7663ee29f231c55f4775b7a473af71eb05bc80b`; exact-head validation passed Release build, model-drift guard, 12/12 unit tests, 249/249 PostgreSQL integration tests, PostgreSQL migration rehearsal and Docker Integration Verification.
 - **Validation:** both PRs passed 12/12 unit tests and 247/247 PostgreSQL integration tests, Release build, EF model-drift guard, PostgreSQL migration rehearsal and Docker Integration Verification.
+- **Denied bed-operation audit attribution:** API PR #146 adds a PostgreSQL-backed HTTP regression for denied bed assignment and bed transfer. It verifies 403 responses, validated tenant and OIDC actor attribution, action/route/admission resource metadata, denied outcome/status/correlation IDs and no placement side effects. Merged as `39c40bb7ccdb899b23684b18595293c331a79078`; exact-head Release build, 12/12 unit tests, 249/249 PostgreSQL integration tests, the additional API build/test and Docker Integration Verification passed.
 - **Real-Keycloak negative authorization:** Local PR #46 is merged. Its exact-head full-stack run [#46114200037](https://github.com/HeapCare/HeapCare.Local/actions/runs/46114200037) denied every IPD route for all five persisted tenant roles and platform-only PlatformOperator while also passing nine-service startup, PostgreSQL logical backup/restore, Chromium PKCE and Firefox/WebKit six-role accessibility baseline. Existing IPD permissions remain ungranted. API PR #137's PostgreSQL suite separately covers a PlatformOperator who also has a tenant FacilityViewer membership.
 
 These are automated isolation, concurrency and negative-authorization proofs. They do not approve positive IPD role grants, admission/bed sequencing, cancellation/discharge or any broader clinical workflow.
@@ -132,8 +133,9 @@ These are automated isolation, concurrency and negative-authorization proofs. Th
 - [ ] Discharge releases the bed and preserves historical placement data.
 - [x] Denied admission reads preserve validated tenant/actor attribution in metadata-only audit records (API PR #138).
 - [x] Successful admission creation records the created Admission ID rather than its parent Hospital ID as the audit resource (API PR #142).
-- [ ] Audit records for all remaining IPD reads/mutations are verified for validated actor attribution without patient/clinical content.
-- [x] PostgreSQL migration rehearsal passes on merged API increments, and Local real-Keycloak full-stack negative authorization verification passes (API PRs #139–#144; Local PR #46).
+- [x] Denied admission read, bed assignment and bed transfer HTTP requests are verified for validated tenant/actor and metadata-only audit attribution (API PRs #138 and #146).
+- [ ] Successful admission, bed assignment and bed transfer audit events have complete positive-path actor/resource verification.
+- [x] PostgreSQL migration rehearsal passes on merged API increments, and Local real-Keycloak full-stack negative authorization verification passes (API PRs #139–#145; Local PR #46).
 
 ## Open policy decisions
 
