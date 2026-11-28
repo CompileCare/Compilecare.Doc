@@ -4,6 +4,13 @@
 
 HeapCare is a hospital and healthcare information/management platform. This roadmap contains only hospital-system capabilities. The [Product Blueprint v1](blueprint-v1.md) is the source for product scope and patient workflows.
 
+## Product execution decisions — 2026-11-28
+
+- **Local-first delivery:** finish local development, local full-stack integration and the prioritised web/product backlog before selecting production hosting, identity provider, region, paid services or production recovery architecture. Production deployment and provider-native backup/PITR remain future release gates; see [deferred production readiness](../operations/heapcare-production-cutover-inventory-2026-11-28.md) and HeapCare.Doc issue #197.
+- **Custom domain:** do not purchase or configure a custom domain during current feature development. Revisit domain/DNS/TLS together with the production deployment decision after the product and currently deprioritised backlog are complete.
+- **Mobile and OTP:** the current delivery is web-first. Mobile application planning and OTP login are deferred until the web version is complete. Do not add mock OTP flows or treat the current OTP service scaffold as production-ready. Before any mobile OTP implementation, complete its credential-rotation/revocation and security, provider, key-management, abuse-control, privacy and tenant/patient binding gates.
+- **Accessibility acceptance:** manual sign-off is tracked in HeapCare.Doc issue #201. The agreed combinations are Windows 11 + Chrome + NVDA; Windows 11 + Firefox + NVDA; Windows 11 + Edge + JAWS; macOS + Safari + VoiceOver; macOS + Chrome + VoiceOver; and Ubuntu Linux + Firefox keyboard-only. Brave receives a separate Chromium-family smoke check. Target WCAG 2.2 Level AA. Automated browser checks are supporting regression evidence, not manual AT or conformance sign-off.
+
 ## Phase 1 — Backend foundation
 
 **Status: Completed and merged**
