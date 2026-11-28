@@ -1,7 +1,22 @@
 # IPD: Admission, Transfer, Discharge and Bed Management
 
-**Status:** Initial ADT scope accepted; detailed hospital policy remains under review.  
+**Status:** Initial ADT scope accepted; admission creation, admission read and bed placement/transfer technical increments are merged. Detailed hospital policy and role grants remain under review.  
 **Related:** [ADR-018: Inpatient ADT and Bed-Management Boundaries](../../architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md), [ADR-006: Tenant, Organization and Patient Data Boundaries](../../architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md).
+
+## Implementation checkpoint — 2026-11-28
+
+The following technical slices are merged to `HeapCare.Api/main`:
+
+- **Persistence:** PR #134 adds tenant-owned inpatient admissions and bed-placement history with hospital registration constraints, same-hospital facility relationships and filtered uniqueness for active admissions/placements/bed occupancy.
+- **History and contracts:** PR #135 adds physical-delete guards and dedicated, ungranted IPD permission names.
+- **Bed service:** PR #136 implements admission read, first-bed assignment and same-hospital transfer with retained placement history, department scope checks and PostgreSQL concurrency protection.
+- **HTTP read/placement routes:** PR #137 exposes admission read, bed assignment and transfer behind dedicated permissions. Existing roles remain denied.
+- **Denied-read audit evidence:** PR #138 verifies that a denied IPD read records the validated Tenant and OIDC actor with outcome, resource ID and correlation metadata.
+- **Admission creation:** PR #139 adds `POST /api/v1/hospitals/{hospitalId}/ipd/admissions`. The service requires an existing patient registration at the exact Hospital and tenant-wide or hospital-wide scope, creates an Active episode with a server-generated UTC timestamp and no bed placement, and returns a conflict for duplicate/concurrent active admissions.
+
+PR #139 exact-head validation passed: 12 unit tests, 240 PostgreSQL integration tests, Release build, EF Core model-drift guard, PostgreSQL migration rehearsal and Docker Integration Verification.
+
+**Access remains closed by default:** no tenant role or PlatformOperator has been granted IPD permissions. The six-role positive/negative permission mapping and hospital workflow approval remain open. These merged technical increments do not establish that admission-before-bed-assignment is the final hospital policy; that workflow decision remains subject to hospital review.
 
 ## Purpose
 
@@ -84,7 +99,7 @@ Medication reconciliation, prescriptions, MAR, nursing notes, vitals/observation
 
 ## Validation checklist
 
-- [ ] Admission only accepts a patient registered at the selected Hospital.
+- [x] Admission service only accepts a patient registered at the selected Hospital (API PR #139; authorization remains permission-gated).
 - [ ] Cross-Tenant and cross-Hospital references return a non-disclosing not-found/denied result.
 - [ ] Unauthorized roles cannot read or mutate IPD resources.
 - [ ] An inactive or occupied bed cannot receive a new active placement.
