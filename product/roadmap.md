@@ -1,6 +1,6 @@
 # HeapCare Delivery Roadmap
 
-**Status:** Working product-first delivery plan, updated 2026-11-27. Phase 5 includes a formal enterprise experience uplift, tracked separately from feature delivery. The 2026-11-25 local full-stack acceptance run is recorded in [Local stack acceptance](qa/local-stack-acceptance-2026-11-25.md). This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
+**Status:** Working product-first delivery plan, updated 2026-11-28. Phase 5 includes a formal enterprise experience uplift, tracked separately from feature delivery. The 2026-11-25 local full-stack acceptance run is recorded in [Local stack acceptance](qa/local-stack-acceptance-2026-11-25.md). This is a milestone order, not a calendar promise. Exit criteria must pass before a phase is called complete.
 
 HeapCare is a hospital and healthcare information/management platform. This roadmap contains only hospital-system capabilities. The [Product Blueprint v1](blueprint-v1.md) is the source for product scope and patient workflows.
 
