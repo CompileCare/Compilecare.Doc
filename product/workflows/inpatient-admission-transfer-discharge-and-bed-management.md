@@ -1,7 +1,7 @@
 # IPD: Admission, Transfer, Discharge and Bed Management
 
-**Status:** Initial IPD ADT technical foundation is merged: admission creation/list/detail, bed assignment and same-hospital transfer. Hospital/Tenant/department read isolation, transfer concurrency, occupied-bed conflict handling, successful/denied bed-operation audit, audit-failure rollback and real-Keycloak negative authorization are verified. All IPD role grants remain closed; hospital policy, cancellation/discharge and the positive Web workflow are incomplete.  
-**Related:** [ADR-018: Inpatient ADT and Bed-Management Boundaries](../../architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md), [ADR-006: Tenant, Organization and Patient Data Boundaries](../../architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md).
+**Status:** Initial IPD ADT technical foundation is merged: admission creation/list/detail, bed assignment and same-hospital transfer. Hospital/Tenant/department isolation, transfer concurrency, occupied-bed conflict handling, and successful/denied/audit-failure evidence for bed operations and admission creation are verified. Real-Keycloak negative authorization is verified. All IPD role grants remain closed; hospital policy, cancellation/discharge and positive Web workflow are incomplete.  
+**Related:** [ADR-018: Inpatient ADT and Bed-Management Boundaries](../../architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md), [ADR-006: Tenant, Organization and Patient Data Boundaries](../../architecture/decisions/ADR-006-tenant-organization-patient-boundaries.md), [IPD Hospital Policy Decision Worksheet](ipd-hospital-policy-decision-worksheet.md).
 
 ## Implementation checkpoint — 2026-11-28
 
@@ -134,6 +134,21 @@ API PR #150 adds PostgreSQL failure-injection regressions against the real `Audi
 PR #150 merged as `4b07eb11c5063288751e1e8a507ce9dc31aafda3`. Exact-head validation passed Release build, EF model-drift guard, 12/12 unit tests, 257/257 PostgreSQL integration tests, Docker Integration Verification and the additional build/test workflow.
 
 This completes regression coverage for both successful and failed IPD bed-operation audit transactions. It does not grant any IPD role permission or change runtime workflow policy.
+## Admission audit transaction proof — merged 2026-11-28
+
+HeapCare.Api PR #151 is merged as \`e28f408e0b576afc8c49f8c20c85772be28d6242\`.
+
+Two PostgreSQL integration tests exercise the real metadata-only AuditEventMiddleware transaction:
+- Successful admission creation commits the new inpatient admission and audit event together. The audit record identifies the generated Admission ID as its resource (not the Patient ID or parent Hospital ID), and records the validated Tenant, OIDC issuer/subject, endpoint action, IPD resource type, route, status/outcome and correlation ID.
+- When the audit-event insert fails after the service has created the admission, the middleware returns HTTP 503 and rolls back the admission. No audit event, placement or partial admission remains.
+
+Exact-head validation passed on PR head \`0c2d3fe84a678cd1ae586a0465433224bf873630\`:
+- 12/12 unit tests.
+- 259/259 PostgreSQL integration tests.
+- Release build and EF model-drift guard in both build/test workflows.
+- Docker Integration Verification.
+- The change is test-only: no runtime behavior, schema, migration, role grant or hospital policy was changed.
+
 ## Validation checklist
 
 - [x] Admission service only accepts a patient registered at the selected Hospital (API PR #139; authorization remains permission-gated).
@@ -154,6 +169,7 @@ This completes regression coverage for both successful and failed IPD bed-operat
 - [x] Denied admission read, bed assignment and bed transfer HTTP requests are verified for validated Tenant/actor and metadata-only audit attribution (API PRs #138 and #146).
 - [x] Successful first-bed assignment and same-Hospital bed transfer commit their business placement changes with metadata-only audit events containing validated actor, Tenant, admission resource ID, route, outcome/status and correlation ID (API PR #148).
 - [x] If audit persistence fails during bed assignment, the request returns 503 and leaves no placement; if audit persistence fails during transfer, the original active placement and history remain unchanged (API PR #150).
+- [x] Successful admission creation commits the admission and audit event together; audit persistence failure returns 503 and rolls back the admission (API PR #151).
 - [x] Successful admission creation records the generated Admission ID as its audit resource (API PR #142); the full positive HTTP/OIDC admission workflow remains gated by approved role grants.
 - [x] PostgreSQL migration rehearsal passed for schema-bearing IPD increments. Local real-Keycloak full-stack negative authorization passed and was re-run in Local PR #48 against API main after API PRs #143–#146; five current IPD routes remain denied for all persisted tenant roles and platform-only PlatformOperator.
 
