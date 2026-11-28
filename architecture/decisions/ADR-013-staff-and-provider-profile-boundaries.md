@@ -1,6 +1,6 @@
 # ADR-013: Staff and provider profile boundaries
 
-- **Status:** Proposed for implementation
+- **Status:** Accepted for the initial profile/assignment slice; operationalized in API/Web; production hospital validation pending
 - **Date:** 2026-11-24
 - **Decision owners:** Product and engineering; hospital operations and clinical stakeholders must validate the workflow before production use
 
@@ -66,3 +66,16 @@ The design avoids conflating an employee record with an account or permission gr
 - [Verified patient contact data](ADR-012-verified-patient-contact-data-and-matching.md)
 - [Product blueprint](../../product/blueprint-v1.md)
 - [Delivery roadmap](../../product/roadmap.md)
+
+## Implementation record — 2026-11-28
+
+The initial scope above is implemented in HeapCare.Api and HeapCare.Web:
+
+- API endpoints: `POST/GET /api/v1/staff`, `GET/PUT /api/v1/staff/{staffId}`, profile deactivate/reactivate, assignment create and assignment end-date.
+- Distinct persisted grants: `staff.read` and `staff.manage`.
+- Tenant-aware profile/assignment queries, hospital/department scope enforcement, bounded paging, duplicate staff-code protection and effective-dated assignment history.
+- API integration tests cover HospitalAdmin management, department scope, explicit denials for roles without grants, cross-tenant isolation and denied-access audit records.
+- Web workspace and component tests cover staff-directory search/display, initial profile/assignment creation and confirmation before deactivation.
+
+This implementation does not include login/account provisioning, profile-to-membership linking, credential verification, licensing, privileging, payroll, roster, HR records or cross-tenant sharing. The hospital/clinical decision owners must validate the operational fields, role mapping and assignment rules before production activation.
+
