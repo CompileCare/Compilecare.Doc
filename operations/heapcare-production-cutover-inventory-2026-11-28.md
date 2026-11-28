@@ -64,7 +64,7 @@ The tracked `.env.example` files contain variable names and placeholders only. T
 | Preferred non-development key | `ConnectionStrings:HeapCare` | Use this key for new deployment configuration |
 | Legacy fallback key | `ConnectionStrings:CompileCare` | Compatibility fallback; do not remove without consumer/configuration audit |
 | Non-development TLS policy | PostgreSQL connection must use `SSL Mode=VerifyFull` | Enforced by API startup validation |
-| CI migration databases | `compilecare_upgrade` and `compilecare_fresh` | Disposable PostgreSQL 16 migration-rehearsal databases only |
+| CI migration databases | `heapcare_upgrade` and `heapcare_fresh` | Disposable PostgreSQL 16 migration-rehearsal databases only |
 
 The API connection-security validator skips Development and Testing. Outside those environments it requires either the HeapCare connection-string key or the legacy fallback, validates the connection string without logging it, and rejects any TLS mode other than `VerifyFull`.
 
