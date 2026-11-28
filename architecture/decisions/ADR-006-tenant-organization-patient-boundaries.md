@@ -8,7 +8,7 @@
 
 ## Context
 
-CompileCare must support both a single-hospital customer and customers operating multiple hospitals or branches. The current API has a tenant identifier and facility hierarchy, but the customer/group/hospital relationship and patient-sharing rules are not fully defined. These choices affect keys, uniqueness, relationships, authorization, patient search, audit, migration and future deployment.
+HeapCare must support both a single-hospital customer and customers operating multiple hospitals or branches. The current API has a tenant identifier and facility hierarchy, but the customer/group/hospital relationship and patient-sharing rules are not fully defined. These choices affect keys, uniqueness, relationships, authorization, patient search, audit, migration and future deployment.
 
 ## Proposed decision
 
@@ -22,7 +22,7 @@ CompileCare must support both a single-hospital customer and customers operating
 
 ### Identity and authorization
 - Authentication establishes the external principal through validated issuer and subject.
-- Tenant membership binds the principal to a tenant and a CompileCare-controlled role/status.
+- Tenant membership binds the principal to a tenant and a HeapCare-controlled role/status.
 - Additional scope grants constrain access to hospitals, branches, departments, services or resources.
 - Tenant-wide membership does not imply unrestricted access to every patient record.
 - Platform operators use a separate trusted identity/policy; tenant roles never grant platform administration.
