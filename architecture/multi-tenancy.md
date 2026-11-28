@@ -11,7 +11,7 @@ Tenant is the data-isolation boundary. Access may be scoped further to tenant, h
 - Tenant-scoped facility and platform-context routes require authentication through OIDC-compatible JWT Bearer validation.
 - The API validates the token and binds the external principal using the validated issuer and `sub`.
 - `X-Tenant-ID` is a tenant selector only. The API requires exactly one valid GUID and verifies an active membership matching `(issuer, subject, tenantId)` in PostgreSQL before setting request tenant context.
-- Facility authorization is derived from the membership role stored in CompileCare, not from tenant or permission claims supplied by the caller.
+- Facility authorization is derived from the membership role stored in HeapCare, not from tenant or permission claims supplied by the caller.
 - Current facility roles: `HospitalAdmin`, `FacilityManager`, `FacilityViewer`.
 - Tenant-aware query filters, keys, indexes and composite hierarchy relationships support persistence isolation.
 
