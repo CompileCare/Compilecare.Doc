@@ -52,7 +52,7 @@ For every capability above, maintain positive and negative integration coverage 
 
 1. No bearer token, invalid signature, wrong issuer, wrong audience, expired token and missing subject.
 2. No tenant header, malformed/multiple tenant headers, inactive tenant and no matching membership.
-3. Each supported persisted role with only its intended permission set; a token forged with extra CompileCare role/permission claims must not change the outcome.
+3. Each supported persisted role with only its intended permission set; a token forged with extra legacy role/permission claims must not change the outcome.
 4. Tenant-wide, hospital-scoped and department-scoped memberships, including cross-tenant, cross-hospital and same-hospital cross-department resource IDs.
 5. Read versus create/update versus delete; draft versus sign versus amend; invoice read versus invoice create versus payment recording; audit query versus export.
 6. Denied requests must not mutate business state. Sensitive denied operations must emit the approved metadata-only denial audit event where the route is configured to do so.
