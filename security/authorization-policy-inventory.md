@@ -5,7 +5,7 @@
 
 ## Source of truth and trust model
 
-The API defines named authorization policies in `src/HeapCare.Api/Security/AuthorizationPolicies.cs`. Tenant permission policies require an authenticated principal and a permission claim on the dedicated `CompileCareTenantMembership` identity. The API creates that identity after resolving the validated OIDC issuer/subject against an active persisted tenant membership and deriving permissions from the persisted role. Token-supplied role and permission claims are not the source of authorization.
+The API defines named authorization policies in `src/HeapCare.Api/Security/AuthorizationPolicies.cs`. Tenant permission policies require an authenticated principal and a permission claim on the dedicated `HeapCareTenantMembership` identity. The API creates that identity after resolving the validated OIDC issuer/subject against an active persisted tenant membership and deriving permissions from the persisted role. Token-supplied role and permission claims are not the source of authorization.
 
 Every tenant-scoped route group must retain its tenant-scoped endpoint metadata and authenticated requirement. Individual operations then apply the narrow policy listed below. Platform-operator operations use separate platform-operator metadata and policy. The `X-Tenant-ID` header selects context; it never grants access.
 
