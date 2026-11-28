@@ -1028,3 +1028,32 @@ Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run 
 - The integrated run completed 11 real-OIDC browser tests, including the six persisted-role workspace checks and the clinical, registration, appointment and billing journeys.
 - Exact cross-repository heads for run #46050151054: API `745085912684d54a2c2f6ca830ade712d76d9e63`, Web `baab2966baeafd8f07e94bf45ab02f8ef3ecc1e9`, Observability `1a06382e4eeed3e0070a0def2b89b8d11512dd52`.
 - All clinical note values in this added test were explicitly synthetic CI placeholders in an ephemeral database. No real patient history, examination findings, diagnosis, treatment or care plan was used; this does not authorize production clinical use.
+
+
+---
+
+## Appointment cancellation and lifecycle concurrency — 2026-11-28
+
+### Merged API behavior
+
+- **HeapCare.Api PR #125** merged as `92f0765e42feca47508bd46518ac41521123318f`. Check-in, cancellation and rescheduling use the same PostgreSQL transaction-scoped advisory lock keyed by tenant, hospital and appointment. Each request verifies its scope first, then locks and rereads the appointment before making a lifecycle decision.
+- A booked appointment can be cancelled by an authorized `appointment.manage` user. Once a queue entry exists, cancellation is rejected with HTTP 409; the appointment remains Booked and the existing queue row is preserved.
+- Repeated cancellation, check-in after cancellation and reschedule after cancellation are rejected with HTTP 409. Authorization denials remain 403 and audit as `Denied`; rejected business transitions audit as `Rejected`.
+- PostgreSQL integration coverage races cancellation against first check-in and permits only two consistent outcomes: cancellation wins, leaving Cancelled with no queue entry; or check-in wins, leaving Booked with exactly one appointment-linked queue entry. Release build, xUnit analyzers, EF model-drift, integration suite, migration rehearsal and Docker/PostgreSQL checks passed on the exact API PR head.
+
+### Merged Web behavior
+
+- **HeapCare.Web PR #91** merged as `254521e578bff33b4ba0d6198b9601f2f1ed0496`. The appointment-management workspace handles HTTP 409 by returning the UI to the first cancellation-confirmation step, preserving the Booked status and displaying actionable refresh guidance. It does not optimistically mark the appointment Cancelled.
+- Its real-Keycloak PatientRegistrar browser journey loads a separate synthetic appointment, confirms cancellation through the workspace, verifies HTTP 200 and the refreshed Cancelled state, and checks the appointment list uses a patient reference rather than exposing the synthetic family name.
+
+### Current integrated acceptance status
+
+- **HeapCare.Local PR #39** is open on final head `855b6f4a19c6bb5cd56e5dfabb539ef35aa0fb65`. The fresh exact-head PR run [#46086993790](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086993790) is running Local tooling validation; the push-triggered full-stack run [#46086998413](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086998413) is building the nine-service stack. Both target Web main `009055abee9de8791c156c0e8e35dcdfafe865ec` and API main `92f0765e42feca47508bd46518ac41521123318f`.
+- The previous Local run #46085930218 passed nine-service startup, persisted-role API cancellation checks, PostgreSQL logical restore and the PatientRegistrar cancellation browser scenario, but six semantic-accessibility role cases failed due to the main-locator temporal dead zone. That locator-order issue is fixed in merged **Web #92**.
+- Merged **Web #94** corrects the ARIA IDREF assertion to split multiple `aria-labelledby`/`aria-describedby` IDs on actual whitespace. Web PR and push pipelines passed unit/build, Chromium E2E, real-OIDC suite discovery and Docker/CSP smoke. Both fixes are now in Web main `009055a`.
+- Do not merge Local #39 or call the integrated cancellation/accessibility acceptance complete until the fresh full-stack run #46086998413 passes the persisted-role API step, PostgreSQL logical restore and all real Keycloak Authorization Code + PKCE browser tests on the exact head above.
+- The latest merged production cutover inventory is **Docs #185**, merged as `7d0f683c2172926f7a55238c7128431bdedec480`. It preserves the boundary between local compatibility identifiers and unknown production identity/database/domain/backup infrastructure.
+
+### Owner-dependent policy boundary
+
+No-show action, grace period, cancellation reason taxonomy, scheduling role mapping, hospital check-in policy and retention still require pilot-hospital approval. The CI workflow uses synthetic users and appointments only; it does not authorize live clinical use.
