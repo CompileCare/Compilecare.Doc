@@ -1,12 +1,12 @@
 # Persisted tenant role-to-permission matrix
 
-**Status:** Source-derived implementation snapshot, reviewed 2026-11-27.  
+**Status:** Source-derived implementation snapshot, reviewed 2026-11-28.  
 **Source of truth for this snapshot:** `HeapCare.Api/src/HeapCare.Api/Security/TenantRolePermissions.cs` and `HeapCare.Api/src/HeapCare.Api/Middleware/TenantContextMiddleware.cs`.  
 **Important:** This records what the current API implementation grants. It is not, by itself, product-owner approval of the intended job responsibilities, a clinical privilege model, or proof that every endpoint and resource scope is correctly enforced.
 
 ## Trust and evaluation model
 
-For a tenant-scoped request, the API validates the OIDC token, then resolves the validated issuer and subject against an active persisted membership in the selected active tenant. The persisted role is passed to the role-to-permission resolver. The API removes caller-supplied reserved role/permission claims and creates a dedicated `CompileCareTenantMembership` identity containing the derived permission claims. Authorization policies accept permissions only from that dedicated identity.
+For a tenant-scoped request, the API validates the OIDC token, then resolves the validated issuer and subject against an active persisted membership in the selected active tenant. The persisted role is passed to the role-to-permission resolver. The API removes caller-supplied reserved role/permission claims and creates a dedicated `HeapCareTenantMembership` identity containing the derived permission claims. Authorization policies accept permissions only from that dedicated identity.
 
 The `X-Tenant-ID` header selects tenant context; it does not grant access. Hospital and department scopes are separately enforced through organization-scope context and service/persistence checks.
 
