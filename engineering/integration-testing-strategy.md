@@ -68,7 +68,7 @@ A PR must restore, build, run unit tests, run API/client integration tests, vali
 
 ## 6. Browser end-to-end tests
 
-The authenticated web application uses Playwright with Chromium. The suite lives in `CompileCare.Web/e2e` and is run in CI through `npm run test:e2e` after installing the pinned browser runtime.
+The authenticated web application uses Playwright with Chromium. The suite lives in `HeapCare.Web/e2e` and is run in CI through `npm run test:e2e` after installing the pinned browser runtime.
 
 Current browser coverage includes:
 - Billing workspace navigation is hidden when the selected membership has no billing permission.
