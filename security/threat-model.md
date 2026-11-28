@@ -1,8 +1,8 @@
-# CompileCare initial application threat model
+# HeapCare initial application threat model
 
 **Status:** Initial engineering threat model — 2026-11-26  
 **Owners:** Engineering, product and security; independent security/privacy/legal review remains required  
-**Scope:** Current CompileCare hospital workspace and API: React/TypeScript browser client, OIDC identity provider, .NET API, PostgreSQL persistence, audit pipeline, OpenTelemetry pipeline, local Docker Compose environment and GitHub Actions/package supply chain.
+**Scope:** Current HeapCare hospital workspace and API: React/TypeScript browser client, OIDC identity provider, .NET API, PostgreSQL persistence, audit pipeline, OpenTelemetry pipeline, local Docker Compose environment and GitHub Actions/package supply chain.
 
 This document records the current trust boundaries, material threats, implemented safeguards and unresolved risks. It is a working engineering baseline, not a formal risk acceptance, penetration-test report, privacy impact assessment or compliance certification. Threat likelihood and impact must be re-evaluated with the pilot hospital, hosting provider and qualified reviewers.
 
@@ -33,7 +33,7 @@ This document records the current trust boundaries, material threats, implemente
 
 ## 2. Trust boundaries
 
-- **TB-1 — User device/browser:** outside CompileCare's control. Browser extensions, local malware, XSS and compromised dependencies can access browser-held state.
+- **TB-1 — User device/browser:** outside HeapCare's control. Browser extensions, local malware, XSS and compromised dependencies can access browser-held state.
 - **TB-2 — Browser to identity provider:** OIDC redirect/token exchange. Issuer and signing-key trust must be pinned to the configured authority and validated by the API.
 - **TB-3 — Browser to API:** bearer-token and tenant-context boundary. Client-supplied IDs, headers and UI permission visibility are untrusted inputs.
 - **TB-4 — API to PostgreSQL:** trusted service identity boundary. Tenant predicates, foreign keys, uniqueness and transaction behavior must be enforced server-side.
@@ -48,7 +48,7 @@ These controls are present in the current code or verified hosted workflows; the
 - OIDC JWT validation requires signed tokens, validates issuer, audience, lifetime, signing key and a single non-empty subject. HTTP identity metadata is permitted only in Development with explicit opt-in.
 - The API derives the issuer from the validated security token. Authentication-failure logs intentionally do not include token contents.
 - Tenant-scoped requests require exactly one non-empty tenant GUID header, then an active persisted membership matching validated issuer, subject and tenant. A missing membership or missing organization scope is denied.
-- Token-supplied CompileCare role/permission claims are removed before the API adds server-derived claims from the persisted membership role. UI feature gating is not the authorization boundary. The source-derived policy-to-endpoint inventory is maintained in [API authorization policy inventory](authorization-policy-inventory.md); it is a review aid, not proof of the role-to-permission matrix.
+- Token-supplied legacy role/permission claims are removed before the API adds server-derived claims from the persisted membership role. UI feature gating is not the authorization boundary. The source-derived policy-to-endpoint inventory is maintained in [API authorization policy inventory](authorization-policy-inventory.md); it is a review aid, not proof of the role-to-permission matrix.
 - Tenant-aware persistence includes query filters, tenant-aware relationships/uniqueness and restrictive delete behavior; cross-tenant, cross-hospital and cross-department tests cover patient, identifier, appointment, queue, OPD, billing and staff workflows.
 - Audit records are metadata-only and append-only. Successful business writes and their audit event share a transaction; failure to persist the success audit rolls back the business operation. Endpoint registration tests require audit metadata on authenticated routes.
 - Audit listing/export is bounded to validated tenant-wide membership scope. Hospital/department-scoped memberships are denied. Query/export bounds are 90 days/100 rows and 31 days/5,000 rows respectively; CSV formula/control-character values are neutralized and export requests are audited.
