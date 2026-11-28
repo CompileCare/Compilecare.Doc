@@ -1,6 +1,6 @@
 # Staff and provider management workflow
 
-**Status:** Proposed workflow for hospital-user validation  
+**Status:** Initial tenant-scoped staff-profile and facility-assignment slice implemented in HeapCare.Api and HeapCare.Web; hospital-user validation remains required before production use.  
 **Related decision:** [ADR-013 — Staff and provider profile boundaries](../../architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md)
 
 ## Purpose
@@ -20,6 +20,19 @@ Maintain the workforce profiles and facility assignments needed to operate a hos
 - The acting user has a validated OIDC identity and active tenant membership.
 - The acting membership has the required staff-management permission in the relevant organization scope.
 - A staff profile is tenant-owned; any membership link references an existing membership in the same tenant.
+
+## Implementation status — 2026-11-28
+
+The initial staff-profile and assignment slice is implemented on the current API and authenticated Web workspace.
+
+- API routes under `/api/v1/staff` support create, bounded/paged list, get by ID, update, deactivate, reactivate, add hospital/department assignment and end-date assignment.
+- API authorization uses separate persisted `staff.read` and `staff.manage` grants. Tenant filters and organization-scope checks apply to profile and assignment reads/writes; department-scoped operators cannot create hospital-wide assignments outside their scope.
+- The current API integration suite covers HospitalAdmin CRUD and effective-dated assignment lifecycle, duplicate staff-code rejection, department scope, explicit role-denial behavior for FacilityManager/FacilityViewer/PatientRegistrar/ClinicalUser, cross-tenant isolation and department-scoped enumeration/mutation denial. Denied attempts are asserted in the audit store.
+- The authenticated Web workspace supports staff search, create with initial assignment, edit, deactivate/reactivate with confirmation, add assignment and end assignment. Component tests cover profile creation and confirmation before deactivation.
+- Provider designation remains descriptive operational metadata only. The code does not verify professional credentials, licence, registration, clinical privileges or scope of practice.
+- Staff profiles are not linked to OIDC identities or tenant memberships. Creating a staff record never grants login or application access.
+
+**Still requires hospital/pilot validation:** minimum workforce fields, naming/staff-code conventions, concurrent assignment policy, role delegation, retention, local employment-data requirements, staff directory visibility, and confirmation that the initial operational workflow matches hospital practice. Any future account/profile linking, credential verification and privileging need separate evidence-backed designs.
 
 ## Main workflow
 

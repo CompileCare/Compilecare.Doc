@@ -1,6 +1,6 @@
 # Workflow: reception and clinical workspace UX foundation
 
-**Status:** Reception, appointment/arrival, queue, OPD clinical and initial billing workspaces are implemented and merged. Browser-level billing recovery, full walk-in-to-billing journey, appointment booking/check-in and successful OIDC silent-renewal coverage are merged. Availability-conflict recovery and failed-renewal warning are implemented and covered; actual expired-session re-authentication and accessibility review are next. Staff/provider administration remains gated on hospital-user validation.  
+**Status:** Reception, appointment/arrival, queue, OPD clinical and initial billing workspaces are implemented and merged. Browser-level billing recovery, full walk-in-to-billing journey, appointment booking/check-in and successful OIDC silent-renewal coverage are merged. Availability-conflict recovery and failed-renewal warning are implemented and covered; actual expired-session re-authentication and manual accessibility review remain open. The initial staff/provider profile and assignment workspace is implemented; hospital validation remains required before production use.  
 **Phase:** 5 — User experience  
 **Related workflows:** [Patient registration](patient-registration.md), [Appointments and queue](appointments-and-queue.md), [OPD encounter and clinical documentation](opd-encounter-and-clinical-documentation.md)  
 **Related architecture:** [ADR-005 — Frontend architecture](../../architecture/decisions/ADR-005-frontend-architecture.md)
@@ -184,7 +184,22 @@ Each increment should be a small vertical slice with tests and documentation upd
 These questions do not block an initial shell and API-backed patient lookup, but they must be resolved before exposing role-sensitive or clinical workflows to pilot users.
 
 
-## Implementation status — 2026-11-24
+## Current workspace implementation checkpoint — 2026-11-28
+
+The earlier 2026-11-24 paragraphs below record the sequence at that date and are not the current delivery status. The following core workflows are now implemented in the authenticated `HeapCare.Web` workspace and paired API:
+
+- Reception: patient search/registration, hospital-local MRN and duplicate review.
+- Appointment and queue: published availability, booking, walk-in, check-in, department queue and lifecycle conflict recovery.
+- Clinical: OPD encounter and clinical-note draft/sign/amendment workflow with role/scope enforcement.
+- Billing: initial OPD invoice, payment, history and receipt retrieval/recovery.
+- Staff/provider: tenant-scoped staff profiles, effective-dated hospital/department assignments, bounded directory search, update/deactivate/reactivate, and separate `staff.read` / `staff.manage` authorization.
+- Tenant administration: scoped membership administration and separate PlatformOperator tenant lifecycle workspace.
+
+Exact integrated Local CI [#46086998413](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086998413) passed nine-service startup, the real-Keycloak persisted-role API workflows, 11/11 real Authorization Code + PKCE browser tests (including six authenticated-role accessibility-baseline checks), and isolated PostgreSQL logical restore with matching row counts across 26 application tables.
+
+**Not thereby accepted:** manual keyboard-only task completion, screen-reader testing, focus/dialog review, contrast, 200%/400% zoom and responsive reflow, macOS/Windows developer-machine usability, clinical workflow policy approval and hospital pilot sign-off remain separate acceptance tasks. Automated CI is not a WCAG 2.2 AA conformance claim. Staff/provider metadata is not credential verification or clinical privileging; profile-to-login linking remains out of scope.
+
+## Implementation status — 2026-11-24 (historical checkpoint)
 
 The authenticated shell, tenant/hospital context and patient lookup are merged in `HeapCare.Web` PRs #1 and #2. Patient registration, duplicate-candidate review and hospital-local MRN assignment are merged in Web PR #3. Its paired documentation update is merged in `HeapCare.Doc` PR #30.
 
