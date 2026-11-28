@@ -1,4 +1,4 @@
-# CompileCare UI screenshot evidence
+# HeapCare UI screenshot evidence
 
 ## Purpose
 
@@ -6,8 +6,8 @@ Keep product documentation aligned with the real authenticated hospital workspac
 
 ## Capture prerequisites
 
-- A deployed or locally running CompileCare.Web build with its exact commit SHA recorded.
-- A non-production OIDC authority/client configuration and a staging CompileCare.Api environment.
+- A deployed or locally running HeapCare.Web build with its exact commit SHA recorded.
+- A non-production OIDC authority/client configuration and a staging HeapCare.Api environment.
 - Synthetic tenant, hospital, department, staff and patient records. Do not use production patient information.
 - A browser capture environment that can complete the OIDC sign-in flow.
 
