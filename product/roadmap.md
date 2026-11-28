@@ -700,7 +700,7 @@ Exact checked-out commits recorded by the run:
 
 **Remaining acceptance gates:** manual authenticated role/workflow execution, UI visual review, keyboard-only and screen-reader review, contrast/zoom/reflow, Mac/Windows launcher acceptance, production ingress/TLS, provider-native PostgreSQL PITR/restore, signing-key rotation, clinical governance and pilot sign-off remain open. Hosted Linux CI is not a substitute for those activities.
 
-**Backlog reconciliation:** API issue #4 (obsolete roadmap tracker) and Site issue #2 (fake demo login on the informational site) are closed with rationale. Mobile issues #2/#3 remain blocked pending OTP service security/provider decisions and a consuming mobile application. Site issue #9 tracks the public-site deployment and remains blocked until the hosting provider/service, domain purchase and DNS authority are confirmed. No candidate domain (including the historical `compilecare.site` reference) is verified as owned or configured.
+**Backlog reconciliation:** API issue #4 (obsolete roadmap tracker) and Site issue #2 (fake demo login on the informational site) are closed with rationale. Mobile issues #2/#3 remain blocked pending OTP service security/provider decisions and a consuming mobile application. Site issue #9 tracks the public-site deployment and remains blocked until the hosting provider/service, domain purchase and DNS authority are confirmed. No legacy or candidate domain is verified as owned or configured.
 
 
 ## HeapCare brand migration — 2026-11-27
@@ -1057,3 +1057,29 @@ Local PR #37 merged as e0364bf081bc57c4a9ba2053d1dd36a30f33fbf4. Full-stack run 
 ### Owner-dependent policy boundary
 
 No-show action, grace period, cancellation reason taxonomy, scheduling role mapping, hospital check-in policy and retention still require pilot-hospital approval. The CI workflow uses synthetic users and appointments only; it does not authorize live clinical use.
+
+
+## Current HeapCare identity and phase checkpoint — 2026-11-28
+
+This section is the current status and supersedes any earlier 2026-11-27 migration sentences below or above it that describe the GitHub administrative rename as still pending.
+
+### Product and repository identity
+
+- The GitHub organization and all 11 repository slugs now use **HeapCare**. Application namespaces, project/folder paths and shared package identities are migrated in the repositories where implementation exists.
+- Current-use architecture, security, engineering, product and operational guides are being aligned to HeapCare paths and naming. Dated audit/QA records retain their original names where they are historical evidence.
+- The official support email, production website domain, DNS authority, TLS certificate and live hosting service are not verified. `heapcare.in` remains unpurchased/unconfigured; do not invent a support address or public URL.
+
+### Technical compatibility identifiers — intentionally retained
+
+- The local Keycloak realm/issuer path remains `compilecare`; local Web client `compilecare-web`, API audience `compilecare-api` and client scope `compilecare-api-audience` remain unchanged.
+- Legacy token claim keys remain `compilecare:tenant_id`, `compilecare:tenant_role`, `compilecare:permission` and `compilecare:validated_issuer`. The server-created membership identity type is now `HeapCareTenantMembership`.
+- The API prefers `ConnectionStrings:HeapCare` while retaining `ConnectionStrings:CompileCare` as a compatibility fallback. Local Docker Compose project and persisted Keycloak/PostgreSQL/observability volume names retain their existing identifiers.
+- These values are not public product branding. Do not rename them without an approved identity/data mapping, isolated rehearsal, backup/restore proof and reversible cutover. The exact local/CI values and safe migration sequence are documented in [the production cutover inventory](../operations/heapcare-production-cutover-inventory-2026-11-28.md).
+
+### Phase status and remaining owner gates
+
+- **Phase 3:** PostgreSQL/EF persistence, OIDC issuer/subject validation, tenant/organization RBAC, platform tenant lifecycle, membership administration, metadata-only audit foundations and controlled audit query/export are implemented. Production IdP/key custody, external user lifecycle, retention/deletion approvals, periodic access reviews, incident response, provider-native backup/PITR, restore objectives, and privacy/legal/security sign-off remain open. `HeapCare.OtpService` is still a scaffold and remains on security hold pending a fresh design/review and confirmation that the historical SMTP credential has been revoked/rotated by its owner.
+- **Phase 4:** the first integrated hospital workflows are implemented across facility hierarchy, patient registration/MRN/duplicate review, staff/provider profile and assignment foundations, appointments/availability, walk-ins/check-in/queue, OPD encounter/clinical note lifecycle and the initial billing/payment/receipt workflow. Broader inpatient, pharmacy, LIS/RIS/PACS, inventory, workforce/HR, patient portal and payer integrations remain deferred behind hospital policy and product decisions.
+- **Phase 5:** the authenticated workspace and core role workspaces are implemented. Local PR #39 merged as `28a2123c5f0dc9b25a8f1ead0c08cb59bb4d51f9`; exact-head run [#46086998413](https://github.com/HeapCare/HeapCare.Local/actions/runs/46086998413) passed both jobs and all 11 real-Keycloak browser tests, including the six role accessibility-baseline checks. Manual keyboard, screen-reader, focus/dialog, contrast and zoom/reflow evaluation remains Not Run; no WCAG conformance is claimed.
+- The same Local run verified an isolated PostgreSQL logical backup/restore with matching row counts across 26 application tables. It is not provider-native backup/PITR or a production DR drill. Production domain/ingress, signing-key custody, provider-native recovery, clinical governance and pilot approval remain independent release gates.
+
