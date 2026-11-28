@@ -184,15 +184,15 @@ Each increment should be a small vertical slice with tests and documentation upd
 These questions do not block an initial shell and API-backed patient lookup, but they must be resolved before exposing role-sensitive or clinical workflows to pilot users.
 
 
-## Implementation status — 2026-11-24
+## Initial implementation history — 2026-11-24
 
 The authenticated shell, tenant/hospital context and patient lookup are merged in `HeapCare.Web` PRs #1 and #2. Patient registration, duplicate-candidate review and hospital-local MRN assignment are merged in Web PR #3. Its paired documentation update is merged in `HeapCare.Doc` PR #30.
 
-The next implementation slice is being developed on `phase5/appointments-and-arrival` with the paired documentation branch `phase5/appointments-and-arrival-ux`. The web API client now consumes the existing department, availability-session, slot, appointment-booking, appointment-check-in, walk-in and department-queue contracts. The reception UI is being extended with selectable patient search results, guided appointment booking against server-published slots, a separate walk-in flow, returned queue-token confirmation and a department queue view. Department, hospital and tenant scoping remain explicit on every request; queue tokens and booking outcomes are server-owned.
+The next implementation slice on `phase5/appointments-and-arrival` was the historical plan on 2026-11-24. That work has since been implemented and merged: the workspace now consumes the department, availability-session, slot, appointment-booking, appointment-check-in, walk-in and department-queue contracts. It provides selectable patient results, server-published slot booking, a separate walk-in flow, queue-token confirmation and department queue visibility. Department, hospital and tenant scoping remain explicit on each request; queue tokens and booking outcomes remain server-owned.
 
 The UI implementation must follow the [HeapCare experience quality bar](../design/experience-quality-bar.md): calm clinical visual hierarchy, responsive desktop/tablet layouts, keyboard-complete selection, visible focus, status text, accessible async feedback and privacy-preserving data handling. This is an implementation standard, not a claim that the current increment has passed visual/accessibility review.
 
-The current increment is not yet merged. Required release gates are API contract tests, UI behavior tests, production TypeScript build, CI Docker build/container smoke test, and manual desktop/tablet/narrow viewport plus keyboard/accessibility review. No unsupported provider data, appointment lists, queue lifecycle actions or clinical workflows will be fabricated in the UI; missing capabilities will remain explicit follow-up work.
+The initial increment's merge gates are retained here as historical context. API contract tests, UI behavior tests, TypeScript production build, Docker/container smoke and automated browser journeys have since passed for the delivered slices. Manual visual, keyboard-only and assistive-technology acceptance remain separate outstanding product-review tasks.
 
 
 ## Queue operations UI increment — 2026-11-24
@@ -275,3 +275,19 @@ The component receives only the patients returned by the existing hospital-scope
 The sidebar and page heading may follow a location hash for convenient section navigation, but the hash is never trusted by itself. The client compares it with the set of modules exposed by the currently loaded API-derived tenant membership context. If the hash does not correspond to a module currently available to that membership, the visual active state falls back to the first available module (or no module when none is assigned). Switching tenant/hospital and receiving a different effective permission set must not leave a hidden module labelled as active.
 
 This is presentation state only. Hiding an item or rejecting a stale hash does not grant or enforce access; every API request continues to perform its own identity, tenant, hospital/department scope and permission validation.
+
+
+## Integrated workspace status — 2026-11-28
+
+The authenticated HeapCare.Web application now delivers the first integrated outpatient workspace rather than only the initial shell and patient-lookup increment.
+
+- **Reception and patient identity:** tenant/hospital context, patient search, registration, hospital-local MRN assignment and duplicate-candidate review.
+- **Appointments and arrival:** server-published availability, appointment booking, walk-in registration, check-in and queue-token confirmation.
+- **Queue operations:** department/date queue visibility and authorized call, recall, start, complete, cancel and no-show transitions, subject to the API's persisted-role and organization-scope checks.
+- **Clinical workspace:** queue-linked encounter creation/resume, patient-identity confirmation, draft clinical documentation, signing, closure and append-only amendment presentation.
+- **Initial billing:** visit-linked invoice, payment capture, receipt retrieval/recovery and daily collection visibility under separate billing permissions.
+- **Administration:** staff/provider operational profiles and effective-dated assignments, tenant membership administration, and a separate PlatformOperator tenant lifecycle workspace.
+
+The API remains authoritative for every permission and scope decision. UI gating is only a usability aid. Staff/provider designation is operational metadata only; it does not verify a professional credential, grant clinical privileges, or create an OIDC identity.
+
+The latest integrated Local acceptance is recorded in [Appointments and queue](appointments-and-queue.md) and [Phase 5 authenticated accessibility acceptance](../../qa/phase5-authenticated-accessibility-acceptance.md). Local PR #39's exact-head run #46086998413 passed the nine-service stack and 11 real-Keycloak browser tests, including the six authenticated role semantic-accessibility baseline checks. This automated result does not complete the manual keyboard, screen-reader, contrast, zoom/reflow or WCAG review.
