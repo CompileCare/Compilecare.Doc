@@ -171,15 +171,49 @@ These are synthetic isolated CI tests. They verify current implementation behavi
 - The Local real-OIDC test uses a dedicated synthetic CI patient and explicit placeholder note content in an ephemeral database only. It is not real patient data and does not approve clinical privilege or production use.
 
 
-## Permission catalogue implementation increment — 2026-11-28
+## Canonical catalogue and persisted RBAC implementation — 2026-11-28
 
-HeapCare.Api PR #155 introduces `TenantPermissionCatalog` in the Application layer as the canonical metadata source for the currently implemented permission codes and the five existing system-role baseline grants.
+**Review state:** The catalogue and persisted-RBAC implementation are available in open HeapCare.Api PRs #155 and #157. They have passed the current API CI, Docker and PostgreSQL migration checks, but are **not merged**. The current `main` branch remains the source of truth until the PRs merge in order.
 
-The catalogue adds:
-- Stable permission code references with module, resource, action, display name, description and a descriptive risk classification.
-- Explicit baseline definitions for HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar and ClinicalUser.
-- Metadata entries for the six existing IPD permission identifiers, all marked non-assignable and omitted from every system-role grant.
+### Canonical permission catalogue — PR #155
 
-The API's `TenantRolePermissions` class now delegates to this catalogue. The existing authorization behavior is intended to remain unchanged: persisted membership still selects one of the five existing roles, and effective access is still constrained by tenant, hospital and department scope.
+The Application-layer `TenantPermissionCatalog` defines the stable permission codes and their module, resource, action, display name, description and descriptive risk classification. Its system-role grant definitions preserve the exact baseline grants for:
 
-**This is not yet dynamic RBAC.** The catalogue and role grant definitions are currently code-managed. There is no tenant-custom role persistence, permission editing UI/API, multiple role assignment, per-permission scope assignment or administrator delegation. Adding or changing a permission definition still requires an API code change and deployment. These capabilities are planned as a separate persistence and administration increment and must not be inferred from PR #155.
+- `HospitalAdmin`
+- `FacilityManager`
+- `FacilityViewer`
+- `PatientRegistrar`
+- `ClinicalUser`
+
+All six existing IPD permissions are registered as non-assignable. No IPD role grant is introduced.
+
+### Persisted tenant role assignments — PR #157
+
+The proposed migration creates:
+
+- `tenant_roles`: tenant-owned system/custom role definitions, stable role codes, active/system status and permission revision.
+- `tenant_role_permissions`: tenant-owned role-to-permission assignments for code-owned permission identifiers.
+- `tenant_role_change_audits`: append-only actor-attributed role changes with reason and previous/new name, description and permission snapshots.
+
+The existing membership contract remains one role code per tenant membership. A composite foreign key links `tenant_memberships (TenantId, Role)` to `tenant_roles (TenantId, Code)`. The migration seeds the five system roles and backfills their exact existing grants for every tenant. Unknown legacy role codes are preserved as inactive, zero-permission roles; they are never mapped to a more privileged system role.
+
+### Effective permission resolution and administration
+
+The proposed runtime derives permission claims from the active persisted role and permission rows on each tenant-scoped request. Missing roles, inactive roles, empty grants, unknown permission identifiers and permissions invalid for the role type fail closed. Permission changes become effective on the next API request; neither token-supplied role/permission claims nor a process-local cache becomes the source of truth.
+
+Tenant-wide membership administrators can create, edit, deactivate and reactivate custom role definitions. Role-definition changes require Tenant scope because the role definition is shared by the entire customer Tenant. Hospital- and department-scoped administrators cannot change a Tenant-wide role definition.
+
+Custom role permissions must be a subset of the actor's own permissions. A separate protected permission, `membership.role.assign.system`, is held only by the immutable `HospitalAdmin` system role. It allows assignment of the five platform-approved system roles for compatibility with the existing membership workflow, but is itself non-assignable and cannot be delegated through a custom role. It is not available in the custom-role permission catalogue.
+
+System roles cannot be edited, demoted or deactivated. Role rows cannot be physically deleted. Custom roles cannot be deactivated while active memberships still reference them. Role edits are serialized against membership role assignment; role-change history records actor, reason and before/after configuration and is protected against update/delete/truncate in PostgreSQL.
+
+### Explicit limits
+
+- A membership still has one role assignment. Multiple roles per membership are not implemented; a permission union across unrelated scopes is intentionally avoided.
+- User-specific permission overrides are not implemented.
+- Permission identifiers and metadata remain code-owned. Administrators can configure which known permissions a custom role receives without redeployment, but adding a new permission identifier still requires an API code change and release.
+- Professional credentials and clinical privileges (licensure, specialty, prescribing/signing eligibility) remain separate from application RBAC.
+- IPD permissions remain non-assignable and ungranted pending the separate IPD role/workflow approval.
+- PlatformOperator remains a separate global identity; it receives no implicit tenant clinical access.
+
+**Current branch caution:** until PR #155 merges, PR #157 merges after it, and the dependent Web PR #102 is accepted, the persisted role-management experience is not available from `main`.
