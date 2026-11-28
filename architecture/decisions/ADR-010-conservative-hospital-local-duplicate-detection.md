@@ -75,7 +75,7 @@ The initial check uses existing patient and hospital-registration fields; it int
 
 ## Implementation status — 2026-11-24
 
-The endpoint was merged in CompileCare.Api PR #16 as commit `41b459975b0e64198ad0fb251f1d43ad3e0bfe0f`. The final API PR head passed Docker Compose verification with 3 unit tests and 55 PostgreSQL integration tests (zero failures), standard CI, and the EF Core model-drift check. No migration was required.
+The endpoint was merged in HeapCare.Api PR #16 as commit `41b459975b0e64198ad0fb251f1d43ad3e0bfe0f`. The final API PR head passed Docker Compose verification with 3 unit tests and 55 PostgreSQL integration tests (zero failures), standard CI, and the EF Core model-drift check. No migration was required.
 
 ## Consequences and deferred work
 
