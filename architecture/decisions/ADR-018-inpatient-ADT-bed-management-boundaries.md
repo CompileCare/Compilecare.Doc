@@ -7,7 +7,7 @@
 
 ## Context
 
-The current platform has a tenant-scoped Hospital → Department → Ward → Room → Bed hierarchy, hospital patient registrations, staff assignments, OPD encounters and audited role-scoped APIs. It does not yet provide an inpatient admission or bed-occupancy workflow.
+The current platform has a tenant-scoped Hospital → Department → Ward → Room → Bed hierarchy, hospital patient registrations, staff assignments, OPD encounters and audited role-scoped APIs. The first IPD technical increments now provide admission and bed-placement persistence, dedicated permission contracts, admission read/bed assignment/transfer services, guarded admission creation and selected IPD HTTP routes. The complete ADT workflow, hospital-approved role mapping and Local real-Keycloak/Web acceptance remain incomplete.
 
 The first inpatient increment must establish a reliable administrative ADT foundation without inventing nursing or clinical policies.
 
@@ -69,6 +69,21 @@ All reads and writes must preserve active Tenant membership, facility/department
 - Fresh database migration, upgrade migration and idempotent migration-script verification pass.
 - Unit tests, API authorization tests, audit verification and Local real-Keycloak integration run before merge.
 - Web workflows are added only after API contracts and permissions are accepted.
+
+## Implementation status — 2026-11-28
+
+Merged technical implementation on `HeapCare.Api/main`:
+
+- PR #134: admission and bed-placement persistence, same-hospital registration relationship, composite facility constraints and PostgreSQL filtered unique indexes.
+- PR #135: append-only retention guards and dedicated IPD permission/DTO contracts. No existing role receives an IPD permission.
+- PR #136: Application/Infrastructure service for reading admissions, assigning a first bed and transferring within the same Hospital, including department scope and concurrency handling.
+- PR #137: admission read, assignment and transfer HTTP routes behind dedicated IPD permissions; existing roles and PlatformOperator remain denied.
+- PR #138: PostgreSQL audit-attribution regression for denied IPD admission reads.
+- PR #139: guarded admission creation for an existing patient registration at the exact selected Hospital. Admission requires Tenant-wide or Hospital-wide scope, creates an Active episode with server-generated UTC timestamp and no bed placement, and returns conflict for duplicate/concurrent active admissions.
+
+PR #139 validation passed on exact head: Release build, EF model-drift guard, 12 unit tests, 240 PostgreSQL integration tests, PostgreSQL migration rehearsal and Docker Integration Verification.
+
+This is not full IPD workflow completion. Cancellation/discharge services and routes, approved role grants, admission mandatory data/reason policy, confirmed admission/bed sequencing, real-Keycloak Local replay and the Web workspace remain outstanding. No production role mapping is inferred from these technical contracts.
 
 ## Open policy questions
 
