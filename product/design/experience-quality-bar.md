@@ -1,4 +1,4 @@
-# CompileCare Web — experience quality bar
+# HeapCare Web — experience quality bar
 
 **Status:** Implementation standard for Phase 5 authenticated workflows  
 **Applies to:** Reception, appointments, arrival, queue operations and clinical workspace
