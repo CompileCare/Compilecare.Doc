@@ -28,6 +28,7 @@ The Web repository currently has an automated e2e/accessibility.spec.ts suite co
 - Public controls and form fields expose accessible names/labels.
 - Images declare alternative text.
 - Reduced-motion preference suppresses nonessential transitions.
+- Forced-colors mode preserves visible keyboard focus, verified by Playwright media emulation (Web PR #96).
 - The public workspace has no horizontal overflow at 768px, 375px and 320px.
 
 The Web CI workflow runs Vitest, TypeScript/production build, Chromium E2E, a production Nginx Docker smoke, and the browser suite against the container with the enforced Content Security Policy. The roadmap also records merged keyboard-focused workflow coverage across Reception, clinical encounter entry, billing, appointments, queue and patient registration (Web PRs #20–#26; hosted runs #214, #218, #246, #247, #234, #254 and #257).
@@ -76,6 +77,7 @@ The Web CI workflow runs Vitest, TypeScript/production build, Chromium E2E, a pr
 - [ ] Check text, control, focus and status contrast against WCAG 2.2 AA target ratios.
 - [ ] Confirm text zoom/reflow at 200% and 400% where supported without loss of workflow or content.
 - [ ] Verify reduced-motion preference across navigation, status transitions and dialogs.
+- [ ] Verify native Windows High Contrast / forced-colors behavior across authenticated role workflows; Playwright media emulation does not replace this manual check.
 - [ ] Confirm sticky shell/navigation does not cover focused controls or active content.
 
 ### Assistive technology
@@ -87,7 +89,8 @@ The Web CI workflow runs Vitest, TypeScript/production build, Chromium E2E, a pr
 
 | Evidence item | Status | Notes |
 |---|---|---|
-| Public workspace automated accessibility tests | Existing CI baseline | Implemented in e2e/accessibility.spec.ts; not an authenticated workflow audit |
+| Public workspace automated accessibility tests | Existing CI baseline | Includes skip link, landmarks, labels, alternative text, reduced motion, forced-colors emulation and responsive overflow; not an authenticated workflow audit |
+| Forced-colors keyboard focus emulation | Passed in Web CI | Web PR #96 merged as `7611875b18afb81d90e64c34d454e41c4a3bd2fa`; run [#46092732937](https://github.com/HeapCare/HeapCare.Web/actions/runs/46092732937); native Windows High Contrast review remains Not Run |
 | Feature keyboard browser coverage | Existing CI baseline | Merged Web PRs #20–#26; hosted Chromium coverage |
 | Authenticated role matrix execution | Not Run | Requires local Keycloak/API/PostgreSQL stack and synthetic role memberships |
 | Desktop/tablet/mobile authenticated screenshots | Not Run | Capture only after local authentication with synthetic data |
