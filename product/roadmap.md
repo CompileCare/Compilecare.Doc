@@ -1205,3 +1205,14 @@ These increments strengthen the existing Tenant-versus-Hospital boundary and met
 **Scope boundary:** PRs #147–#149 are test-only and make no runtime, schema, migration, policy or permission changes. The Local full-stack run checked out API main at PR #146 (`39c40bb7`); subsequent API PRs #147–#149 add tests only. The Local evidence proves negative authorization and Linux CI/browser coverage, not positive IPD workflow, manual accessibility certification, production recovery or clinical approval.
 
 **Still gated:** hospital-approved six-role positive permissions and scopes; admission-before-bed sequencing and mandatory fields/reason catalogue; cancellation/discharge eligibility and reasons; bed reservation/readiness policy; successful real-Keycloak HTTP workflow and Web IPD workspace; manual Windows/macOS/Ubuntu assistive-technology accessibility acceptance. All six IPD permission identifiers remain ungranted.
+
+### IPD audit-failure rollback verification — merged 2026-11-28
+
+HeapCare.Api PR #150 merged as `4b07eb11c5063288751e1e8a507ce9dc31aafda3`. PostgreSQL failure-injection integration tests exercise the real metadata-only `AuditEventMiddleware` + InpatientService transaction:
+- A successful first-bed assignment followed by an audit-event insert failure returns 503 and leaves no placement or audit event.
+- A successful same-Hospital transfer followed by an audit-event insert failure returns 503 and rolls back both the previous-placement closure and new-placement creation, preserving the original active placement/history.
+- The synthetic PostgreSQL trigger/function are removed in `finally`.
+
+Exact-head checks passed Release build, EF model-drift guard, 12/12 unit tests, 257/257 PostgreSQL integration tests, Docker Integration Verification and the additional build/test workflow. The only database error logs are the two expected synthetic failure injections.
+
+This verifies IPD bed-operation audit transaction failure handling, complementing API PR #148 success-path audit verification and #138/#146 denied-path audit verification. No runtime, schema, migration, role-grant or hospital-policy change was made. All six IPD permission identifiers remain ungranted.
