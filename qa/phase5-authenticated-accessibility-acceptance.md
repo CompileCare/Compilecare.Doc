@@ -92,7 +92,7 @@ The Web CI workflow runs Vitest, TypeScript/production build, Chromium E2E, a pr
 | Public workspace automated accessibility tests | Existing CI baseline | Includes skip link, landmarks, labels, alternative text, reduced motion, forced-colors emulation and responsive overflow; not an authenticated workflow audit |
 | Forced-colors keyboard focus emulation | Passed in Web CI | Web PR #96 merged as `7611875b18afb81d90e64c34d454e41c4a3bd2fa`; run [#46092732937](https://github.com/HeapCare/HeapCare.Web/actions/runs/46092732937); native Windows High Contrast review remains Not Run |
 | Feature keyboard browser coverage | Existing CI baseline | Merged Web PRs #20–#26; hosted Chromium coverage |
-| Authenticated role matrix execution | Not Run | Requires local Keycloak/API/PostgreSQL stack and synthetic role memberships |
+| Authenticated role matrix — automated baseline | Passed in hosted CI; manual review Not Run | Local #42 run #46095042936 executed all six persisted identities with real Keycloak OIDC; keyboard-only task completion, screen readers, dialogs, contrast and zoom/reflow remain manual |
 | Desktop/tablet/mobile authenticated screenshots | Not Run | Capture only after local authentication with synthetic data |
 | Screen-reader review | Not Run | Requires a real desktop assistive-technology environment |
 | Contrast and zoom/reflow review | Not Run | Manual visual verification required |
@@ -190,3 +190,23 @@ The real-Keycloak Authorization Code + PKCE browser suite completed **11/11 test
 This integrated CI run includes the Web #92 locator initialization fix and Web #94 ARIA IDREF whitespace-tokenization fix. It is evidence for automated role/workspace and semantic checks only. The manual checklist below remains **Not Run**: keyboard-only completion across all six role workflows, dialog/focus behavior with assistive technology, real screen-reader testing, contrast measurements, 200%/400% zoom and reflow, desktop/tablet evidence, and qualified WCAG 2.2 AA evaluation. No WCAG conformance or production/pilot approval is claimed.
 
 The PostgreSQL exercise is a disposable logical dump/restore smoke test, not provider-native backup/PITR, off-site recovery, or a production disaster-recovery drill.
+
+
+## Latest integrated real-Keycloak accessibility and workflow replay — 2026-11-28
+
+HeapCare.Local PR #42 merged as `a48723643762a56c2ca5cf3a4fa7f6693d70e72c`. The exact-head PR workflow [#46095042936](https://github.com/HeapCare/HeapCare.Local/actions/runs/46095042936) completed **successfully**, with both jobs green: the full nine-service Docker/telemetry verification and the Local tooling/observability validation job.
+
+Exact source trees used by the full-stack job:
+- Local PR merge ref tree: `0fe5c72dd36d23aaa48927ef1335762c2e3b3604` (PR head `bcd7259465cf168e2e1fcf042aaf01349ccb4e5a`; the PR was merged after this run as `a48723643762a56c2ca5cf3a4fa7f6693d70e72c`).
+- HeapCare.Api main: `f2121a4062afb06b69d1be4c8b1d7640cca55fbc`.
+- HeapCare.Web main: `9dff5b506eef0de2955c6a27d70f4b30838686b0`.
+- HeapCare.Observability main: `84bc2ec84de9a1378ac376491d6f6e38dfdcabb6`.
+
+Automated results:
+- Nine-service Compose stack started and completed its API/telemetry verification; the tooling job passed Keycloak realm-import smoke, Compose validation, OTel Collector configuration and the Docker observability pipeline smoke.
+- Real Keycloak-issued identities and PostgreSQL-persisted tenant/membership workflows passed.
+- PostgreSQL logical backup was restored into a separate empty database; all **26 application tables** had matching source/restore row counts. This remains a disposable logical backup/restore smoke test, not provider-native PITR, off-site recovery or a production DR rehearsal.
+- The real Authorization Code + PKCE browser suite completed **11/11 tests**. The six authenticated workspace accessibility-baseline tests passed for HospitalAdmin, FacilityManager, FacilityViewer, PatientRegistrar, ClinicalUser and PlatformOperator. Each role is checked with forced-colors media emulation and visible skip-link focus styling after real OIDC sign-in. The additional tests exercised the existing tenant workspace, reception registration/search, appointment booking/check-in, queue, synthetic clinical encounter and billing/receipt paths, plus the persisted PlatformOperator control plane.
+- CI-only secrets, browser identity artifacts, containers, volumes and network were removed by the successful teardown step.
+
+**Manual boundary remains unchanged:** native Windows High Contrast, keyboard-only completion of the full six-role workflows, screen-reader evaluation, dialog/focus review with assistive technology, real contrast measurements, desktop/tablet acceptance, 200%/400% zoom and reflow, and qualified WCAG 2.2 AA evaluation remain **Not Run**. No WCAG conformance, production readiness or pilot approval is claimed.
