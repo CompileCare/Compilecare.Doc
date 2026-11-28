@@ -114,6 +114,13 @@ Medication reconciliation, prescriptions, MAR, nursing notes, vitals/observation
 
 These are automated isolation, concurrency and negative-authorization proofs. They do not approve positive IPD role grants, admission/bed sequencing, cancellation/discharge or any broader clinical workflow.
 
+## Occupied-bed conflict and denied bed-operation audit — merged 2026-11-28
+
+- **Occupied-bed transfer rejection:** API PR #145 assigns two synthetic active admissions to different beds, then attempts to transfer one admission into the other's occupied bed. The service returns 409 and the test verifies both original placements remain active and unchanged. Merged as `b7663ee29f231c55f4775b7a473af71eb05bc80b`.
+- **Denied bed-operation audit:** API PR #146 calls bed assignment and bed transfer with a persisted FacilityViewer membership that has no IPD permission. Both requests return 403; PostgreSQL audit records retain the validated tenant, issuer/subject, admission resource ID, endpoint/action, route, denied outcome/status and correlation ID. No bed placement is created. Merged as `39c40bb7ccdb899b23684b18595293c331a79078`.
+- **Validation:** both PRs passed 12/12 unit and 249/249 PostgreSQL integration tests, Release build, EF model-drift guard, migration rehearsal and Docker Integration Verification.
+- **Scope:** these are test-only safety/audit proofs. They do not grant IPD permissions or decide bed readiness, cancellation/discharge or positive clinical workflows.
+
 ## Validation checklist
 
 - [x] Admission service only accepts a patient registered at the selected Hospital (API PR #139; authorization remains permission-gated).
@@ -122,16 +129,17 @@ These are automated isolation, concurrency and negative-authorization proofs. Th
 - [x] Hospital-scoped admission-list reads cannot access a sibling Hospital under the same Tenant; sibling requests return a non-disclosing 404 (API PR #141; PostgreSQL integration test).
 - [x] Hospital-scoped admission list supports pagination and department visibility by current placement; out-of-scope placement history is omitted (API PR #140; route remains permission-gated).
 - [x] Current tenant roles and platform-only PlatformOperator are denied all IPD HTTP routes with real Keycloak-issued tokens; API and Local tests preserve the fail-closed default (API PR #137; Local PR #46).
-- [ ] An inactive or occupied bed cannot receive a new active placement.
+- [x] An inactive or occupied bed cannot receive a new active placement (API PR #136 inactive-bed test; API PR #145 occupied-bed transfer conflict and unchanged-placement test).
 - [x] Concurrent attempts to occupy one bed produce one winner and safe conflicts for others (API PR #136 PostgreSQL service tests).
 - [x] Transfer closes the old placement and opens the new placement atomically (API PR #136 PostgreSQL service tests).
 - [x] Concurrent transfers cannot leave two current placements for one admission; one succeeds and one conflicts (API PR #144).
 - [ ] Cancellation and discharge enforce allowed lifecycle transitions.
 - [ ] Discharge releases the bed and preserves historical placement data.
 - [x] Denied admission reads preserve validated tenant/actor attribution in metadata-only audit records (API PR #138).
+- [x] Denied bed assignment and transfer requests preserve validated tenant/actor, admission resource, route/action and correlation in metadata-only audit (API PR #146).
 - [x] Successful admission creation records the created Admission ID rather than its parent Hospital ID as the audit resource (API PR #142).
 - [ ] Audit records for all remaining IPD reads/mutations are verified for validated actor attribution without patient/clinical content.
-- [x] PostgreSQL migration rehearsal passes on merged API increments, and Local real-Keycloak full-stack negative authorization verification passes (API PRs #139–#144; Local PR #46).
+- [x] PostgreSQL migration rehearsal passes on merged API increments, and Local real-Keycloak full-stack negative authorization verification passes (API PRs #139–#146; Local PR #46).
 
 ## Open policy decisions
 
