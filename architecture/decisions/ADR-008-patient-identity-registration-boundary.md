@@ -7,7 +7,7 @@
 
 ## Context
 
-CompileCare must support a patient visiting multiple hospitals within one customer tenant without duplicating the patient master, while preserving hospital-level access controls. Patient identity must remain separate from appointments, encounters, billing and other clinical/business activity.
+HeapCare must support a patient visiting multiple hospitals within one customer tenant without duplicating the patient master, while preserving hospital-level access controls. Patient identity must remain separate from appointments, encounters, billing and other clinical/business activity.
 
 The product direction below is accepted for architecture and implementation. It does not replace hospital-specific operational approval or qualified legal/privacy review. In particular, retention schedules, consent purposes, ABDM exchange and hospital-required demographics must be configured and reviewed for each applicable deployment.
 
@@ -131,7 +131,7 @@ Before a pilot is enabled, each hospital must approve its MRN format/sequence an
 
 ### Patient master and hospital registration — merged
 
-The foundational API slice was merged into `CompileCare.Api` through PR #14. The separate patient-master boundary is intentionally narrower than this full ADR:
+The foundational API slice was merged into `HeapCare.Api` through PR #14. The separate patient-master boundary is intentionally narrower than this full ADR:
 
 - `Patient` is a tenant-owned master with an internal GUID, given name, optional middle/family name and optional date of birth.
 - `HospitalPatientRegistration` associates the master with a hospital using tenant-composite foreign keys. The database enforces one registration per patient per hospital.
@@ -143,7 +143,7 @@ The patient master migration `20261124143001_AddPatientMasterRegistration` is pa
 
 ### Hospital MRN and patient identifiers — merged
 
-Hospital MRN policy and assignment were delivered separately in `CompileCare.Api` PR #15 and follow ADR-009:
+Hospital MRN policy and assignment were delivered separately in `HeapCare.Api` PR #15 and follow ADR-009:
 
 - `PatientIdentifier` is a separate tenant-owned entity tied through a tenant + hospital + patient composite foreign key to an existing `HospitalPatientRegistration`. The immutable Patient GUID remains the primary identity.
 - Each hospital may create one MRN policy with an approved prefix and numeric padding width. No global prefix or implicit policy is assumed; replacement/reset is not available in this initial increment.
@@ -156,11 +156,11 @@ The generated EF migration 20261124143002_AddPatientIdentifierManagement is part
 
 ### Duplicate candidate detection — initial increment merged
 
-The conservative first-pass matching contract is recorded in [ADR-010](ADR-010-conservative-hospital-local-duplicate-detection.md). The read-only, hospital-local API is merged in CompileCare.Api PR #16 as commit 41b459975b0e64198ad0fb251f1d43ad3e0bfe0f. On the final PR head, Docker Compose verification passed 3 unit tests and 55 PostgreSQL integration tests with zero failures; standard CI and the EF Core model-drift check also passed. The endpoint requires the dedicated patient.duplicate.review permission and hospital-wide scope. It requires exact given name plus exact DOB, returns at most 20 minimal candidates, and never links, blocks or merges records.
+The conservative first-pass matching contract is recorded in [ADR-010](ADR-010-conservative-hospital-local-duplicate-detection.md). The read-only, hospital-local API is merged in HeapCare.Api PR #16 as commit 41b459975b0e64198ad0fb251f1d43ad3e0bfe0f. On the final PR head, Docker Compose verification passed 3 unit tests and 55 PostgreSQL integration tests with zero failures; standard CI and the EF Core model-drift check also passed. The endpoint requires the dedicated patient.duplicate.review permission and hospital-wide scope. It requires exact given name plus exact DOB, returns at most 20 minimal candidates, and never links, blocks or merges records.
 
 ### Normalized multi-signal duplicate matching — merged
 
-The normalized matching implementation was delivered in CompileCare.Api PR #17 and squash-merged to main as commit c603dc602565b69f25b24b4738e45f24c4090362. It persists versioned normalized name search keys, requires exact DOB and returns candidates when normalized given name matches or both normalized middle and family names match. The post-merge main build, EF model-drift check, 12 unit tests and 58 PostgreSQL integration tests passed. The endpoint remains hospital-local, advisory and non-linking.
+The normalized matching implementation was delivered in HeapCare.Api PR #17 and squash-merged to main as commit c603dc602565b69f25b24b4738e45f24c4090362. It persists versioned normalized name search keys, requires exact DOB and returns candidates when normalized given name matches or both normalized middle and family names match. The post-merge main build, EF model-drift check, 12 unit tests and 58 PostgreSQL integration tests passed. The endpoint remains hospital-local, advisory and non-linking.
 
 ### Explicitly deferred
 
