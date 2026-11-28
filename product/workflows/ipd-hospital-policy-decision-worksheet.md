@@ -2,7 +2,7 @@
 
 **Status:** Draft for hospital/operations review — not an approved clinical or operational policy.  
 **Date:** 2026-11-28  
-**Related:** HeapCare.Doc issue #200; [ADR-018: Inpatient ADT and Bed-Management Boundaries](../../architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md); [IPD workflow](inpatient-admission-transfer-discharge-and-bed-management.md); [facility-site model proposal](../../architecture/decisions/ADR-019-facility-site-model-proposal.md).
+**Related:** HeapCare.Doc issue #200; [ADR-018: Inpatient ADT and Bed-Management Boundaries](../../architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md); [IPD workflow](inpatient-admission-transfer-discharge-and-bed-management.md); [facility-site model proposal](../../architecture/decisions/ADR-019-facility-site-model-and-scope-inheritance.md).
 
 ## Purpose and approval boundary
 
